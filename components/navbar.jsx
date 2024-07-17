@@ -119,13 +119,13 @@ const CanvasserNavbar = () => {
                 >
                     <ul className='font-medium flex items-center flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white'>
                         <li>
-                            <a
-                                href='#'
+                            <Link
+                                href='/book-lead'
                                 className='block py-2 px-3 text-white bg-primary rounded md:bg-transparent md:text-primary md:p-0'
                                 aria-current='page'
                             >
                                 Book a lead
-                            </a>
+                            </Link>
                         </li>
                         <li>
                             <a

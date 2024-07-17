@@ -84,9 +84,10 @@ model Lead {
   phone2          String?
   email           String?
   address         String
-  quadrant        String
+  postalCode      String
+  images          String[]
   addressNotes    String?
-  appointmentDate DateTime
+  appointmentDateTime String
   homeOwnerType   HomeOwnerType
   age             AgeRange
   concerns        String[]
@@ -99,6 +100,11 @@ model Lead {
   salesRep        String?       @db.ObjectId
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+}
+
+model Timings {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  time            String
 }
 
 enum UserRole {

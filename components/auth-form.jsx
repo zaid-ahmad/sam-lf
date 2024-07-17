@@ -25,27 +25,7 @@ import resendLogin from "@/server/actions/resend-login";
 import { useEffect, useState } from "react";
 import Spinner from "./spinner";
 import { useToast } from "@/components/ui/use-toast";
-
-const loginSchema = z.object({
-    email: z.string().email({ message: "Invalid email address." }),
-});
-
-const registerSchema = z.object({
-    email: z.string().email({ message: "Invalid email address." }),
-    firstName: z
-        .string()
-        .min(2, { message: "First name must be at least 2 characters." }),
-    lastName: z
-        .string()
-        .min(2, { message: "Last name must be at least 2 characters." }),
-    branchCode: z
-        .string()
-        .length(5, { message: "Branch code must be 5 characters." })
-        .toUpperCase(),
-    role: z.enum(["CANVASSER", "SALES_REP"], {
-        required_error: "Please select a role.",
-    }),
-});
+import { loginSchema, registerSchema } from "@/lib/validations/schema";
 
 function AuthForm() {
     const [formError, setFormError] = useState("");
@@ -267,6 +247,7 @@ function AuthForm() {
                         className={`w-full mt-3 ${
                             isLoading ? "cursor-not-allowed opacity-80" : ""
                         }`}
+                        disabled={isLoading}
                     >
                         {isLoading ? (
                             <div className='flex items-center justify-center'>
