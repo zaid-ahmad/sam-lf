@@ -6,7 +6,6 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-    VisibilityState,
 } from "@tanstack/react-table";
 
 import {
@@ -29,27 +28,46 @@ import {
 import { useState } from "react";
 import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
 
-export function DataTable({ initialColumns, initialData }) {
+export function DataTable({
+    initialColumns,
+    initialData,
+    saleReps,
+    assignLeadToSalesRep,
+}) {
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [data, setData] = useState(initialData);
     const [columnVisibility, setColumnVisibility] = useState({});
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
     const [selectedLeadId, setSelectedLeadId] = useState(null);
+    const [leadDetails, setLeadDetails] = useState(null);
 
-    const handleAssignSalesRep = (leadId) => {
-        setSelectedLeadId(leadId);
+    const handleAssignSalesRep = (lead) => {
+        setSelectedLeadId(lead.id);
+        setLeadDetails(lead);
         setIsAssignDialogOpen(true);
     };
 
     const handleAssignComplete = async (leadId, salesRepId) => {
-        // Here you would typically make an API call to update the lead
-        // For now, we'll just update the local state
+        const updatedData = await assignLeadToSalesRep(leadId, salesRepId);
         setData(
             data.map((lead) =>
-                lead.id === leadId ? { ...lead, salesRep: salesRepId } : lead
+                lead.id === leadId
+                    ? {
+                          ...lead,
+                          salesRep:
+                              updatedData.salesRep.firstName +
+                              " " +
+                              updatedData.salesRep.lastName,
+
+                          status: updatedData.status,
+                      }
+                    : lead
             )
         );
+        setIsAssignDialogOpen(false);
+        setSelectedLeadId(null);
+        setLeadDetails(null);
     };
 
     const columns = initialColumns.map((col) => {
@@ -92,7 +110,7 @@ export function DataTable({ initialColumns, initialData }) {
                     className='max-w-sm'
                 />
             </div> */}
-            <DropdownMenu>
+            {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant='outline' className='ml-auto my-5'>
                         Show/Hide Columns
@@ -117,8 +135,8 @@ export function DataTable({ initialColumns, initialData }) {
                             );
                         })}
                 </DropdownMenuContent>
-            </DropdownMenu>
-            <div className='rounded-md border'>
+            </DropdownMenu> */}
+            <div className='rounded-md border my-7'>
                 <Table className='bg-white rounded-lg'>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -175,6 +193,8 @@ export function DataTable({ initialColumns, initialData }) {
                     onClose={() => setIsAssignDialogOpen(false)}
                     leadId={selectedLeadId}
                     onAssign={handleAssignComplete}
+                    saleReps={saleReps}
+                    leadDetails={leadDetails}
                 />
                 <div className='flex items-center justify-end space-x-2 py-4'>
                     <Button

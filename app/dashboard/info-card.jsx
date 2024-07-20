@@ -1,26 +1,33 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 
-const colors = {
-    blue: "bg-blue-100 text-blue-800",
-    yellow: "bg-yellow-100 text-yellow-800",
-    orange: "bg-orange-100 text-orange-800",
-    purple: "bg-purple-100 text-purple-800",
-    red: "bg-red-100 text-red-800",
-    green: "bg-green-100 text-green-800",
-};
-
-const InfoCard = ({ title, value, Icon, color }) => {
+const InfoCard = ({ title, value }) => {
     return (
-        <Card
-            className={`text-center ${colors[color]} shadow-md hover:shadow-lg transition-shadow duration-300`}
-        >
+        <Card className={`text-center `}>
             <CardHeader className='pb-2'>
-                <CardTitle className='text-lg font-semibold'>{title}</CardTitle>
+                <CardTitle className='text-lg'>{title}</CardTitle>
+                <CardDescription>
+                    {title === "Leads so far for today"
+                        ? "July 19, 2024"
+                        : "Slots Filled"}
+                </CardDescription>
             </CardHeader>
             <CardContent>
-                {Icon && <LucideIcon className='mx-auto mb-2 h-8 w-8' />}
-                <p className='text-4xl font-bold'>{value}</p>
+                <p className='text-3xl font-bold'>
+                    {title === "Leads so far for today" ? (
+                        `${value}`
+                    ) : (
+                        <>
+                            {value}{" "}
+                            <span className='text-sm text-zinc-700'>/20</span>
+                        </>
+                    )}
+                </p>
             </CardContent>
         </Card>
     );

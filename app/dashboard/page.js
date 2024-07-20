@@ -11,6 +11,8 @@ import {
     CheckCircle2,
 } from "lucide-react";
 import prisma from "@/lib/prisma";
+import { getSalesRepresentatives } from "@/lib/data";
+import { assignLeadToSalesRep } from "@/server/actions/assign-to-sales-rep";
 
 async function getData(session) {
     const user = await prisma.user.findUnique({
@@ -74,50 +76,27 @@ const Dashboard = async () => {
 
     const data = await getData(session);
 
+    const sale_reps = await getSalesRepresentatives();
+
     return (
         <div className='container mx-auto py-10'>
             <h2 className='text-2xl font-semibold mb-7'>
                 Hello {extractFirstName(session.user.email)}!
             </h2>
             <div className='flex items-center gap-7'>
-                <InfoCard
-                    title='Leads for Today'
-                    value='30'
-                    icon={Users}
-                    color='blue'
-                />
-                <InfoCard
-                    title='Unassigned'
-                    value='10'
-                    icon={UserPlus}
-                    color='yellow'
-                />
-                <InfoCard
-                    title='Assigned'
-                    value='20'
-                    icon={UserCheck}
-                    color='orange'
-                />
-                <InfoCard
-                    title='Demo Leads'
-                    value='10'
-                    icon={Clock}
-                    color='purple'
-                />
-                <InfoCard
-                    title='Dead Leads'
-                    value='0'
-                    icon={UserMinus}
-                    color='red'
-                />
-                <InfoCard
-                    title='Sold'
-                    value='15'
-                    icon={CheckCircle2}
-                    color='green'
-                />
+                <InfoCard title='Leads so far for today' value='24' />
+                <InfoCard title='11 AM' value='1' />
+                <InfoCard title='1 PM' value='0' />
+                <InfoCard title='3 PM' value='5' />
+                <InfoCard title='5 PM' value='8' />
+                <InfoCard title='7 PM' value='10' />
             </div>
-            <DataTable intialColumns={columns} initialData={data} />
+            <DataTable
+                initialColumns={columns}
+                initialData={data}
+                saleReps={sale_reps}
+                assignLeadToSalesRep={assignLeadToSalesRep}
+            />
         </div>
     );
 };

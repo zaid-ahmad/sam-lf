@@ -19,20 +19,15 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-export function AssignSalesRepDialog({ isOpen, onClose, leadId, onAssign }) {
-    const [salesReps, setSalesReps] = useState([]);
+export function AssignSalesRepDialog({
+    saleReps,
+    isOpen,
+    onClose,
+    leadId,
+    onAssign,
+    leadDetails,
+}) {
     const [selectedRep, setSelectedRep] = useState("");
-
-    useEffect(() => {
-        async function fetchSalesReps() {
-            const response = await fetch("/api/salesReps");
-            const data = await response.json();
-            setSalesReps(data);
-        }
-        if (isOpen) {
-            fetchSalesReps();
-        }
-    }, [isOpen]);
 
     const handleAssign = () => {
         onAssign(leadId, selectedRep);
@@ -49,13 +44,38 @@ export function AssignSalesRepDialog({ isOpen, onClose, leadId, onAssign }) {
                         selecting their name from the dropdown menu.
                     </DialogDescription>
                 </DialogHeader>
+
+                {leadDetails && (
+                    <div className='my-3'>
+                        <h3 className='font-semibold text-sm mb-2'>
+                            Appointment Details
+                        </h3>
+                        <div className='p-3 bg-zinc-50 rounded-lg text-xs grid grid-cols-2'>
+                            <div className='flex flex-col gap-3'>
+                                <span>Appointment Date:</span>
+                                <span>Address:</span>
+                                <span>Quadrant:</span>
+                                <span>Homeowner Type:</span>
+                                <span>Canvasser:</span>
+                            </div>
+                            <div className='flex flex-col gap-3'>
+                                <span>{leadDetails.appointmentDateTime}</span>
+                                <span>{leadDetails.address}</span>
+                                <span>{leadDetails.quadrant}</span>
+                                <span>{leadDetails.homeOwnerType}</span>
+                                <span>{leadDetails.canvasser}</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <Select onValueChange={setSelectedRep} value={selectedRep}>
                     <SelectTrigger>
                         <SelectValue placeholder='Select a sales rep' />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            {salesReps.map((rep) => (
+                            {saleReps.map((rep) => (
                                 <SelectItem
                                     key={rep.id}
                                     value={rep.id.toString()}

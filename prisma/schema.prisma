@@ -129,6 +129,7 @@ enum UserRole {
 
 enum LeadStatus {
   APPOINTMENT
+  ASSIGNED
   DEAD
   DEMO
   SALE

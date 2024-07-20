@@ -15,7 +15,19 @@ import { Badge } from "@/components/ui/badge";
 export const columns = [
     {
         accessorKey: "status",
-        header: "Status",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant='ghost'
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === "asc")
+                    }
+                >
+                    Status
+                    <ArrowUpDown className='ml-2 h-4 w-4' />
+                </Button>
+            );
+        },
         cell: ({ row }) => {
             const status = row.getValue("status") || "UNASSIGNED";
 
@@ -38,6 +50,19 @@ export const columns = [
                 </Badge>
             );
         },
+        sortingFn: (rowA, rowB, columnId) => {
+            const statusOrder = [
+                "APPOINTMENT",
+                "ASSIGNED",
+                "DEMO",
+                "SOLD",
+                "DEAD",
+                "UNASSIGNED",
+            ];
+            const statusA = rowA.getValue(columnId) || "UNASSIGNED";
+            const statusB = rowB.getValue(columnId) || "UNASSIGNED";
+            return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
+        },
     },
     {
         accessorKey: "homeOwnerType",
@@ -57,16 +82,34 @@ export const columns = [
     },
     {
         accessorKey: "salesRep",
-        header: "Sales Rep.",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant='ghost'
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === "asc")
+                    }
+                >
+                    Sales Rep.
+                    <ArrowUpDown className='ml-2 h-4 w-4' />
+                </Button>
+            );
+        },
         cell: ({ row }) => {
             const salesRep = row.getValue("salesRep");
             return salesRep === null ? (
-                <>
-                    <p className='text-red-500'>Not Assigned</p>
-                </>
+                <p className='text-red-500'>Not Assigned</p>
             ) : (
                 salesRep
             );
+        },
+        sortingFn: (rowA, rowB, columnId) => {
+            const repA = rowA.getValue(columnId);
+            const repB = rowB.getValue(columnId);
+            if (repA === null && repB === null) return 0;
+            if (repA === null) return 1;
+            if (repB === null) return -1;
+            return repA.localeCompare(repB);
         },
     },
     {
@@ -110,9 +153,11 @@ export const columns = [
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();
-                                onAssignSalesRep(lead.id);
+                                onAssignSalesRep(lead);
                             }}
-                        ></DropdownMenuItem>
+                        >
+                            Assign sales rep.
+                        </DropdownMenuItem>
 
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
