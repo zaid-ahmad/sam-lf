@@ -39,6 +39,7 @@ export async function addLeadToDatabase(formData) {
                 phone2: validatedData.secondaryPhone,
                 email: validatedData.email,
                 address: validatedData.address,
+                quadrant: validatedData.quadrant,
                 postalCode: validatedData.postalCode,
                 images: validatedData.images || [],
                 addressNotes: validatedData.addressNotes,
@@ -48,11 +49,12 @@ export async function addLeadToDatabase(formData) {
                 concerns: validatedData.concerns,
                 surrounding: validatedData.surroundings,
                 serviceNeeded: validatedData.serviceNeeds,
-                canvasser: user.id,
+                canvasser: {
+                    connect: { id: user.id },
+                },
+                branch: user.branchCode,
             },
         });
-
-        // Add the lead to the calendar.
 
         // Send email notification to the admins about the new lead
 

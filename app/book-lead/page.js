@@ -2,12 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -20,7 +18,6 @@ import {
     CardTitle,
     CardDescription,
     CardContent,
-    CardFooter,
 } from "@/components/ui/card";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,10 +36,9 @@ import GoogleAddressAutocomplete from "@/components/google-address-autocomplete"
 import { getSignedURL } from "@/server/actions/s3";
 import { appointmentSchemaForm } from "@/lib/validations/schema";
 import { addLeadToDatabase } from "@/server/actions/book-lead";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/dist/server/api-utils";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const computeSHA256 = async (file) => {
     const buffer = await file.arrayBuffer();
@@ -119,6 +115,13 @@ const services = [
     },
 ];
 
+const quadrants = [
+    { id: "NW", label: "NW" },
+    { id: "NE", label: "NE" },
+    { id: "SW", label: "SW" },
+    { id: "SE", label: "SE" },
+];
+
 function AppointmentRequestForm() {
     const { toast } = useToast();
     const router = useRouter();
@@ -174,6 +177,7 @@ function AppointmentRequestForm() {
             appointmentDateTime: "",
             homeownerType: "",
             age: "",
+            quadrant: "",
             concerns: [],
             surroundings: "",
             serviceNeeds: [],
@@ -393,9 +397,83 @@ function AppointmentRequestForm() {
                                         />
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* Appointment, Age, Home Owner Type */}
-                                <div className='flex gap-16'>
+                            <div className='flex flex-col gap-6'>
+                                {/* Google Maps API Address Input */}
+                                <FormField
+                                    control={form.control}
+                                    name='address'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Address{""}
+                                                <span className='text-red-600'>
+                                                    *
+                                                </span>
+                                            </FormLabel>
+                                            <FormControl>
+                                                <GoogleAddressAutocomplete
+                                                    {...form.register(
+                                                        "address"
+                                                    )}
+                                                    onAddressSelect={(
+                                                        address,
+                                                        postalCode
+                                                    ) => {
+                                                        field.onChange(address);
+                                                        form.setValue(
+                                                            "postalCode",
+                                                            postalCode
+                                                        );
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Postal Code */}
+                                <FormField
+                                    control={form.control}
+                                    name='postalCode'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Postal Code</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    readOnly
+                                                    disabled
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Address Notes */}
+                                <FormField
+                                    control={form.control}
+                                    name='addressNotes'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Extra Address Notes
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Textarea {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            {/* Appointment, Age, Home Owner Type, Quadrant */}
+                            <div className='col-span-2 grid grid-cols-2 gap-6'>
+                                <div className='space-y-6'>
                                     {/* Appointment */}
                                     <FormField
                                         control={form.control}
@@ -472,7 +550,9 @@ function AppointmentRequestForm() {
                                             </FormItem>
                                         )}
                                     />
+                                </div>
 
+                                <div className='space-y-6'>
                                     {/* Home Owner Type */}
                                     <FormField
                                         control={form.control}
@@ -515,78 +595,50 @@ function AppointmentRequestForm() {
                                             </FormItem>
                                         )}
                                     />
+
+                                    {/* Quadrant */}
+                                    <FormField
+                                        control={form.control}
+                                        name='quadrant'
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <div className='mb-4'>
+                                                    <FormLabel className='text-base'>
+                                                        Quadrant{" "}
+                                                        <span className='text-red-600'>
+                                                            *
+                                                        </span>
+                                                    </FormLabel>
+                                                </div>
+                                                <RadioGroup
+                                                    onValueChange={
+                                                        field.onChange
+                                                    }
+                                                    value={field.value}
+                                                    className='space-y-1'
+                                                >
+                                                    {quadrants.map((item) => (
+                                                        <FormItem
+                                                            key={item.id}
+                                                            className='flex flex-row items-center space-x-3 space-y-0'
+                                                        >
+                                                            <FormControl>
+                                                                <RadioGroupItem
+                                                                    value={
+                                                                        item.id
+                                                                    }
+                                                                />
+                                                            </FormControl>
+                                                            <FormLabel className='font-normal'>
+                                                                {item.label}
+                                                            </FormLabel>
+                                                        </FormItem>
+                                                    ))}
+                                                </RadioGroup>
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
-                            </div>
-                            <div className='flex flex-col gap-6'>
-                                {/* Google Maps API Address Input */}
-                                <FormField
-                                    control={form.control}
-                                    name='address'
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Address{""}
-                                                <span className='text-red-600'>
-                                                    *
-                                                </span>
-                                            </FormLabel>
-                                            <FormControl>
-                                                <GoogleAddressAutocomplete
-                                                    {...form.register(
-                                                        "address"
-                                                    )}
-                                                    onAddressSelect={(
-                                                        address,
-                                                        postalCode
-                                                    ) => {
-                                                        field.onChange(address);
-                                                        form.setValue(
-                                                            "postalCode",
-                                                            postalCode
-                                                        );
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {/* Postal Code */}
-                                <FormField
-                                    control={form.control}
-                                    name='postalCode'
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Postal Code</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    readOnly
-                                                    disabled
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {/* Address Notes */}
-                                <FormField
-                                    control={form.control}
-                                    name='addressNotes'
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Extra Address Notes
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Textarea {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
                             </div>
 
                             {/* Concerns */}

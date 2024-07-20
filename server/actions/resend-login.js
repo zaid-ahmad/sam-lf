@@ -5,7 +5,13 @@ import prisma from "@/lib/prisma";
 
 const VALID_ROLES = ["ADMIN", "CANVASSER", "SALES_REP"];
 
-async function validateAndCreateUser(email, branchCode, role) {
+async function validateAndCreateUser(
+    firstName,
+    lastName,
+    email,
+    branchCode,
+    role
+) {
     if (!email || !branchCode || !role) {
         throw new Error("All fields are required.");
     }
@@ -23,7 +29,9 @@ async function validateAndCreateUser(email, branchCode, role) {
 
     let user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-        user = await prisma.user.create({ data: { email, branchCode, role } });
+        user = await prisma.user.create({
+            data: { firstName, lastName, email, branchCode, role },
+        });
     }
 
     return user;
@@ -40,8 +48,22 @@ async function sendLoginLink(email) {
 export default async function resendLogin(values, isLogin) {
     try {
         if (!isLogin) {
-            const { email, branchCode, role } = values;
-            await validateAndCreateUser(email, branchCode, role);
+            const { firstName, lastName, email, branchCode, role } = values;
+            await validateAndCreateUser(
+                firstName,
+                lastName,
+                email,
+                branchCode,
+                role
+            );
+        }
+
+        const userExists = await prisma.user.findUnique({
+            where: { email: values.email },
+        });
+
+        if (!userExists) {
+            throw new Error("Something went wrong.");
         }
 
         return await sendLoginLink(values.email);

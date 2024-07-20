@@ -68,22 +68,26 @@ model User {
   lastName      String?
   email         String?   @unique
   emailVerified DateTime?
-  branchCode    String
+  branchCode    String    
   account       Account[]
   sessions      Session[]
   role          UserRole
+  leadsCreated  Lead[]    @relation("CanvasserLeads")
+  leadsAssigned Lead[]    @relation("SalesRepLeads")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
 
 model Lead {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  branch          String        
   firstName       String
   lastName        String
   phone1          String
   phone2          String?
   email           String?
   address         String
+  quadrant        Quadrant
   postalCode      String
   images          String[]
   addressNotes    String?
@@ -96,8 +100,10 @@ model Lead {
   serviceNeeded   TypesOfServices[]
   status          LeadStatus?   @default(APPOINTMENT)
   reason          String?
-  canvasser       String        @db.ObjectId
-  salesRep        String?       @db.ObjectId
+  canvasser          User          @relation("CanvasserLeads", fields: [canvasserId], references: [id])
+  canvasserId        String        @db.ObjectId
+  salesRep           User?         @relation("SalesRepLeads", fields: [salesRepId], references: [id])
+  salesRepId         String?       @db.ObjectId
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
@@ -105,6 +111,13 @@ model Lead {
 model Timings {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
   time            String
+}
+
+enum Quadrant {
+  NW
+  NE
+  SW
+  SE
 }
 
 enum UserRole {
