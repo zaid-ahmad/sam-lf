@@ -8,7 +8,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { deleteLead } from "@/server/actions/delete-lead";
+import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
 
 export const columns = [
     {
@@ -152,14 +153,30 @@ export const columns = [
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                             <form
-                                action={`/api/leads/${lead.id}/delete`}
-                                method='POST'
+                                action={deleteLead}
+                                className='group-hover:text-red-900 flex items-center justify-between w-full'
                             >
+                                <input
+                                    type='hidden'
+                                    name='id'
+                                    value={lead.id}
+                                    readOnly
+                                />
+                                <input
+                                    type='hidden'
+                                    name='inPastLeads'
+                                    value={true}
+                                    readOnly
+                                />
                                 <button
                                     type='submit'
-                                    className='w-full text-left'
+                                    className='w-full text-left flex items-center justify-between'
                                 >
                                     Delete
+                                    <Trash
+                                        size={14}
+                                        className='group-hover:text-red-900'
+                                    />
                                 </button>
                             </form>
                         </DropdownMenuItem>

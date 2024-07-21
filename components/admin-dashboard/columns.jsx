@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import parseAppointmentDateTime from "@/lib/formatDateTime";
 import { Badge } from "@/components/ui/badge";
+import { deleteLead } from "@/server/actions/delete-lead";
 
 export const columns = [
     {
@@ -149,7 +150,9 @@ export const columns = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                        <DropdownMenuItem>View lead details</DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <a href={`/leads/${lead.id}`}>View details</a>
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();
@@ -160,21 +163,34 @@ export const columns = [
                         </DropdownMenuItem>
 
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            onClick={() =>
-                                navigator.clipboard.writeText(
-                                    lead.id.toString()
-                                )
-                            }
-                            className='group'
-                        >
-                            <span className='group-hover:text-red-900 flex items-center justify-between w-full'>
-                                <span>Delete</span>
-                                <Trash
-                                    size={14}
-                                    className='group-hover:text-red-900'
+                        <DropdownMenuItem asChild>
+                            <form
+                                action={deleteLead}
+                                className='group-hover:text-red-900 flex items-center justify-between w-full'
+                            >
+                                <input
+                                    type='hidden'
+                                    name='id'
+                                    value={lead.id}
+                                    readOnly
                                 />
-                            </span>
+                                <input
+                                    type='hidden'
+                                    name='inPastLeads'
+                                    value={true}
+                                    readOnly
+                                />
+                                <button
+                                    type='submit'
+                                    className='w-full text-left flex items-center justify-between'
+                                >
+                                    Delete
+                                    <Trash
+                                        size={14}
+                                        className='group-hover:text-red-900'
+                                    />
+                                </button>
+                            </form>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
