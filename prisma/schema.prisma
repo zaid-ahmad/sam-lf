@@ -96,10 +96,14 @@ model Lead {
   age             AgeRange
   concerns        String[]
   surrounding     String[]
-  amount          Float?
   serviceNeeded   TypesOfServices[]
   status          LeadStatus?   @default(APPOINTMENT)
+  amount          Float?
   reason          String?
+  jobNumber       String?
+  DNSFile         String?
+  installationDate String?
+  funded          Boolean       @default(false)
   canvasser          User          @relation("CanvasserLeads", fields: [canvasserId], references: [id])
   canvasserId        String        @db.ObjectId
   salesRep           User?         @relation("SalesRepLeads", fields: [salesRepId], references: [id])
@@ -124,7 +128,6 @@ enum UserRole {
   ADMIN
   CANVASSER
   SALES_REP
-  CUSTOMER
 }
 
 enum LeadStatus {

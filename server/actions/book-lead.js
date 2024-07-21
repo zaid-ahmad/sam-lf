@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { appointmentSchema } from "@/lib/validations/schema";
+import { revalidatePath } from "next/cache";
 export async function addLeadToDatabase(formData) {
     try {
         const session = await auth();
@@ -57,6 +58,8 @@ export async function addLeadToDatabase(formData) {
         });
 
         // Send email notification to the admins about the new lead
+
+        revalidatePath("/dashboard");
 
         return { success: true };
     } catch (error) {

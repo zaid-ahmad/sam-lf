@@ -15,7 +15,10 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import { useEffect, useState } from "react";
 
-export default function AppointmentScheduler({ onSchedule }) {
+export default function AppointmentScheduler({
+    onSchedule,
+    showTimeSlots = true,
+}) {
     const [date, setDate] = useState();
     const [selectedTime, setSelectedTime] = useState();
 
@@ -29,14 +32,15 @@ export default function AppointmentScheduler({ onSchedule }) {
     ];
 
     useEffect(() => {
-        if (date && selectedTime) {
-            const formattedDateTime = `${format(
-                date,
-                "MMMM do, yyyy"
-            )} at ${selectedTime}`;
+        if (date) {
+            const formattedDate = format(date, "MMMM do, yyyy");
+            const formattedDateTime =
+                showTimeSlots && selectedTime
+                    ? `${formattedDate} at ${selectedTime}`
+                    : formattedDate;
             onSchedule(formattedDateTime);
         }
-    }, [date, selectedTime, onSchedule]);
+    }, [date, selectedTime, onSchedule, showTimeSlots]);
 
     return (
         <Popover>
@@ -49,45 +53,60 @@ export default function AppointmentScheduler({ onSchedule }) {
                     )}
                 >
                     <CalendarIcon className='mr-2 h-4 w-4' />
-                    {date && selectedTime ? (
-                        `${format(date, "PPP")} at ${selectedTime}`
+                    {date ? (
+                        showTimeSlots && selectedTime ? (
+                            `${format(date, "PPP")} at ${selectedTime}`
+                        ) : (
+                            format(date, "PPP")
+                        )
                     ) : (
-                        <span>Pick a date & time</span>
+                        <span>
+                            {showTimeSlots
+                                ? "Pick a date & time"
+                                : "Pick a date"}
+                        </span>
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className='w-auto flex items-center p-3'>
+            <PopoverContent
+                className={cn(
+                    "w-auto flex items-center p-3",
+                    showTimeSlots ? "" : "flex-col"
+                )}
+            >
                 <Calendar
                     mode='single'
                     selected={date}
                     onSelect={setDate}
                     initialFocus
                 />
-                <RadioGroup
-                    className='grid grid-cols-3 gap-2 mb-5'
-                    value={selectedTime}
-                    onValueChange={setSelectedTime}
-                >
-                    {timeSlots.map((time) => (
-                        <div key={time}>
-                            <RadioGroupItem
-                                value={time}
-                                id={time}
-                                className='peer sr-only'
-                            />
-                            <Label
-                                htmlFor={time}
-                                className={`flex items-center justify-center px-2 py-1 text-sm font-normal text-center border rounded-lg cursor-pointer ${
-                                    selectedTime === time
-                                        ? "bg-primary text-white"
-                                        : "bg-white text-gray-500 border-gray-200 hover:text-gray-900 hover:bg-gray-50"
-                                }`}
-                            >
-                                {time}
-                            </Label>
-                        </div>
-                    ))}
-                </RadioGroup>
+                {showTimeSlots && (
+                    <RadioGroup
+                        className='grid grid-cols-3 gap-2 mb-5'
+                        value={selectedTime}
+                        onValueChange={setSelectedTime}
+                    >
+                        {timeSlots.map((time) => (
+                            <div key={time}>
+                                <RadioGroupItem
+                                    value={time}
+                                    id={time}
+                                    className='peer sr-only'
+                                />
+                                <Label
+                                    htmlFor={time}
+                                    className={`flex items-center justify-center px-2 py-1 text-sm font-normal text-center border rounded-lg cursor-pointer ${
+                                        selectedTime === time
+                                            ? "bg-primary text-white"
+                                            : "bg-white text-gray-500 border-gray-200 hover:text-gray-900 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    {time}
+                                </Label>
+                            </div>
+                        ))}
+                    </RadioGroup>
+                )}
             </PopoverContent>
         </Popover>
     );

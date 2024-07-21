@@ -6,26 +6,20 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 
-const InfoCard = ({ title, value }) => {
+const InfoCard = ({ title, value, description = "", outOf20 = false }) => {
     return (
         <Card className={`text-center `}>
             <CardHeader className='pb-2'>
                 <CardTitle className='text-lg'>{title}</CardTitle>
-                <CardDescription>
-                    {title === "Leads so far for today"
-                        ? "July 19, 2024"
-                        : "Slots Filled"}
-                </CardDescription>
+                <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent>
                 <p className='text-3xl font-bold'>
-                    {title === "Leads so far for today" ? (
-                        `${value}`
-                    ) : (
-                        <>
-                            {value}{" "}
-                            <span className='text-sm text-zinc-700'>/20</span>
-                        </>
+                    {value}
+                    {outOf20 && (
+                        <span className='text-sm font-medium text-zinc-500'>
+                            /20
+                        </span>
                     )}
                 </p>
             </CardContent>

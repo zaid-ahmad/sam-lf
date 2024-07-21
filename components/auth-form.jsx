@@ -210,18 +210,16 @@ function AuthForm() {
         setIsLoading(true);
         setFormError("");
         try {
-            console.log(values, isLogin);
             const result = await resendLogin(values, isLogin);
             if (result?.error) {
                 setFormError(result.error.message);
                 console.error("Error submitting form:", result.error);
-            } else {
-                setIsEmailSent(true);
             }
         } catch (error) {
             setFormError(error.message);
             console.error("Error submitting form:", error);
         } finally {
+            setIsEmailSent(true);
             setIsLoading(false);
         }
     }

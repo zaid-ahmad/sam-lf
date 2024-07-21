@@ -1,20 +1,18 @@
 import { auth } from "@/auth";
-import { DataTable } from "./data-table";
-import { columns } from "./columns";
-import InfoCard from "./info-card";
-import {
-    Users,
-    UserPlus,
-    UserCheck,
-    Clock,
-    UserMinus,
-    CheckCircle2,
-} from "lucide-react";
 import prisma from "@/lib/prisma";
+
+import SalesRepDashboard from "@/components/salesrep-dashboard/salesrep-dashboard";
+import CanvasserDashboard from "@/components/canvasser-dashboard/canvasser-dashboard";
+import AdminDashboard from "@/components/admin-dashboard/admin-dashboard";
+
+import { extractFirstName, getTodayAndTomorrow } from "@/lib/utils";
 import { getSalesRepresentatives } from "@/lib/data";
 import { assignLeadToSalesRep } from "@/server/actions/assign-to-sales-rep";
+import { changeLeadStatus } from "@/server/actions/change-lead-status";
 
-async function getData(session) {
+async function getAdminData(session) {
+    const { today, tomorrow } = getTodayAndTomorrow();
+
     const user = await prisma.user.findUnique({
         where: { email: session.user.email },
     });
@@ -22,6 +20,10 @@ async function getData(session) {
     const result = await prisma.lead.findMany({
         where: {
             branch: user.branchCode,
+            createdAt: {
+                gte: today,
+                lt: tomorrow,
+            },
         },
         select: {
             id: true,
@@ -57,48 +59,175 @@ async function getData(session) {
             : null,
     }));
 
-    return transformedData;
+    return {
+        data: transformedData,
+        name: user.firstName,
+        branch: user.branchCode,
+    };
 }
 
-function extractFirstName(email) {
-    // Split the email address at the @ symbol
-    const [localPart] = email.split("@");
+async function getSalesRepData(session) {
+    const { today, tomorrow } = getTodayAndTomorrow();
 
-    // Split the local part by dots and take the first part
-    const [firstName] = localPart.split(".");
+    const user = await prisma.user.findUnique({
+        where: { email: session.user.email, role: "SALES_REP" },
+    });
 
-    // Capitalize the first letter and make the rest lowercase
-    return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    const result = await prisma.lead.findMany({
+        where: {
+            branch: user.branchCode,
+            salesRepId: user.id,
+            createdAt: {
+                gte: today,
+                lt: tomorrow,
+            },
+        },
+        select: {
+            id: true,
+            homeOwnerType: true,
+            address: true,
+            canvasser: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+            salesRep: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+            status: true,
+            quadrant: true,
+            appointmentDateTime: true,
+        },
+    });
+
+    // Transform the result to flatten canvasser and salesRep
+    const transformedData = result.map((lead) => ({
+        ...lead,
+        name: lead.firstName,
+        canvasser: lead.canvasser
+            ? `${lead.canvasser.firstName} ${lead.canvasser.lastName}`.trim()
+            : "N/A",
+        salesRep: lead.salesRep
+            ? `${lead.salesRep.firstName} ${lead.salesRep.lastName}`.trim()
+            : null,
+    }));
+
+    return { data: transformedData, name: user.firstName, id: user.id };
+}
+
+async function adminDashboardData(branch) {
+    const { today, tomorrow } = getTodayAndTomorrow();
+
+    const totalLeads = await prisma.lead.count({
+        where: {
+            branch: branch,
+            createdAt: {
+                gte: today,
+                lt: tomorrow,
+            },
+        },
+    });
+
+    const totalAssignedLeads = await prisma.lead.count({
+        where: {
+            status: {
+                equals: "ASSIGNED",
+            },
+            createdAt: {
+                gte: today,
+                lt: tomorrow,
+            },
+        },
+    });
+
+    const totalUnassignedLeads = await prisma.lead.count({
+        where: {
+            status: {
+                equals: "APPOINTMENT",
+            },
+            createdAt: {
+                gte: today,
+                lt: tomorrow,
+            },
+        },
+    });
+
+    return { totalLeads, totalAssignedLeads, totalUnassignedLeads };
+}
+
+async function salesRepDashboardData(id) {
+    const { today, tomorrow } = getTodayAndTomorrow();
+    const totalLeads = await prisma.lead.count({
+        where: {
+            salesRepId: {
+                equals: id,
+            },
+            status: {
+                equals: "ASSIGNED",
+            },
+            createdAt: {
+                gte: today,
+                lt: tomorrow,
+            },
+        },
+    });
+
+    return { totalLeads };
 }
 
 const Dashboard = async () => {
     const session = await auth();
+    const role = session?.user?.role;
 
-    const data = await getData(session);
+    if (role === "ADMIN") {
+        const { data, name, branch } = await getAdminData(session);
+        const sale_reps = await getSalesRepresentatives();
+        const { totalLeads, totalAssignedLeads, totalUnassignedLeads } =
+            await adminDashboardData(branch);
 
-    const sale_reps = await getSalesRepresentatives();
-
-    return (
-        <div className='container mx-auto py-10'>
-            <h2 className='text-2xl font-semibold mb-7'>
-                Hello {extractFirstName(session.user.email)}!
-            </h2>
-            <div className='flex items-center gap-7'>
-                <InfoCard title='Leads so far for today' value='24' />
-                <InfoCard title='11 AM' value='1' />
-                <InfoCard title='1 PM' value='0' />
-                <InfoCard title='3 PM' value='5' />
-                <InfoCard title='5 PM' value='8' />
-                <InfoCard title='7 PM' value='10' />
-            </div>
-            <DataTable
-                initialColumns={columns}
-                initialData={data}
-                saleReps={sale_reps}
+        return (
+            <AdminDashboard
+                name={name}
+                data={data}
+                sale_reps={sale_reps}
                 assignLeadToSalesRep={assignLeadToSalesRep}
+                totalLeads={totalLeads}
+                totalAssignedLeads={totalAssignedLeads}
+                totalUnassignedLeads={totalUnassignedLeads}
             />
-        </div>
-    );
+        );
+    } else if (role === "CANVASSER") {
+        const { data, name } = await getAdminData(session);
+        const sale_reps = await getSalesRepresentatives();
+
+        return (
+            <CanvasserDashboard
+                name={name}
+                data={data}
+                sale_reps={sale_reps}
+                assignLeadToSalesRep={assignLeadToSalesRep}
+                firstName={extractFirstName(session.user.email)}
+            />
+        );
+    } else if (role === "SALES_REP") {
+        const { data, name, id } = await getSalesRepData(session);
+        const { totalLeads } = await salesRepDashboardData(id);
+
+        return (
+            <SalesRepDashboard
+                name={name}
+                data={data}
+                changeLeadStatus={changeLeadStatus}
+                totalLeads={totalLeads}
+            />
+        );
+    } else {
+        return <p>How did you end up here? lol</p>;
+    }
 };
 
 export default Dashboard;

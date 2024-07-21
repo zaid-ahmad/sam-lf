@@ -39,16 +39,7 @@ import { addLeadToDatabase } from "@/server/actions/book-lead";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
-const computeSHA256 = async (file) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-    return hashHex;
-};
+import { computeSHA256 } from "@/lib/utils";
 
 const concerns = [
     {
