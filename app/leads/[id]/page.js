@@ -58,6 +58,60 @@ function formatAgeRange(ageRange) {
     }
 }
 
+function formatService(service) {
+    switch (service) {
+        case "REPAIRS":
+            return "Repairs";
+
+        case "GUTTERS":
+            return "Gutters";
+
+        case "LF":
+            return "Leaf Filter";
+
+        case "FI":
+            return "Free Inspection";
+
+        default:
+            return service;
+    }
+}
+
+function formatConcerns(concern) {
+    switch (concern) {
+        case "inspection-estimate":
+            return "Inspection / Estimate";
+
+        case "clogging-damages":
+            return "Cloging / Damages";
+
+        case "new-gutters":
+            return "New Gutters";
+
+        case "downspout-roof-extensions":
+            return "Downspout / Roof Extensions Needed";
+
+        default:
+            return concern;
+    }
+}
+
+function formatSurroundingAwareness(surrounding_awareness) {
+    switch (surrounding_awareness) {
+        case "lotsoftrees":
+            return "Lots of trees";
+
+        case "wildlife":
+            return "Wildlife";
+
+        case "roofingOrShingleGrit":
+            return "Roofing / Shingle Grit";
+
+        default:
+            return surrounding_awareness;
+    }
+}
+
 export default async function LeadDetailsPage({ params }) {
     const lead = await getLeadDetails(params.id);
 
@@ -136,7 +190,7 @@ export default async function LeadDetailsPage({ params }) {
                         <div className='flex flex-wrap gap-2 mt-2'>
                             {lead.serviceNeeded.map((service, index) => (
                                 <Badge key={index} variant='secondary'>
-                                    {service}
+                                    {formatService(service)}
                                 </Badge>
                             ))}
                         </div>
@@ -220,7 +274,9 @@ export default async function LeadDetailsPage({ params }) {
                                 <h3 className='font-semibold'>Concerns</h3>
                                 <ul className='list-disc pl-5 mt-2'>
                                     {lead.concerns.map((concern, index) => (
-                                        <li key={index}>{concern}</li>
+                                        <li key={index}>
+                                            {formatConcerns(concern)}
+                                        </li>
                                     ))}
                                 </ul>
                             </div>
@@ -231,10 +287,14 @@ export default async function LeadDetailsPage({ params }) {
                         <>
                             <Separator className='my-4' />
                             <div>
-                                <h3 className='font-semibold'>Surrounding</h3>
+                                <h3 className='font-semibold'>
+                                    Surrounding Awareness
+                                </h3>
                                 <ul className='list-disc pl-5 mt-2'>
                                     {lead.surrounding.map((item, index) => (
-                                        <li key={index}>{item}</li>
+                                        <li key={index}>
+                                            {formatSurroundingAwareness(item)}
+                                        </li>
                                     ))}
                                 </ul>
                             </div>

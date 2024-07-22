@@ -103,7 +103,7 @@ const AdminNavbar = () => {
                                 className='block py-2 px-3 text-white bg-primary rounded md:bg-transparent md:text-primary md:p-0'
                                 aria-current='page'
                             >
-                                View pending installs
+                                Pending installs
                             </Link>
                         </li>
                         <li>
@@ -111,7 +111,7 @@ const AdminNavbar = () => {
                                 href='/past-leads'
                                 className='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0'
                             >
-                                View past leads
+                                Past leads
                             </Link>
                         </li>
 
@@ -186,7 +186,7 @@ const CanvasserNavbar = () => {
                                 className='block py-2 px-3 text-white bg-primary rounded md:bg-transparent md:text-primary md:p-0'
                                 aria-current='page'
                             >
-                                Book a lead
+                                Appointment request form
                             </Link>
                         </li>
                         <li>
@@ -194,7 +194,7 @@ const CanvasserNavbar = () => {
                                 href='#'
                                 className='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0'
                             >
-                                View past leads
+                                Past leads
                             </a>
                         </li>
                         <li>
@@ -302,3 +302,9 @@ const Navbar = async () => {
 };
 
 export default Navbar;
+
+/*
+
+    1. Filter Pending installs by date range and canvasser
+    2. Filter by dead, demo, on past leads, canvasser and by date.
+*/

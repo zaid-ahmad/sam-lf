@@ -24,8 +24,15 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
 
 export function DataTable({
@@ -33,6 +40,8 @@ export function DataTable({
     initialData,
     saleReps,
     assignLeadToSalesRep,
+    statusOptions,
+    canvasserOptions,
 }) {
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
@@ -41,6 +50,24 @@ export function DataTable({
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
     const [selectedLeadId, setSelectedLeadId] = useState(null);
     const [leadDetails, setLeadDetails] = useState(null);
+
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [canvasserFilter, setCanvasserFilter] = useState("all");
+    const [dateFilter, setDateFilter] = useState("");
+
+    const filteredData = useMemo(() => {
+        return data.filter((item) => {
+            const matchesStatus =
+                statusFilter === "all" || item.status === statusFilter;
+            const matchesCanvasser =
+                canvasserFilter === "all" || item.canvasser === canvasserFilter;
+            const matchesDate =
+                !dateFilter ||
+                (item.appointmentDateTime &&
+                    item.appointmentDateTime.startsWith(dateFilter));
+            return matchesStatus && matchesCanvasser && matchesDate;
+        });
+    }, [data, statusFilter, canvasserFilter, dateFilter]);
 
     const handleAssignSalesRep = (lead) => {
         setSelectedLeadId(lead.id);
@@ -82,7 +109,7 @@ export function DataTable({
     });
 
     const table = useReactTable({
-        data,
+        data: filteredData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -98,45 +125,49 @@ export function DataTable({
 
     return (
         <div>
-            {/* <div className='flex items-center py-4'>
-                <Input
-                    placeholder='Filter emails...'
-                    value={table.getColumn("email")?.getFilterValue() ?? ""}
-                    onChange={(event) =>
-                        table
-                            .getColumn("email")
-                            ?.setFilterValue(event.target.value)
-                    }
-                    className='max-w-sm'
+            <div className='flex space-x-4 mt-7 mb-4'>
+                <Select
+                    onValueChange={setStatusFilter}
+                    value={statusFilter || "all"}
+                >
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Filter by Status' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>All Statuses</SelectItem>
+                        {statusOptions.map((status) => (
+                            <SelectItem key={status} value={status}>
+                                {status}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <Select
+                    onValueChange={setCanvasserFilter}
+                    value={canvasserFilter || "all"}
+                >
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Filter by Canvasser' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>All Canvassers</SelectItem>
+                        {canvasserOptions.map((canvasser) => (
+                            <SelectItem key={canvasser} value={canvasser}>
+                                {canvasser}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <input
+                    type='date'
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    value={dateFilter}
+                    className='border rounded p-2'
                 />
-            </div> */}
-            {/* <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant='outline' className='ml-auto my-5'>
-                        Show/Hide Columns
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
-                    {table
-                        .getAllColumns()
-                        .filter((column) => column.getCanHide())
-                        .map((column) => {
-                            return (
-                                <DropdownMenuCheckboxItem
-                                    key={column.id}
-                                    className='capitalize'
-                                    checked={column.getIsVisible()}
-                                    onCheckedChange={(value) =>
-                                        column.toggleVisibility(!!value)
-                                    }
-                                >
-                                    {column.id}
-                                </DropdownMenuCheckboxItem>
-                            );
-                        })}
-                </DropdownMenuContent>
-            </DropdownMenu> */}
-            <div className='rounded-md border my-7'>
+            </div>
+            <div className='rounded-md border'>
                 <Table className='bg-white rounded-lg'>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
