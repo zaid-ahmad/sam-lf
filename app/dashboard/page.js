@@ -179,6 +179,23 @@ async function salesRepDashboardData(id) {
     return { totalLeads };
 }
 
+async function getAllCanvasserNames(branch) {
+    const canvassers = await prisma.user.findMany({
+        where: {
+            role: "CANVASSER",
+            branchCode: branch,
+        },
+        select: {
+            firstName: true,
+            lastName: true,
+        },
+    });
+
+    return canvassers.map((canvasser) =>
+        `${canvasser.firstName} ${canvasser.lastName}`.trim()
+    );
+}
+
 const Dashboard = async () => {
     const session = await auth();
     const role = session?.user?.role;
@@ -189,6 +206,8 @@ const Dashboard = async () => {
         const { totalLeads, totalAssignedLeads, totalUnassignedLeads } =
             await adminDashboardData(branch);
 
+        const listOfCanvassers = await getAllCanvasserNames(branch);
+
         return (
             <AdminDashboard
                 name={name}
@@ -198,6 +217,7 @@ const Dashboard = async () => {
                 totalLeads={totalLeads}
                 totalAssignedLeads={totalAssignedLeads}
                 totalUnassignedLeads={totalUnassignedLeads}
+                listOfCanvassers={listOfCanvassers}
             />
         );
     } else if (role === "CANVASSER") {

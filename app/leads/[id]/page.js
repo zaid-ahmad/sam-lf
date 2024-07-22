@@ -11,6 +11,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import Image from "next/image";
 
 async function getLeadDetails(id) {
     const lead = await prisma.lead.findUnique({
@@ -149,7 +150,7 @@ export default async function LeadDetailsPage({ params }) {
                         <div>
                             <h3 className='font-semibold'>Contact</h3>
                             <p>Phone: {lead.phone1}</p>
-                            {lead.phone2 && <p>Alt Phone: {lead.phone2}</p>}
+                            {lead.phone2 && <p>Alt. Phone: {lead.phone2}</p>}
                             {lead.email && <p>Email: {lead.email}</p>}
                         </div>
                     </div>
@@ -160,7 +161,7 @@ export default async function LeadDetailsPage({ params }) {
                         <div>
                             <h3 className='font-semibold'>Address</h3>
                             <p>{lead.address}</p>
-                            <p>{lead.postalCode}</p>
+                            <p>Postal Code: {lead.postalCode}</p>
                             <p>Quadrant: {lead.quadrant}</p>
                         </div>
                         <div>
@@ -195,6 +196,26 @@ export default async function LeadDetailsPage({ params }) {
                             ))}
                         </div>
                     </div>
+
+                    <Separator className='my-4' />
+
+                    {lead.images && lead.images.length > 0 && (
+                        <div>
+                            <h3 className='font-semibold'>Images</h3>
+                            <div className='flex flex-wrap gap-2 mt-2'>
+                                {lead.images.map((image, index) => (
+                                    <Image
+                                        src={image}
+                                        key={index}
+                                        alt={`Image ${index}`}
+                                        width={400}
+                                        height={200}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    <div></div>
 
                     <Separator className='my-4' />
 

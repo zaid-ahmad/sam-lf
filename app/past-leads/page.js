@@ -62,14 +62,39 @@ async function getAdminPastLeads(session) {
             : null,
     }));
 
-    return transformedData;
+    return { data: transformedData, branch: user.branchCode };
+}
+
+async function getAllCanvasserNames(branch) {
+    const canvassers = await prisma.user.findMany({
+        where: {
+            role: "CANVASSER",
+            branchCode: branch,
+        },
+        select: {
+            firstName: true,
+            lastName: true,
+        },
+    });
+
+    return canvassers.map((canvasser) =>
+        `${canvasser.firstName} ${canvasser.lastName}`.trim()
+    );
 }
 
 const PastLeads = async () => {
     const session = await auth();
 
     if (session.user.role === "ADMIN") {
-        const data = await getAdminPastLeads(session);
+        const { data, branch } = await getAdminPastLeads(session);
+        const listOfCanvassers = await getAllCanvasserNames(branch);
+        const statusOptions = [
+            "APPOINTMENT",
+            "ASSIGNED",
+            "DEMO",
+            "SALE",
+            "DEAD",
+        ];
 
         return (
             <div className='container'>
@@ -87,7 +112,12 @@ const PastLeads = async () => {
                     </BreadcrumbList>
                 </Breadcrumb>
                 <h1 className='my-5 text-2xl font-bold'>Past Leads</h1>
-                <DataTable columns={columns} data={data} />
+                <DataTable
+                    columns={columns}
+                    data={data}
+                    statusOptions={statusOptions}
+                    canvasserOptions={listOfCanvassers}
+                />
             </div>
         );
     }

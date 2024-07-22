@@ -27,15 +27,51 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { markLeadAsFunded } from "@/server/actions/mark-funded";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { parse } from "date-fns";
 
-export function PendingInstallsTable({ columns, initialData }) {
+export function PendingInstallsTable({ columns, initialData, canvasserNames }) {
     const [sorting, setSorting] = useState([]);
     const [data, setData] = useState(initialData);
 
+    const [canvasserFilter, setCanvasserFilter] = useState("all");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+
+    const filteredData = useMemo(() => {
+        return data.filter((item) => {
+            const matchesCanvasser =
+                canvasserFilter === "all" || item.canvasser === canvasserFilter;
+
+            let matchesDateRange = true;
+            if (startDate || endDate) {
+                const itemDate = parse(
+                    item.appointmentDateTime.split(" at ")[0],
+                    "MMMM do, yyyy",
+                    new Date()
+                );
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+
+                matchesDateRange =
+                    (!start || itemDate >= start) && (!end || itemDate <= end);
+            }
+
+            return matchesCanvasser && matchesDateRange;
+        });
+    }, [data, canvasserFilter, startDate, endDate]);
+
     const table = useReactTable({
-        data,
+        data: filteredData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -76,6 +112,40 @@ export function PendingInstallsTable({ columns, initialData }) {
             </Breadcrumb>
 
             <h1 className='my-5 text-2xl font-bold'>Pending Installs</h1>
+
+            <div className='flex space-x-4 mb-4'>
+                <Select
+                    onValueChange={setCanvasserFilter}
+                    value={canvasserFilter}
+                >
+                    <SelectTrigger className='w-[200px]'>
+                        <SelectValue placeholder='Filter by Canvasser' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>All Canvassers</SelectItem>
+                        {canvasserNames.map((name) => (
+                            <SelectItem key={name} value={name}>
+                                {name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <div className='flex space-x-4'>
+                    <Input
+                        type='date'
+                        placeholder='Start Date'
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
+                    <span className='my-auto'>to</span>
+                    <Input
+                        type='date'
+                        placeholder='End Date'
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
+                </div>
+            </div>
             <div className='rounded-md border my-7'>
                 <Table className='bg-white rounded-lg'>
                     <TableHeader>

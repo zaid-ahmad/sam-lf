@@ -10,6 +10,10 @@ export const columns = [
         header: "Appointment Date & Time",
     },
     {
+        accessorKey: "canvasser",
+        header: "Canvasser",
+    },
+    {
         accessorKey: "installationDate",
         header: "Installation Date",
     },

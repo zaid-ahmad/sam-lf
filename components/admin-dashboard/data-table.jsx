@@ -8,6 +8,8 @@ import {
     useReactTable,
 } from "@tanstack/react-table";
 
+import { parse, isSameDay } from "date-fns";
+
 import {
     Table,
     TableBody,
@@ -18,12 +20,7 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
     Select,
     SelectContent,
@@ -61,10 +58,18 @@ export function DataTable({
                 statusFilter === "all" || item.status === statusFilter;
             const matchesCanvasser =
                 canvasserFilter === "all" || item.canvasser === canvasserFilter;
-            const matchesDate =
-                !dateFilter ||
-                (item.appointmentDateTime &&
-                    item.appointmentDateTime.startsWith(dateFilter));
+
+            let matchesDate = true;
+            if (dateFilter && item.appointmentDateTime) {
+                const appointmentDate = parse(
+                    item.appointmentDateTime.split(" at ")[0],
+                    "MMMM do, yyyy",
+                    new Date()
+                );
+                const filterDate = parse(dateFilter, "yyyy-MM-dd", new Date());
+                matchesDate = isSameDay(appointmentDate, filterDate);
+            }
+
             return matchesStatus && matchesCanvasser && matchesDate;
         });
     }, [data, statusFilter, canvasserFilter, dateFilter]);

@@ -23,9 +23,41 @@ async function getPendingInstallsData(session) {
             installationDate: true,
             amount: true,
             funded: true,
+            canvasser: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                },
+            },
         },
     });
-    return pendingInstallsData;
+
+    const transformedData = pendingInstallsData.map((lead) => ({
+        ...lead,
+        canvasser: lead.canvasser
+            ? `${lead.canvasser.firstName} ${lead.canvasser.lastName}`.trim()
+            : "N/A",
+    }));
+
+    const canvassers = await prisma.user.findMany({
+        where: {
+            role: "CANVASSER",
+            branchCode: user.branchCode,
+        },
+        select: {
+            firstName: true,
+            lastName: true,
+        },
+    });
+
+    const canvasserNames = canvassers.map((c) =>
+        `${c.firstName} ${c.lastName}`.trim()
+    );
+
+    return {
+        transformedData,
+        canvasserNames,
+    };
 }
 
 const PendingInstalls = async () => {
@@ -36,9 +68,17 @@ const PendingInstalls = async () => {
         return redirect("/");
     }
 
-    const data = await getPendingInstallsData(session);
+    const { transformedData, canvasserNames } = await getPendingInstallsData(
+        session
+    );
 
-    return <PendingInstallsTable columns={columns} initialData={data} />;
+    return (
+        <PendingInstallsTable
+            columns={columns}
+            initialData={transformedData}
+            canvasserNames={canvasserNames}
+        />
+    );
 };
 
 export default PendingInstalls;

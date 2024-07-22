@@ -12,16 +12,9 @@ const AdminDashboard = ({
     totalLeads,
     totalAssignedLeads,
     totalUnassignedLeads,
+    listOfCanvassers,
 }) => {
-    const statusOptions = [
-        "APPOINTMENT",
-        "ASSIGNED",
-        "DEMO",
-        "SALE",
-        "DEAD",
-        "UNASSIGNED",
-    ];
-    const canvasserOptions = ["Zaid Ahmad", "Rajdeep Narela"];
+    const statusOptions = ["APPOINTMENT", "ASSIGNED", "DEMO", "SALE", "DEAD"];
 
     return (
         <div className='container mx-auto py-10'>
@@ -77,7 +70,7 @@ const AdminDashboard = ({
                 saleReps={sale_reps}
                 assignLeadToSalesRep={assignLeadToSalesRep}
                 statusOptions={statusOptions}
-                canvasserOptions={canvasserOptions}
+                canvasserOptions={listOfCanvassers}
             />
         </div>
     );

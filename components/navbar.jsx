@@ -302,9 +302,3 @@ const Navbar = async () => {
 };
 
 export default Navbar;
-
-/*
-
-    1. Filter Pending installs by date range and canvasser
-    2. Filter by dead, demo, on past leads, canvasser and by date.
-*/

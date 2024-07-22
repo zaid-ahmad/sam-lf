@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import parseAppointmentDateTime from "@/lib/formatDateTime";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export const columns = [
     {
@@ -148,7 +149,9 @@ export const columns = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                        <DropdownMenuItem>View lead details</DropdownMenuItem>
+                        <Link href={`/leads/${lead.id}`}>
+                            <DropdownMenuItem>View details</DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();

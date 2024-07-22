@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import parseAppointmentDateTime from "@/lib/formatDateTime";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export const columns = [
     {
@@ -149,33 +150,9 @@ export const columns = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                        <DropdownMenuItem>View lead details</DropdownMenuItem>
-                        <DropdownMenuItem
-                            onSelect={(e) => {
-                                e.preventDefault();
-                                onAssignSalesRep(lead);
-                            }}
-                        >
-                            Assign sales rep.
-                        </DropdownMenuItem>
-
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            onClick={() =>
-                                navigator.clipboard.writeText(
-                                    lead.id.toString()
-                                )
-                            }
-                            className='group'
-                        >
-                            <span className='group-hover:text-red-900 flex items-center justify-between w-full'>
-                                <span>Delete</span>
-                                <Trash
-                                    size={14}
-                                    className='group-hover:text-red-900'
-                                />
-                            </span>
-                        </DropdownMenuItem>
+                        <Link href={`/leads/${lead.id}`}>
+                            <DropdownMenuItem>View details</DropdownMenuItem>
+                        </Link>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
