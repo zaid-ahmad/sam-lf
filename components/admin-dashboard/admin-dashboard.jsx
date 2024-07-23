@@ -13,14 +13,17 @@ const AdminDashboard = ({
     totalAssignedLeads,
     totalUnassignedLeads,
     listOfCanvassers,
+    slots_11,
+    slots_01,
+    slots_03,
+    slots_05,
+    slots_07,
 }) => {
     const statusOptions = ["APPOINTMENT", "ASSIGNED", "DEMO", "SALE", "DEAD"];
 
     return (
         <div className='container mx-auto py-10'>
-            <h2 className='text-2xl font-semibold mb-7'>
-                Hello {name}! (admin)
-            </h2>
+            <h2 className='text-2xl font-semibold mb-7'>Hello {name}!</h2>
             <div className='flex items-center gap-[1.74rem]'>
                 <InfoCard
                     title='Leads so far for today'
@@ -29,33 +32,28 @@ const AdminDashboard = ({
                 />
                 <InfoCard
                     title='11 AM'
-                    value='1'
+                    value={slots_11}
                     description={"Slots Filled"}
-                    outOf20={true}
                 />
                 <InfoCard
                     title='1 PM'
-                    value='0'
+                    value={slots_01}
                     description={"Slots Filled"}
-                    outOf20={true}
                 />
                 <InfoCard
                     title='3 PM'
-                    value='5'
+                    value={slots_03}
                     description={"Slots Filled"}
-                    outOf20={true}
                 />
                 <InfoCard
                     title='5 PM'
-                    value='8'
+                    value={slots_05}
                     description={"Slots Filled"}
-                    outOf20={true}
                 />
                 <InfoCard
                     title='7 PM'
-                    value='10'
+                    value={slots_07}
                     description={"Slots Filled"}
-                    outOf20={true}
                 />
                 <Separator
                     orientation='vertical'

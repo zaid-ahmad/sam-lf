@@ -37,7 +37,7 @@ export const columns = [
                 APPOINTMENT: "blue",
                 ASSIGNED: "yellow",
                 DEMO: "purple",
-                SOLD: "green",
+                SALE: "green",
                 DEAD: "red",
                 UNASSIGNED: "gray",
             };
@@ -150,9 +150,9 @@ export const columns = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                        <Link href={`/leads/${lead.id}`}>
+                        <a href={`/leads/${lead.id}`}>
                             <DropdownMenuItem>View details</DropdownMenuItem>
-                        </Link>
+                        </a>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

@@ -92,6 +92,9 @@ function formatConcerns(concern) {
         case "downspout-roof-extensions":
             return "Downspout / Roof Extensions Needed";
 
+        case "lf-interest":
+            return "Leaf Filter Interest";
+
         default:
             return concern;
     }

@@ -190,12 +190,12 @@ const CanvasserNavbar = () => {
                             </Link>
                         </li>
                         <li>
-                            <a
-                                href='#'
+                            <Link
+                                href='/past-leads'
                                 className='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0'
                             >
                                 Past leads
-                            </a>
+                            </Link>
                         </li>
                         <li>
                             <form

@@ -18,72 +18,37 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "@/components/ui/button";
+
 import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
-import { useState } from "react";
-import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
+import { useMemo, useState } from "react";
 
-export function DataTable({
-    initialColumns,
-    initialData,
-    saleReps,
-    assignLeadToSalesRep,
-}) {
+export function DataTable({ initialColumns, initialData, statusOptions }) {
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [data, setData] = useState(initialData);
     const [columnVisibility, setColumnVisibility] = useState({});
-    const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
-    const [selectedLeadId, setSelectedLeadId] = useState(null);
-    const [leadDetails, setLeadDetails] = useState(null);
 
-    const handleAssignSalesRep = (lead) => {
-        setSelectedLeadId(lead.id);
-        setLeadDetails(lead);
-        setIsAssignDialogOpen(true);
-    };
+    const [statusFilter, setStatusFilter] = useState("all");
 
-    const handleAssignComplete = async (leadId, salesRepId) => {
-        const updatedData = await assignLeadToSalesRep(leadId, salesRepId);
-        setData(
-            data.map((lead) =>
-                lead.id === leadId
-                    ? {
-                          ...lead,
-                          salesRep:
-                              updatedData.salesRep.firstName +
-                              " " +
-                              updatedData.salesRep.lastName,
+    const filteredData = useMemo(() => {
+        return data.filter((item) => {
+            const matchesStatus =
+                statusFilter === "all" || item.status === statusFilter;
 
-                          status: updatedData.status,
-                      }
-                    : lead
-            )
-        );
-        setIsAssignDialogOpen(false);
-        setSelectedLeadId(null);
-        setLeadDetails(null);
-    };
-
-    const columns = initialColumns.map((col) => {
-        if (col.id === "actions") {
-            return {
-                ...col,
-                cell: ({ row }) =>
-                    col.cell({ row, onAssignSalesRep: handleAssignSalesRep }),
-            };
-        }
-        return col;
-    });
+            return matchesStatus;
+        });
+    }, [data, statusFilter]);
 
     const table = useReactTable({
-        data,
-        columns,
+        data: filteredData,
+        columns: initialColumns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
@@ -98,45 +63,25 @@ export function DataTable({
 
     return (
         <div>
-            {/* <div className='flex items-center py-4'>
-                <Input
-                    placeholder='Filter emails...'
-                    value={table.getColumn("email")?.getFilterValue() ?? ""}
-                    onChange={(event) =>
-                        table
-                            .getColumn("email")
-                            ?.setFilterValue(event.target.value)
-                    }
-                    className='max-w-sm'
-                />
-            </div> */}
-            {/* <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant='outline' className='ml-auto my-5'>
-                        Show/Hide Columns
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
-                    {table
-                        .getAllColumns()
-                        .filter((column) => column.getCanHide())
-                        .map((column) => {
-                            return (
-                                <DropdownMenuCheckboxItem
-                                    key={column.id}
-                                    className='capitalize'
-                                    checked={column.getIsVisible()}
-                                    onCheckedChange={(value) =>
-                                        column.toggleVisibility(!!value)
-                                    }
-                                >
-                                    {column.id}
-                                </DropdownMenuCheckboxItem>
-                            );
-                        })}
-                </DropdownMenuContent>
-            </DropdownMenu> */}
-            <div className='rounded-md border my-7'>
+            <div className='mt-7 mb-4'>
+                <Select
+                    onValueChange={setStatusFilter}
+                    value={statusFilter || "all"}
+                >
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Filter by Status' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>All Statuses</SelectItem>
+                        {statusOptions.map((status) => (
+                            <SelectItem key={status} value={status}>
+                                {status}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className='rounded-md border'>
                 <Table className='bg-white rounded-lg'>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -188,14 +133,6 @@ export function DataTable({
                         )}
                     </TableBody>
                 </Table>
-                <AssignSalesRepDialog
-                    isOpen={isAssignDialogOpen}
-                    onClose={() => setIsAssignDialogOpen(false)}
-                    leadId={selectedLeadId}
-                    onAssign={handleAssignComplete}
-                    saleReps={saleReps}
-                    leadDetails={leadDetails}
-                />
                 <div className='flex items-center justify-end space-x-2 py-4'>
                     <Button
                         variant='outline'

@@ -27,6 +27,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { useMemo, useState } from "react";
+import { isSameDay, parse } from "date-fns";
 
 export function DataTable({ columns, data, statusOptions, canvasserOptions }) {
     const [sorting, setSorting] = useState([]);
@@ -88,23 +89,24 @@ export function DataTable({ columns, data, statusOptions, canvasserOptions }) {
                         ))}
                     </SelectContent>
                 </Select>
-
-                <Select
-                    onValueChange={setCanvasserFilter}
-                    value={canvasserFilter || "all"}
-                >
-                    <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder='Filter by Canvasser' />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value='all'>All Canvassers</SelectItem>
-                        {canvasserOptions.map((canvasser) => (
-                            <SelectItem key={canvasser} value={canvasser}>
-                                {canvasser}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                {canvasserOptions && (
+                    <Select
+                        onValueChange={setCanvasserFilter}
+                        value={canvasserFilter || "all"}
+                    >
+                        <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Filter by Canvasser' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='all'>All Canvassers</SelectItem>
+                            {canvasserOptions.map((canvasser) => (
+                                <SelectItem key={canvasser} value={canvasser}>
+                                    {canvasser}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
 
                 <input
                     type='date'

@@ -151,9 +151,9 @@ export const columns = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                        <Link href={`/leads/${lead.id}`}>
+                        <a href={`/leads/${lead.id}`}>
                             <DropdownMenuItem>View details</DropdownMenuItem>
-                        </Link>
+                        </a>
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();

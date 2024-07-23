@@ -6,7 +6,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 
-const InfoCard = ({ title, value, description = "", outOf20 = false }) => {
+const InfoCard = ({ title, value, description = "" }) => {
     return (
         <Card className={`text-center `}>
             <CardHeader className='pb-2'>
@@ -14,14 +14,7 @@ const InfoCard = ({ title, value, description = "", outOf20 = false }) => {
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent>
-                <p className='text-3xl font-bold'>
-                    {value}
-                    {outOf20 && (
-                        <span className='text-sm font-medium text-zinc-500'>
-                            /20
-                        </span>
-                    )}
-                </p>
+                <p className='text-3xl font-bold'>{value}</p>
             </CardContent>
         </Card>
     );

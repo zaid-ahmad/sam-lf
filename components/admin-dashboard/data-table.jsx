@@ -50,7 +50,6 @@ export function DataTable({
 
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
-    const [dateFilter, setDateFilter] = useState("");
 
     const filteredData = useMemo(() => {
         return data.filter((item) => {
@@ -59,20 +58,9 @@ export function DataTable({
             const matchesCanvasser =
                 canvasserFilter === "all" || item.canvasser === canvasserFilter;
 
-            let matchesDate = true;
-            if (dateFilter && item.appointmentDateTime) {
-                const appointmentDate = parse(
-                    item.appointmentDateTime.split(" at ")[0],
-                    "MMMM do, yyyy",
-                    new Date()
-                );
-                const filterDate = parse(dateFilter, "yyyy-MM-dd", new Date());
-                matchesDate = isSameDay(appointmentDate, filterDate);
-            }
-
-            return matchesStatus && matchesCanvasser && matchesDate;
+            return matchesStatus && matchesCanvasser;
         });
-    }, [data, statusFilter, canvasserFilter, dateFilter]);
+    }, [data, statusFilter, canvasserFilter]);
 
     const handleAssignSalesRep = (lead) => {
         setSelectedLeadId(lead.id);
@@ -164,13 +152,6 @@ export function DataTable({
                         ))}
                     </SelectContent>
                 </Select>
-
-                <input
-                    type='date'
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    value={dateFilter}
-                    className='border rounded p-2'
-                />
             </div>
             <div className='rounded-md border'>
                 <Table className='bg-white rounded-lg'>
