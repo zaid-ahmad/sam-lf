@@ -120,8 +120,8 @@ export default async function LeadDetailsPage({ params }) {
     const lead = await getLeadDetails(params.id);
 
     return (
-        <div className='container mx-auto py-10'>
-            <Breadcrumb className='mb-10 max-w-3xl mx-auto '>
+        <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
+            <Breadcrumb className='mb-4 sm:mb-10 max-w-3xl mx-auto '>
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href='/dashboard'>
@@ -138,12 +138,12 @@ export default async function LeadDetailsPage({ params }) {
             </Breadcrumb>
             <Card className='w-full max-w-3xl mx-auto'>
                 <CardHeader>
-                    <CardTitle className='text-2xl font-bold'>
+                    <CardTitle className='text-xl sm:text-2xl font-bold'>
                         Lead Details
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className='grid grid-cols-2 gap-4'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
                             <h3 className='font-semibold'>Name</h3>
                             <p>
@@ -160,7 +160,7 @@ export default async function LeadDetailsPage({ params }) {
 
                     <Separator className='my-4' />
 
-                    <div className='grid grid-cols-2 gap-4'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
                             <h3 className='font-semibold'>Address</h3>
                             <p>{lead.address}</p>
@@ -204,7 +204,7 @@ export default async function LeadDetailsPage({ params }) {
 
                     {lead.images && lead.images.length > 0 && (
                         <div>
-                            <h3 className='font-semibold'>Images</h3>
+                            <h3 className='font-semibold mt-4'>Images</h3>
                             <div className='flex flex-wrap gap-2 mt-2'>
                                 {lead.images.map((image, index) => (
                                     <Image
@@ -213,6 +213,7 @@ export default async function LeadDetailsPage({ params }) {
                                         alt={`Image ${index}`}
                                         width={400}
                                         height={200}
+                                        className='w-full sm:w-auto'
                                     />
                                 ))}
                             </div>
@@ -222,7 +223,7 @@ export default async function LeadDetailsPage({ params }) {
 
                     <Separator className='my-4' />
 
-                    <div className='grid grid-cols-2 gap-4'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
                             <h3 className='font-semibold'>Status</h3>
                             <Badge
@@ -270,7 +271,7 @@ export default async function LeadDetailsPage({ params }) {
 
                     <Separator className='my-4' />
 
-                    <div className='grid grid-cols-2 gap-4'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
                             <h3 className='font-semibold'>Canvasser</h3>
                             <p>

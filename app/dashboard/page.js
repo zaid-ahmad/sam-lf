@@ -232,8 +232,6 @@ async function adminDashboardData(branch) {
         leadsPerTimeSlot[slot] = count;
     }
 
-    console.log(leadsPerTimeSlot);
-
     return {
         totalLeads,
         totalAssignedLeads,

@@ -6,9 +6,9 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 
-const InfoCard = ({ title, value, description = "" }) => {
+const InfoCard = ({ title, value, description = "", className }) => {
     return (
-        <Card className={`text-center `}>
+        <Card className={`text-center ${className}`}>
             <CardHeader className='pb-2'>
                 <CardTitle className='text-lg'>{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>

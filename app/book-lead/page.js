@@ -253,7 +253,7 @@ function AppointmentRequestForm() {
     }
 
     return (
-        <Card className='w-full max-w-4xl mx-auto mt-7 p-6 sm:p-8 md:p-10'>
+        <Card className='w-full max-w-4xl mx-auto mt-4 sm:mt-7 p-4 sm:p-6 md:p-8'>
             <CardHeader>
                 <CardTitle className='text-3xl font-bold'>
                     Appointment Request Form
@@ -269,30 +269,33 @@ function AppointmentRequestForm() {
                         onSubmit={form.handleSubmit((values) =>
                             onSubmit(values)
                         )}
-                        className='space-y-8'
+                        className='space-y-6 sm:space-y-8'
                     >
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                        <div className='grid grid-cols-1 gap-6'>
                             <div className='flex flex-col gap-20'>
-                                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
                                     {/* First Name */}
-                                    <FormField
-                                        control={form.control}
-                                        name='firstName'
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    First Name{""}
-                                                    <span className='text-red-600'>
-                                                        *
-                                                    </span>
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+
+                                    <div className='col-span-2'>
+                                        <FormField
+                                            control={form.control}
+                                            name='firstName'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        First Name{""}
+                                                        <span className='text-red-600'>
+                                                            *
+                                                        </span>
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
 
                                     {/* Last Name */}
                                     <FormField
@@ -315,31 +318,33 @@ function AppointmentRequestForm() {
                                     />
 
                                     {/* Primary Phone */}
-                                    <FormField
-                                        control={form.control}
-                                        name='primaryPhone'
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Primary Phone{""}
-                                                    <span className='text-red-600'>
-                                                        *
-                                                    </span>
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        placeholder='(000) 000-0000'
-                                                        {...field}
-                                                        value={phone1}
-                                                        onChange={
-                                                            handlePhone1Change
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    <div className='col-span-2'>
+                                        <FormField
+                                            control={form.control}
+                                            name='primaryPhone'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Primary Phone{""}
+                                                        <span className='text-red-600'>
+                                                            *
+                                                        </span>
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder='(000) 000-0000'
+                                                            {...field}
+                                                            value={phone1}
+                                                            onChange={
+                                                                handlePhone1Change
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
 
                                     {/* Secondary Phone */}
                                     <FormField
@@ -390,7 +395,7 @@ function AppointmentRequestForm() {
                                 </div>
                             </div>
 
-                            <div className='flex flex-col gap-6'>
+                            <div className='space-y-4 sm:space-y-6'>
                                 {/* Google Maps API Address Input */}
                                 <FormField
                                     control={form.control}
@@ -463,7 +468,7 @@ function AppointmentRequestForm() {
                             </div>
 
                             {/* Appointment, Age, Home Owner Type, Quadrant */}
-                            <div className='col-span-2 grid grid-cols-2 gap-6'>
+                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
                                 <div className='space-y-6'>
                                     {/* Appointment */}
                                     <FormField
@@ -515,7 +520,7 @@ function AppointmentRequestForm() {
                                                         }
                                                         value={field.value}
                                                     >
-                                                        <SelectTrigger className='w-[180px]'>
+                                                        <SelectTrigger className='w-full'>
                                                             <SelectValue placeholder='Please Select' />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -563,7 +568,7 @@ function AppointmentRequestForm() {
                                                         }
                                                         value={field.value}
                                                     >
-                                                        <SelectTrigger className='w-[180px]'>
+                                                        <SelectTrigger className='w-full'>
                                                             <SelectValue placeholder='Please Select' />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -606,12 +611,12 @@ function AppointmentRequestForm() {
                                                         field.onChange
                                                     }
                                                     value={field.value}
-                                                    className='space-y-1'
+                                                    className='grid grid-cols-2 gap-2'
                                                 >
                                                     {quadrants.map((item) => (
                                                         <FormItem
                                                             key={item.id}
-                                                            className='flex flex-row items-center space-x-3 space-y-0'
+                                                            className='flex items-center space-x-2'
                                                         >
                                                             <FormControl>
                                                                 <RadioGroupItem
@@ -891,7 +896,7 @@ function AppointmentRequestForm() {
                         </div>
                         <Button
                             type='submit'
-                            className='w-full'
+                            className='w-full mt-6'
                             disabled={form.formState.isSubmitting}
                         >
                             {form.formState.isSubmitting
