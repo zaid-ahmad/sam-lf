@@ -178,7 +178,7 @@ export const columns = [
                                 <input
                                     type='hidden'
                                     name='inPastLeads'
-                                    value={true}
+                                    value={false}
                                     readOnly
                                 />
                                 <button
