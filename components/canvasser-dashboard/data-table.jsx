@@ -124,7 +124,7 @@ export function DataTable({ initialColumns, initialData, statusOptions }) {
                         ) : (
                             <TableRow>
                                 <TableCell
-                                    colSpan={columns.length}
+                                    colSpan={initialColumns.length}
                                     className='h-24 text-center'
                                 >
                                     No results.

@@ -77,20 +77,21 @@ export async function addLeadToDatabase(formData) {
                 branch: user.branchCode,
             },
         });
+        /* 
+        Sends email notification to the admins of the branch
+        const emailVerdict = await sendEmail(user.branch);
 
-        // Sends email notification to the admins of the branch
-        // const emailVerdict = await sendEmail(user.branch);
+        if (!emailVerdict) {
+            return { failure: "failed to send email" };
+        }
 
-        // if (!emailVerdict) {
-        //     return { failure: "failed to send email" };
-        // }
-
-        // Sends SMS notification to the customer about the appointment
+        Sends SMS notification to the customer about the appointment
         const SMSverdict = await sendSMS(newLead.phone1);
 
         if (!SMSverdict) {
             return { failure: "failed to send SMS" };
         }
+        */
 
         revalidatePath("/dashboard");
 

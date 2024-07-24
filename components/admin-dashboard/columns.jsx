@@ -140,7 +140,7 @@ export const columns = [
     },
     {
         id: "actions",
-        cell: ({ row, onAssignSalesRep }) => {
+        cell: ({ row, onAssignSalesRep, onDeleteLead }) => {
             const lead = row.original;
             return (
                 <DropdownMenu>
@@ -166,7 +166,10 @@ export const columns = [
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <form
-                                action={deleteLead}
+                                action={async (formData) => {
+                                    await deleteLead(formData);
+                                    onDeleteLead(lead.id);
+                                }}
                                 className='group-hover:text-red-900 flex items-center justify-between w-full'
                             >
                                 <input

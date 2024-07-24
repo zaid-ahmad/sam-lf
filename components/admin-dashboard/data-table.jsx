@@ -90,12 +90,20 @@ export function DataTable({
         setLeadDetails(null);
     };
 
+    const handleDeleteLead = (id) => {
+        setData(data.filter((lead) => lead.id !== id));
+    };
+
     const columns = initialColumns.map((col) => {
         if (col.id === "actions") {
             return {
                 ...col,
                 cell: ({ row }) =>
-                    col.cell({ row, onAssignSalesRep: handleAssignSalesRep }),
+                    col.cell({
+                        row,
+                        onAssignSalesRep: handleAssignSalesRep,
+                        onDeleteLead: handleDeleteLead,
+                    }),
             };
         }
         return col;
