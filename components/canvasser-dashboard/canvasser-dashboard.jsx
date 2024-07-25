@@ -1,8 +1,12 @@
+"use client";
+
 import InfoCard from "@/app/dashboard/info-card";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { displayTodaysDate } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const CanvasserDashboard = ({
     data,
@@ -12,6 +16,15 @@ const CanvasserDashboard = ({
     totalDead,
     totalSale,
 }) => {
+    const router = useRouter();
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            router.refresh();
+        }, 10000); // Refresh every 10 seconds
+
+        return () => clearInterval(intervalId);
+    }, [router]);
     const statusOptions = ["APPOINTMENT", "ASSIGNED", "DEMO", "SALE", "DEAD"];
 
     return (
