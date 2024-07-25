@@ -1,10 +1,39 @@
 "use server";
 
 import { auth } from "@/auth";
+import NewLeadEmail from "@/emails/NewLeadEmail";
 import prisma from "@/lib/prisma";
+import resend from "@/lib/resend";
 import { formatPhoneNumber } from "@/lib/utils";
 import { appointmentSchema } from "@/lib/validations/schema";
 import { revalidatePath } from "next/cache";
+
+async function sendEmail(
+    admin_emails,
+    customerName,
+    customerPhone,
+    customerAddress,
+    customerQuadrant,
+    leadId
+) {
+    const data = await resend.emails.send({
+        from: "SAM 2.0 <noreply@zaidahmad.com>",
+        to: admin_emails,
+        subject: "New Lead",
+        react: NewLeadEmail({
+            customerName,
+            customerPhone,
+            customerAddress,
+            customerQuadrant,
+            leadId,
+        }),
+    });
+
+    return {
+        success: true,
+        data: data,
+    };
+}
 
 async function sendSMS(phoneNumber) {
     const accountSId = process.env.TWILIO_ACCOUNT_SID;
@@ -77,21 +106,31 @@ export async function addLeadToDatabase(formData) {
                 branch: user.branchCode,
             },
         });
-        /* 
-        Sends email notification to the admins of the branch
-        const emailVerdict = await sendEmail(user.branch);
 
-        if (!emailVerdict) {
+        const admin_emails = await prisma.user.findMany({
+            where: {
+                branchCode: user.branchCode,
+                role: "ADMIN",
+            },
+            select: {
+                email: true,
+            },
+        });
+
+        const admin_email_list = admin_emails.map((admin) => admin.email);
+
+        const isEmailSent = await sendEmail(
+            admin_email_list,
+            validatedData.firstName,
+            validatedData.primaryPhone,
+            validatedData.address,
+            validatedData.quadrant,
+            newLead.id
+        );
+
+        if (!isEmailSent || !isEmailSent.success) {
             return { failure: "failed to send email" };
         }
-
-        Sends SMS notification to the customer about the appointment
-        const SMSverdict = await sendSMS(newLead.phone1);
-
-        if (!SMSverdict) {
-            return { failure: "failed to send SMS" };
-        }
-        */
 
         revalidatePath("/dashboard");
 

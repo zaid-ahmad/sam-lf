@@ -243,7 +243,7 @@ function AppointmentRequestForm() {
                 toast({
                     title: "Error!",
                     description:
-                        "Somwthing went wrong. Please refresh and try again.",
+                        "Something went wrong. Please refresh and try again.",
                 });
                 router.refresh();
             }

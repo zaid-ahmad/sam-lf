@@ -1,7 +1,39 @@
 "use server";
 
+import EmailToReps from "@/emails/EmailToReps";
 import prisma from "@/lib/prisma-edge";
+import resend from "@/lib/resend";
 import { revalidatePath } from "next/cache";
+
+async function sendEmail(
+    saleRepEmail,
+    saleRepName,
+    customerName,
+    customerPhone,
+    customerAddress,
+    customerQuadrant,
+    leadId
+) {
+    const data = await resend.emails.send({
+        from: "SAM 2.0 <noreply@zaidahmad.com>",
+        to: saleRepEmail,
+        subject: "A new lead has been assigned to you",
+        react: EmailToReps({
+            saleRepEmail,
+            saleRepName,
+            customerName,
+            customerPhone,
+            customerAddress,
+            customerQuadrant,
+            leadId,
+        }),
+    });
+
+    return {
+        success: true,
+        data: data,
+    };
+}
 
 export async function assignLeadToSalesRep(leadId, salesRepId) {
     try {
@@ -24,7 +56,7 @@ export async function assignLeadToSalesRep(leadId, salesRepId) {
         // Verify that the sales rep exists and has the correct role
         const salesRep = await prisma.user.findUnique({
             where: { id: salesRepId, role: "SALES_REP" },
-            select: { id: true },
+            select: { id: true, email: true, firstName: true, lastName: true },
         });
 
         if (!salesRep) {
@@ -43,6 +75,9 @@ export async function assignLeadToSalesRep(leadId, salesRepId) {
                 id: true,
                 firstName: true,
                 lastName: true,
+                phone1: true,
+                address: true,
+                quadrant: true,
                 status: true,
                 salesRep: {
                     select: {
@@ -53,6 +88,20 @@ export async function assignLeadToSalesRep(leadId, salesRepId) {
                 },
             },
         });
+
+        const isEmailSent = await sendEmail(
+            salesRep.email,
+            salesRep.firstName + " " + salesRep.lastName,
+            updatedLead.firstName + " " + updatedLead.lastName,
+            updatedLead.phone1,
+            updatedLead.address,
+            updatedLead.quadrant,
+            updatedLead.id
+        );
+
+        if (!isEmailSent) {
+            throw new Error("Failed to send email");
+        }
 
         revalidatePath("/dashboard");
         return updatedLead;
