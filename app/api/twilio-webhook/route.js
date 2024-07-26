@@ -1,5 +1,5 @@
 import RescheduleRequest from "@/emails/RescheduleRequest";
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma-edge";
 import resend from "@/lib/resend";
 import { dirtyToFormattedPhoneNumber } from "@/lib/utils";
 import { NextResponse } from "next/server";
