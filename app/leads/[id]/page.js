@@ -85,7 +85,7 @@ function formatConcerns(concern) {
             return "Inspection / Estimate";
 
         case "clogging-damages":
-            return "Cloging / Damages";
+            return "Clogging / Damages";
 
         case "new-gutters":
             return "New Gutters";
