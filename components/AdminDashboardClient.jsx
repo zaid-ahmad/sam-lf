@@ -16,7 +16,7 @@ export default function AdminDashboardClient({ initialData }) {
             }
         };
 
-        const intervalId = setInterval(fetchData, 20000); // Poll every 20 seconds
+        const intervalId = setInterval(fetchData, 30000); // Poll every 30 seconds
 
         return () => clearInterval(intervalId); // Cleanup on unmount
     }, []);

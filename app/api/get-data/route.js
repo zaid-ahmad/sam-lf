@@ -74,8 +74,6 @@ export async function GET(request) {
 
             break;
         case "canvasser":
-            console.log("hi from canvasser");
-
             const { canvasserData, canvasserFirstName } =
                 await getCanvasserData(session);
             const { totalCanvasserLeads, totalDemo, totalDead, totalSale } =

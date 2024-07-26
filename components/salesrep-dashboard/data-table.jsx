@@ -25,7 +25,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChangeLeadStatusDialog } from "../change-lead-status-dialog";
 
 export function DataTable({
@@ -43,6 +43,10 @@ export function DataTable({
     const [leadDetails, setLeadDetails] = useState(null);
 
     const [statusFilter, setStatusFilter] = useState("all");
+
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
 
     const filteredData = useMemo(() => {
         return data.filter((item) => {

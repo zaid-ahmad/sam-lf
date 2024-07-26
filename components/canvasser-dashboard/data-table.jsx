@@ -27,7 +27,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function DataTable({ initialColumns, initialData, statusOptions }) {
     const [sorting, setSorting] = useState([]);
@@ -36,6 +36,10 @@ export function DataTable({ initialColumns, initialData, statusOptions }) {
     const [columnVisibility, setColumnVisibility] = useState({});
 
     const [statusFilter, setStatusFilter] = useState("all");
+
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
 
     const filteredData = useMemo(() => {
         return data.filter((item) => {
