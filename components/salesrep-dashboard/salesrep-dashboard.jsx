@@ -35,7 +35,7 @@ const SalesRepDashboard = ({
             </h2>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-[1.74rem] mb-6 sm:mb-10'>
                 <InfoCard
-                    title='Leads so far for today'
+                    title='Leads assigned today'
                     value={totalLeads}
                     description={displayTodaysDate()}
                     className='w-full sm:w-auto'
