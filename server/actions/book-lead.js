@@ -121,7 +121,7 @@ export async function addLeadToDatabase(formData) {
 
         const isEmailSent = await sendEmail(
             admin_email_list,
-            validatedData.firstName,
+            validatedData.firstName + " " + validatedData.lastName,
             validatedData.primaryPhone,
             validatedData.address,
             validatedData.quadrant,
