@@ -1,6 +1,6 @@
 {
     "functions": {
-        "/auth": {
+        "app/auth.js": {
             "maxDuration": 60
         }
     }
