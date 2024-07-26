@@ -1,18 +1,13 @@
-"use client";
-
 import InfoCard from "@/app/dashboard/info-card";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { displayTodaysDate } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 const AdminDashboard = ({
     data,
-    sale_reps,
-    assignLeadToSalesRep,
     name,
+    sale_reps,
     totalLeads,
     totalAssignedLeads,
     totalUnassignedLeads,
@@ -22,16 +17,8 @@ const AdminDashboard = ({
     slots_03,
     slots_05,
     slots_07,
+    assignLeadToSalesRep,
 }) => {
-    const router = useRouter();
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            router.refresh();
-        }, 10000); // Refresh every 10 seconds
-
-        return () => clearInterval(intervalId);
-    }, [router]);
     const statusOptions = ["APPOINTMENT", "ASSIGNED", "DEMO", "SALE", "DEAD"];
 
     return (

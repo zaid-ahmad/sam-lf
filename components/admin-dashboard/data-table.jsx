@@ -29,7 +29,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
 
 export function DataTable({
@@ -50,6 +50,10 @@ export function DataTable({
 
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
+
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
 
     const filteredData = useMemo(() => {
         return data.filter((item) => {
