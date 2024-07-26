@@ -12,6 +12,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Image from "next/image";
+import Link from "next/link";
 
 async function getLeadDetails(id) {
     const lead = await prisma.lead.findUnique({
@@ -219,9 +220,6 @@ export default async function LeadDetailsPage({ params }) {
                             </div>
                         </div>
                     )}
-                    <div></div>
-
-                    <Separator className='my-4' />
 
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
@@ -237,37 +235,53 @@ export default async function LeadDetailsPage({ params }) {
                                 {lead.status}
                             </Badge>
                         </div>
-                        <div>
-                            <h3 className='font-semibold'>Amount</h3>
-                            <p>
-                                {lead.amount
-                                    ? `$${lead.amount.toFixed(2)}`
-                                    : "N/A"}
-                            </p>
-                        </div>
-                    </div>
+                        {lead.amount && (
+                            <div>
+                                <h3 className='font-semibold'>Amount</h3>
+                                <p>{`$${lead.amount.toFixed(2)}`}</p>
+                            </div>
+                        )}
 
-                    {lead.jobNumber && (
-                        <>
-                            <Separator className='my-4' />
+                        {lead.reason && (
+                            <div>
+                                <h3 className='font-semibold'>Reason</h3>
+                                {lead.reason ? (
+                                    <p>{lead.reason}</p>
+                                ) : (
+                                    <p>N/A</p>
+                                )}
+                            </div>
+                        )}
+
+                        {lead.jobNumber && (
                             <div>
                                 <h3 className='font-semibold'>Job Number</h3>
                                 <p>{lead.jobNumber}</p>
                             </div>
-                        </>
-                    )}
+                        )}
 
-                    {lead.installationDate && (
-                        <>
-                            <Separator className='my-4' />
+                        {lead.installationDate && (
                             <div>
                                 <h3 className='font-semibold'>
                                     Installation Date
                                 </h3>
                                 <p>{lead.installationDate}</p>
                             </div>
-                        </>
-                    )}
+                        )}
+
+                        {lead.DNSFile && (
+                            <div>
+                                <h3 className='font-semibold'>DNS File</h3>
+                                <Link
+                                    href={lead.DNSFile}
+                                    download
+                                    className='underline'
+                                >
+                                    See here
+                                </Link>
+                            </div>
+                        )}
+                    </div>
 
                     <Separator className='my-4' />
 

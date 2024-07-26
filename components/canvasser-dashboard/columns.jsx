@@ -40,6 +40,7 @@ export const columns = [
                 SALE: "green",
                 DEAD: "red",
                 UNASSIGNED: "gray",
+                REBOOK: "pink",
             };
 
             return (

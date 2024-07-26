@@ -139,6 +139,8 @@ const PastLeads = async () => {
             "DEMO",
             "SALE",
             "DEAD",
+            "REBOOK",
+            "CANCELLED",
         ];
 
         return (
@@ -175,6 +177,8 @@ const PastLeads = async () => {
             "DEMO",
             "SALE",
             "DEAD",
+            "REBOOK",
+            "CANCELLED",
         ];
 
         return (

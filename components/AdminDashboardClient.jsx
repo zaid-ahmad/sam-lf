@@ -21,8 +21,6 @@ export default function AdminDashboardClient({ initialData }) {
         return () => clearInterval(intervalId); // Cleanup on unmount
     }, []);
 
-    console.log(dashboardData);
-
     return (
         <AdminDashboard
             {...dashboardData}

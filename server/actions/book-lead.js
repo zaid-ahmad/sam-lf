@@ -7,6 +7,7 @@ import resend from "@/lib/resend";
 import { formatPhoneNumber } from "@/lib/utils";
 import { appointmentSchema } from "@/lib/validations/schema";
 import { revalidatePath } from "next/cache";
+import twilio from "twilio";
 
 async function sendEmail(
     admin_emails,
@@ -35,14 +36,23 @@ async function sendEmail(
     };
 }
 
-async function sendSMS(phoneNumber) {
+async function sendSMS(phoneNumber, dateTime) {
     const accountSId = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
 
-    const client = require("twilio")(accountSId, authToken);
+    const client = twilio(accountSId, authToken);
 
     const result = await client.messages.create({
-        body: "Your appointment has been booked!",
+        body: `
+        Leaf Filter Appointment Confirmation ${dateTime}. 
+
+We look forward to meeting you!
+
+To make any changes, reply with :
+REBOOK - To have your appointment rescheduled.
+CANCEL-APT - To cancel your appointment.
+STOP - To unsubscribe.
+        `,
         from: "+19123015571",
         to: formatPhoneNumber(phoneNumber),
     });
@@ -127,6 +137,15 @@ export async function addLeadToDatabase(formData) {
             validatedData.quadrant,
             newLead.id
         );
+
+        const isSMSSent = await sendSMS(
+            validatedData.primaryPhone,
+            validatedData.appointmentDateTime
+        );
+
+        if (!isSMSSent) {
+            return { failure: "failed to send SMS" };
+        }
 
         if (!isEmailSent || !isEmailSent.success) {
             return { failure: "failed to send email" };

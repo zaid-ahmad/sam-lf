@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import SalesRepDashboard from "./salesrep-dashboard/salesrep-dashboard";
+import { changeLeadStatus } from "@/server/actions/change-lead-status";
 
 export default function SaleRepDashboardClient({ initialData }) {
     const [dashboardData, setDashboardData] = useState(initialData);
@@ -20,5 +21,10 @@ export default function SaleRepDashboardClient({ initialData }) {
         return () => clearInterval(intervalId); // Cleanup on unmount
     }, []);
 
-    return <SalesRepDashboard {...dashboardData} />;
+    return (
+        <SalesRepDashboard
+            {...dashboardData}
+            changeLeadStatus={changeLeadStatus}
+        />
+    );
 }

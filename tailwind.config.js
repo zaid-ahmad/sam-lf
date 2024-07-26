@@ -26,6 +26,9 @@ module.exports = {
         "bg-gray-100",
         "text-gray-800",
         "border-gray-300",
+        "bg-pink-100",
+        "text-pink-800",
+        "border-pink-300",
     ],
     prefix: "",
     theme: {

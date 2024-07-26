@@ -25,7 +25,15 @@ const CanvasserDashboard = ({
 
         return () => clearInterval(intervalId);
     }, [router]);
-    const statusOptions = ["APPOINTMENT", "ASSIGNED", "DEMO", "SALE", "DEAD"];
+    const statusOptions = [
+        "APPOINTMENT",
+        "ASSIGNED",
+        "DEMO",
+        "SALE",
+        "DEAD",
+        "REBOOK",
+        "CANCELLED",
+    ];
 
     return (
         <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>

@@ -83,7 +83,7 @@ model Lead {
   branch          String        
   firstName       String
   lastName        String
-  phone1          String
+  phone1          String        @unique
   phone2          String?
   email           String?
   address         String
@@ -136,6 +136,8 @@ enum LeadStatus {
   DEAD
   DEMO
   SALE
+  REBOOK
+  CANCELLED
 }
 
 enum TypesOfServices {
