@@ -1,7 +1,7 @@
 "use server";
 
 import EmailToReps from "@/emails/EmailToReps";
-import prisma from "@/lib/prisma-edge";
+import prisma from "@/lib/prisma";
 import resend from "@/lib/resend";
 import { revalidatePath } from "next/cache";
 
