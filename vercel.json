@@ -1,6 +1,6 @@
 {
     "functions": {
-        "app/api/auth/[...nextauth]/route.js": {
+        "/auth": {
             "maxDuration": 60
         }
     }
