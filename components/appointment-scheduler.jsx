@@ -45,14 +45,23 @@ export default function AppointmentScheduler({
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button
+                <div
+                    role='button'
                     variant={"outline"}
+                    tabIndex={0}
+                    aria-haspopup='true'
                     className={cn(
                         "w-full sm:w-[280px] justify-start text-left font-normal",
                         !date && "text-muted-foreground"
                     )}
                     onClick={() => {}}
                     onTouchStart={() => {}}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            e.target.click();
+                        }
+                    }}
                 >
                     <CalendarIcon className='mr-2 h-4 w-4' />
                     <span className='truncate'>
@@ -70,11 +79,11 @@ export default function AppointmentScheduler({
                             </span>
                         )}
                     </span>
-                </Button>
+                </div>
             </PopoverTrigger>
             <PopoverContent
                 className={cn(
-                    "w-auto p-0 z-50",
+                    "w-auto p-0 z-[1000]",
                     showTimeSlots ? "max-w-[400px]" : "max-w-[300px]"
                 )}
             >
