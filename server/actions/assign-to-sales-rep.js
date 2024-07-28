@@ -15,7 +15,7 @@ async function sendEmail(
     leadId
 ) {
     const data = await resend.emails.send({
-        from: "SAM 2.0 <noreply@zaidahmad.com>",
+        from: "SAM 2.0 <noreply@leadflowmanager.com>",
         to: saleRepEmail,
         subject: "A new lead has been assigned to you",
         react: EmailToReps({
