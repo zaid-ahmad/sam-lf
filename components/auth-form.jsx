@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 import {
     Form,
     FormControl,
@@ -20,14 +21,22 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import resendLogin from "@/server/actions/resend-login";
-import { useEffect, useState } from "react";
+import handleAuth from "@/server/actions/handle-auth";
+import { useState } from "react";
 import Spinner from "./spinner";
 import { useToast } from "@/components/ui/use-toast";
 import { loginSchema, registerSchema } from "@/lib/validations/schema";
+import { useRouter } from "next/navigation";
 
-// Move FormFields component outside of AuthForm
-const FormFields = ({ form, isLogin, onSubmit, formError, isLoading }) => (
+const FormFields = ({
+    form,
+    isLogin,
+    onSubmit,
+    formError,
+    isLoading,
+    showPassword,
+    setShowPassword,
+}) => (
     <Form {...form}>
         <form
             onSubmit={form.handleSubmit((values) => onSubmit(values, isLogin))}
@@ -45,18 +54,47 @@ const FormFields = ({ form, isLogin, onSubmit, formError, isLoading }) => (
                             <Input
                                 {...field}
                                 type='email'
-                                placeholder='firstname.lastname@leafhome.com'
+                                placeholder='example@example.com'
                                 required
+                                value={field.value || ""}
                             />
                         </FormControl>
-                        {isLogin ? (
-                            <FormMessage>
-                                <span className='text-black font-base text-xs'>
-                                    A secure login link will be sent to the
-                                    provided email address.
-                                </span>
-                            </FormMessage>
-                        ) : null}
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>
+                            Password<span className='text-red-500'>*</span>
+                        </FormLabel>
+                        <FormControl>
+                            <div className='relative'>
+                                <Input
+                                    {...field}
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder='Enter your password'
+                                    value={field.value || ""}
+                                    required
+                                />
+                                <button
+                                    type='button'
+                                    className='absolute inset-y-0 right-0 pr-3 flex items-center'
+                                    onClick={() =>
+                                        setShowPassword(!showPassword)
+                                    }
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className='h-4 w-4 text-gray-500' />
+                                    ) : (
+                                        <Eye className='h-4 w-4 text-gray-500' />
+                                    )}
+                                </button>
+                            </div>
+                        </FormControl>
                         <FormMessage />
                     </FormItem>
                 )}
@@ -78,6 +116,7 @@ const FormFields = ({ form, isLogin, onSubmit, formError, isLoading }) => (
                                             {...field}
                                             type='text'
                                             placeholder='John'
+                                            value={field.value || ""}
                                             required
                                         />
                                     </FormControl>
@@ -99,6 +138,7 @@ const FormFields = ({ form, isLogin, onSubmit, formError, isLoading }) => (
                                             {...field}
                                             type='text'
                                             placeholder='Doe'
+                                            value={field.value || ""}
                                             required
                                         />
                                     </FormControl>
@@ -122,6 +162,8 @@ const FormFields = ({ form, isLogin, onSubmit, formError, isLoading }) => (
                                         type='text'
                                         placeholder='XXXX'
                                         className='uppercase'
+                                        value={field.value || ""}
+                                        maxLength={4}
                                         required
                                     />
                                 </FormControl>
@@ -141,7 +183,7 @@ const FormFields = ({ form, isLogin, onSubmit, formError, isLoading }) => (
                                 <FormControl>
                                     <Select
                                         onValueChange={field.onChange}
-                                        defaultValue={field.value}
+                                        defaultValue={field.value || ""}
                                     >
                                         <SelectTrigger className='w-full'>
                                             <SelectValue placeholder='Select a role' />
@@ -180,7 +222,7 @@ const FormFields = ({ form, isLogin, onSubmit, formError, isLoading }) => (
                             <Spinner color='text-gray-100' />
                         </div>
                     ) : (
-                        <p>{isLogin ? "Send Login Link" : "Create Account"}</p>
+                        <p>{isLogin ? "Log In" : "Create Account"}</p>
                     )}
                 </Button>
             </div>
@@ -188,59 +230,69 @@ const FormFields = ({ form, isLogin, onSubmit, formError, isLoading }) => (
     </Form>
 );
 
+const loginDefaultValues = {
+    email: "",
+    password: "",
+};
+
+const registerDefaultValues = {
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    branchCode: "",
+    role: "",
+};
+
 function AuthForm() {
     const [formError, setFormError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [isEmailSent, setIsEmailSent] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
     const { toast } = useToast();
+    const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
 
     const form = useForm({
         resolver: zodResolver(isLogin ? loginSchema : registerSchema),
-        defaultValues: {
-            email: "",
-            firstName: "",
-            lastName: "",
-            branchCode: "",
-            role: undefined,
-        },
+        defaultValues: isLogin ? loginDefaultValues : registerDefaultValues,
     });
 
     async function onSubmit(values, isLogin) {
         setIsLoading(true);
         setFormError("");
         try {
-            const result = await resendLogin(values, isLogin);
+            const dataToSend = isLogin
+                ? { email: values.email, password: values.password }
+                : values;
+            const result = await handleAuth(dataToSend, isLogin);
             if (result?.error) {
-                setFormError(result.error.message);
+                setFormError(result.error);
                 console.error("Error submitting form:", result.error);
+            } else if (result?.success) {
+                router.push(result.redirectUrl);
             }
         } catch (error) {
-            setFormError(error.message);
+            setFormError("An unexpected error occurred.");
             console.error("Error submitting form:", error);
         } finally {
-            setIsEmailSent(true);
             setIsLoading(false);
         }
     }
 
-    useEffect(() => {
-        if (isEmailSent) {
-            toast({
-                title: "Email sent",
-                description: "Check your inbox for the login link.",
-            });
-        }
-    }, [isEmailSent, toast]);
-
     const handleTabChange = (newValue) => {
-        setIsLogin(newValue === "login");
-        form.reset();
+        const isLoginTab = newValue === "login";
+        setIsLogin(isLoginTab);
+        form.reset(isLoginTab ? loginDefaultValues : registerDefaultValues);
+        setShowPassword(false);
+        setFormError("");
     };
 
     return (
         <div className='flex flex-col items-center shadow-lg p-7 rounded-lg bg-white'>
-            <Tabs defaultValue='login' className='w-[400px] h-[500px]'>
+            <Tabs
+                defaultValue={isLogin ? "login" : "account"}
+                className='w-80 md:w-[400px] h-[590px]'
+            >
                 <TabsList className='grid w-full grid-cols-2 gap-4'>
                     <TabsTrigger
                         value='account'
@@ -262,6 +314,8 @@ function AuthForm() {
                         onSubmit={onSubmit}
                         formError={formError}
                         isLoading={isLoading}
+                        setShowPassword={setShowPassword}
+                        showPassword={showPassword}
                     />
                 </TabsContent>
                 <TabsContent value='login'>
@@ -271,6 +325,8 @@ function AuthForm() {
                         onSubmit={onSubmit}
                         formError={formError}
                         isLoading={isLoading}
+                        setShowPassword={setShowPassword}
+                        showPassword={showPassword}
                     />
                 </TabsContent>
             </Tabs>
