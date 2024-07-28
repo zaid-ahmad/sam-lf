@@ -157,7 +157,7 @@ async function sendEmailToBranchAdmins(branch, lead) {
     const admin_email_list = admin_emails.map((admin) => admin.email);
 
     const data = await resend.emails.send({
-        from: "SAM 2.0 <noreply@zaidahmad.com>",
+        from: "SAM 2.0 <noreply@leadflowmanager.com>",
         to: admin_email_list,
         subject: `Rescheduling Request for ${lead.firstName} ${lead.lastName}`,
         react: RescheduleRequest({
