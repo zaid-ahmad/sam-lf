@@ -51,6 +51,8 @@ export default function AppointmentScheduler({
                         "w-full sm:w-[280px] justify-start text-left font-normal",
                         !date && "text-muted-foreground"
                     )}
+                    onClick={() => {}}
+                    onTouchStart={() => {}}
                 >
                     <CalendarIcon className='mr-2 h-4 w-4' />
                     <span className='truncate'>
@@ -72,7 +74,7 @@ export default function AppointmentScheduler({
             </PopoverTrigger>
             <PopoverContent
                 className={cn(
-                    "w-auto p-0",
+                    "w-auto p-0 z-50",
                     showTimeSlots ? "max-w-[400px]" : "max-w-[300px]"
                 )}
             >
