@@ -51,7 +51,7 @@ export default function AppointmentScheduler({
                     tabIndex={0}
                     aria-haspopup='true'
                     className={cn(
-                        "w-full sm:w-[280px] justify-start text-left font-normal flex items-center px-3 py-2 rounded-lg bg-zinc-50 border",
+                        "w-full sm:w-[280px] justify-start text-left font-normal flex items-center px-3 py-2 rounded-lg text-sm bg-zinc-50 border",
                         !date && "text-muted-foreground"
                     )}
                     onClick={() => {}}

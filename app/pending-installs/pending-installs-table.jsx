@@ -39,11 +39,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { parse } from "date-fns";
 
-export function PendingInstallsTable({ columns, initialData, canvasserNames }) {
+export function PendingInstallsTable({
+    columns,
+    initialData,
+    canvasserNames,
+    allBranches,
+    isSuperAdmin,
+}) {
     const [sorting, setSorting] = useState([]);
     const [data, setData] = useState(initialData);
 
     const [canvasserFilter, setCanvasserFilter] = useState("all");
+    const [branchFilter, setBranchFilter] = useState("all");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
@@ -51,6 +58,8 @@ export function PendingInstallsTable({ columns, initialData, canvasserNames }) {
         return data.filter((item) => {
             const matchesCanvasser =
                 canvasserFilter === "all" || item.canvasser === canvasserFilter;
+            const matchesBranch =
+                branchFilter === "all" || item.branch === branchFilter;
 
             let matchesDateRange = true;
             if (startDate || endDate) {
@@ -66,9 +75,9 @@ export function PendingInstallsTable({ columns, initialData, canvasserNames }) {
                     (!start || itemDate >= start) && (!end || itemDate <= end);
             }
 
-            return matchesCanvasser && matchesDateRange;
+            return matchesCanvasser && matchesBranch && matchesDateRange;
         });
-    }, [data, canvasserFilter, startDate, endDate]);
+    }, [data, canvasserFilter, branchFilter, startDate, endDate]);
 
     const table = useReactTable({
         data: filteredData,
@@ -130,6 +139,24 @@ export function PendingInstallsTable({ columns, initialData, canvasserNames }) {
                         ))}
                     </SelectContent>
                 </Select>
+                {isSuperAdmin && (
+                    <Select
+                        onValueChange={setBranchFilter}
+                        value={branchFilter}
+                    >
+                        <SelectTrigger className='w-[200px]'>
+                            <SelectValue placeholder='Filter by Branch' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='all'>All Branches</SelectItem>
+                            {allBranches.map(({ code, name }) => (
+                                <SelectItem key={code} value={code}>
+                                    {name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
                 <div className='flex space-x-4'>
                     <Input
                         type='date'

@@ -4,18 +4,20 @@ import { redirect } from "next/navigation";
 import { PendingInstallsTable } from "./pending-installs-table";
 import { columns } from "./columns";
 
-async function getPendingInstallsData(session) {
+async function getPendingInstallsData(session, branch = null) {
     const user = await prisma.user.findUnique({
         where: {
             email: session?.user?.email,
         },
     });
 
+    const whereClause = {
+        status: "SALE",
+        branch: branch || user.branchCode,
+    };
+
     const pendingInstallsData = await prisma.lead.findMany({
-        where: {
-            status: "SALE",
-            branch: user.branchCode,
-        },
+        where: whereClause,
         select: {
             id: true,
             jobNumber: true,
@@ -23,6 +25,7 @@ async function getPendingInstallsData(session) {
             installationDate: true,
             amount: true,
             funded: true,
+            branch: true,
             canvasser: {
                 select: {
                     firstName: true,
@@ -42,7 +45,7 @@ async function getPendingInstallsData(session) {
     const canvassers = await prisma.user.findMany({
         where: {
             role: "CANVASSER",
-            branchCode: user.branchCode,
+            branchCode: branch || user.branchCode,
         },
         select: {
             firstName: true,
@@ -54,9 +57,17 @@ async function getPendingInstallsData(session) {
         `${c.firstName} ${c.lastName}`.trim()
     );
 
+    const allBranches = await prisma.branch.findMany({
+        select: {
+            code: true,
+            name: true,
+        },
+    });
+
     return {
         transformedData,
         canvasserNames,
+        allBranches,
     };
 }
 
@@ -64,19 +75,20 @@ const PendingInstalls = async () => {
     const session = await auth();
     const role = session?.user?.role;
 
-    if (role !== "ADMIN") {
+    if (role !== "ADMIN" && role !== "SUPERADMIN") {
         return redirect("/");
     }
 
-    const { transformedData, canvasserNames } = await getPendingInstallsData(
-        session
-    );
+    const { transformedData, canvasserNames, allBranches } =
+        await getPendingInstallsData(session);
 
     return (
         <PendingInstallsTable
             columns={columns}
             initialData={transformedData}
             canvasserNames={canvasserNames}
+            allBranches={allBranches}
+            isSuperAdmin={role === "SUPERADMIN"}
         />
     );
 };

@@ -11,8 +11,9 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { getBranches } from "@/lib/data";
 
-async function getAdminPastLeads(session) {
+async function getAdminPastLeads(session, branch = null) {
     const { today } = getTodayAndTomorrow();
     const user = await prisma.user.findUnique({
         where: {
@@ -24,7 +25,7 @@ async function getAdminPastLeads(session) {
     });
     const data = await prisma.lead.findMany({
         where: {
-            branch: user.branchCode,
+            branch: branch || user.branchCode,
             createdAt: {
                 lt: today,
             },
@@ -110,12 +111,12 @@ async function getCanvasserPastLeads(user_id) {
     return { data: transformedData };
 }
 
-async function getAllCanvasserNames(branch) {
+async function getAllCanvasserNames(branch = null) {
+    const whereClause = branch
+        ? { role: "CANVASSER", branchCode: branch }
+        : { role: "CANVASSER" };
     const canvassers = await prisma.user.findMany({
-        where: {
-            role: "CANVASSER",
-            branchCode: branch,
-        },
+        where: whereClause,
         select: {
             firstName: true,
             lastName: true,
@@ -130,7 +131,7 @@ async function getAllCanvasserNames(branch) {
 const PastLeads = async () => {
     const session = await auth();
 
-    if (session.user.role === "ADMIN") {
+    if (session.user.role === "ADMIN" || session.user.role === "SUPERADMIN") {
         const { data, branch } = await getAdminPastLeads(session);
         const listOfCanvassers = await getAllCanvasserNames(branch);
         const statusOptions = [
@@ -142,6 +143,9 @@ const PastLeads = async () => {
             "REBOOK",
             "CANCELLED",
         ];
+
+        const allBranches =
+            session.user.role === "SUPERADMIN" ? await getBranches() : null;
 
         return (
             <div className='container'>
@@ -164,6 +168,8 @@ const PastLeads = async () => {
                     data={data}
                     statusOptions={statusOptions}
                     canvasserOptions={listOfCanvassers}
+                    allBranches={allBranches}
+                    isSuperAdmin={session.user.role === "SUPERADMIN"}
                 />
             </div>
         );

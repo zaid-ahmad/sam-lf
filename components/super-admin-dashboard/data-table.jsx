@@ -8,6 +8,8 @@ import {
     useReactTable,
 } from "@tanstack/react-table";
 
+import { parse, isSameDay } from "date-fns";
+
 import {
     Table,
     TableBody,
@@ -17,6 +19,8 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
+import { Button } from "@/components/ui/button";
+
 import {
     Select,
     SelectContent,
@@ -25,24 +29,31 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import { Button } from "@/components/ui/button";
-import { useMemo, useState } from "react";
-import { isSameDay, parse } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
+import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
 
 export function DataTable({
-    columns,
-    data,
+    initialColumns,
+    initialData,
+    saleReps,
+    assignLeadToSalesRep,
     statusOptions,
     canvasserOptions,
-    allBranches,
-    isSuperAdmin,
 }) {
     const [sorting, setSorting] = useState([]);
+    const [columnFilters, setColumnFilters] = useState([]);
+    const [data, setData] = useState(initialData);
+    const [columnVisibility, setColumnVisibility] = useState({});
+    const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+    const [selectedLeadId, setSelectedLeadId] = useState(null);
+    const [leadDetails, setLeadDetails] = useState(null);
 
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
-    const [branchFilter, setBranchFilter] = useState("all");
-    const [dateFilter, setDateFilter] = useState("");
+
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
 
     const filteredData = useMemo(() => {
         return data.filter((item) => {
@@ -50,28 +61,57 @@ export function DataTable({
                 statusFilter === "all" || item.status === statusFilter;
             const matchesCanvasser =
                 canvasserFilter === "all" || item.canvasser === canvasserFilter;
-            const matchesBranch =
-                branchFilter === "all" || item.branch === branchFilter;
 
-            let matchesDate = true;
-            if (dateFilter && item.appointmentDateTime) {
-                const appointmentDate = parse(
-                    item.appointmentDateTime.split(" at ")[0],
-                    "MMMM do, yyyy",
-                    new Date()
-                );
-                const filterDate = parse(dateFilter, "yyyy-MM-dd", new Date());
-                matchesDate = isSameDay(appointmentDate, filterDate);
-            }
-
-            return (
-                matchesStatus &&
-                matchesCanvasser &&
-                matchesBranch &&
-                matchesDate
-            );
+            return matchesStatus && matchesCanvasser;
         });
-    }, [data, statusFilter, canvasserFilter, branchFilter, dateFilter]);
+    }, [data, statusFilter, canvasserFilter]);
+
+    const handleAssignSalesRep = (lead) => {
+        setSelectedLeadId(lead.id);
+        setLeadDetails(lead);
+        setIsAssignDialogOpen(true);
+    };
+
+    const handleAssignComplete = async (leadId, salesRepId) => {
+        const updatedData = await assignLeadToSalesRep(leadId, salesRepId);
+        setData(
+            data.map((lead) =>
+                lead.id === leadId
+                    ? {
+                          ...lead,
+                          salesRep:
+                              updatedData.salesRep.firstName +
+                              " " +
+                              updatedData.salesRep.lastName,
+
+                          status: updatedData.status,
+                      }
+                    : lead
+            )
+        );
+        setIsAssignDialogOpen(false);
+        setSelectedLeadId(null);
+        setLeadDetails(null);
+    };
+
+    const handleDeleteLead = (id) => {
+        setData(data.filter((lead) => lead.id !== id));
+    };
+
+    const columns = initialColumns.map((col) => {
+        if (col.id === "actions") {
+            return {
+                ...col,
+                cell: ({ row }) =>
+                    col.cell({
+                        row,
+                        onAssignSalesRep: handleAssignSalesRep,
+                        onDeleteLead: handleDeleteLead,
+                    }),
+            };
+        }
+        return col;
+    });
 
     const table = useReactTable({
         data: filteredData,
@@ -80,8 +120,11 @@ export function DataTable({
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
+        onColumnVisibilityChange: setColumnVisibility,
         state: {
             sorting,
+            columnFilters,
+            columnVisibility,
         },
     });
 
@@ -104,68 +147,42 @@ export function DataTable({
                         ))}
                     </SelectContent>
                 </Select>
-                {canvasserOptions && (
-                    <Select
-                        onValueChange={setCanvasserFilter}
-                        value={canvasserFilter || "all"}
-                    >
-                        <SelectTrigger className='w-[180px]'>
-                            <SelectValue placeholder='Filter by Canvasser' />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value='all'>All Canvassers</SelectItem>
-                            {canvasserOptions.map((canvasser) => (
-                                <SelectItem key={canvasser} value={canvasser}>
-                                    {canvasser}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                )}
-                {isSuperAdmin && allBranches && (
-                    <Select
-                        onValueChange={setBranchFilter}
-                        value={branchFilter || "all"}
-                    >
-                        <SelectTrigger className='w-[180px]'>
-                            <SelectValue placeholder='Filter by Branch' />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value='all'>All Branches</SelectItem>
-                            {allBranches.map((branch) => (
-                                <SelectItem
-                                    key={branch.code}
-                                    value={branch.code}
-                                >
-                                    {branch.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                )}
-                <input
-                    type='date'
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    value={dateFilter}
-                    className='border rounded p-2'
-                />
+
+                <Select
+                    onValueChange={setCanvasserFilter}
+                    value={canvasserFilter || "all"}
+                >
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Filter by Canvasser' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>All Canvassers</SelectItem>
+                        {canvasserOptions.map((canvasser) => (
+                            <SelectItem key={canvasser} value={canvasser}>
+                                {canvasser}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
-            <div className='rounded-md border my-7'>
+            <div className='rounded-md border'>
                 <Table className='bg-white rounded-lg'>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext()
-                                              )}
-                                    </TableHead>
-                                ))}
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef
+                                                          .header,
+                                                      header.getContext()
+                                                  )}
+                                        </TableHead>
+                                    );
+                                })}
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -200,6 +217,14 @@ export function DataTable({
                         )}
                     </TableBody>
                 </Table>
+                <AssignSalesRepDialog
+                    isOpen={isAssignDialogOpen}
+                    onClose={() => setIsAssignDialogOpen(false)}
+                    leadId={selectedLeadId}
+                    onAssign={handleAssignComplete}
+                    saleReps={saleReps}
+                    leadDetails={leadDetails}
+                />
                 <div className='flex items-center justify-end space-x-2 py-4'>
                     <Button
                         variant='outline'

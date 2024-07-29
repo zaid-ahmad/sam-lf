@@ -84,6 +84,7 @@ enum UserRole {
   ADMIN
   CANVASSER
   SALES_REP
+  SUPERADMIN
 }
 
 enum LeadStatus {
