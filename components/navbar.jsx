@@ -190,7 +190,7 @@ const Navbar = async () => {
 
     const role = session?.user?.role;
 
-    return role === "ADMIN" ? (
+    return role === "ADMIN" || role === "SUPERADMIN" ? (
         <AdminNavbar />
     ) : role === "CANVASSER" ? (
         <CanvasserNavbar />

@@ -27,4 +27,8 @@ export const columns = [
         header: "Funded",
         cell: ({ row }) => (row.original.funded ? "Yes" : "No"),
     },
+    {
+        accessorKey: "branch",
+        header: "Branch",
+    },
 ];

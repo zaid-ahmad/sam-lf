@@ -1,10 +1,20 @@
+"use client";
+
 import InfoCard from "@/app/dashboard/info-card";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { displayTodaysDate } from "@/lib/utils";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../ui/select";
+import { useEffect, useState } from "react";
 
-const AdminDashboard = ({
+const SuperAdminDashboard = ({
     data,
     name,
     sale_reps,
@@ -19,8 +29,9 @@ const AdminDashboard = ({
     slots_07,
     assignLeadToSalesRep,
     allBranches,
-    isSuperAdmin,
+    onBranchChange,
 }) => {
+    const [branchFilter, setBranchFilter] = useState("3CGY");
     const statusOptions = [
         "APPOINTMENT",
         "ASSIGNED",
@@ -31,11 +42,29 @@ const AdminDashboard = ({
         "CANCELLED",
     ];
 
+    useEffect(() => {
+        onBranchChange(branchFilter);
+    }, [branchFilter, onBranchChange]);
+
     return (
         <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
-            <h2 className='text-xl sm:text-2xl font-semibold mb-4 sm:mb-7'>
-                Hello {name}! superadmin
-            </h2>
+            <div className='w-full flex items-center justify-between'>
+                <h2 className='text-xl sm:text-2xl font-semibold mb-4 sm:mb-7 py-2'>
+                    Hello {name}!
+                </h2>
+                <Select onValueChange={setBranchFilter} value={branchFilter}>
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Select a branch' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {allBranches.map(({ code, name }) => (
+                            <SelectItem key={code} value={code}>
+                                {name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-[1.74rem] mb-6 sm:mb-10'>
                 <InfoCard
                     title='Leads booked today'
@@ -102,4 +131,4 @@ const AdminDashboard = ({
     );
 };
 
-export default AdminDashboard;
+export default SuperAdminDashboard;

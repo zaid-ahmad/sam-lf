@@ -1,15 +1,17 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import parseAppointmentDateTime from "@/lib/formatDateTime";
+import { Badge } from "@/components/ui/badge";
 import { deleteLead } from "@/server/actions/delete-lead";
-import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
 import Link from "next/link";
 
 export const columns = [
@@ -138,12 +140,8 @@ export const columns = [
         },
     },
     {
-        accessorKey: "branch",
-        header: "Branch",
-    },
-    {
         id: "actions",
-        cell: ({ row }) => {
+        cell: ({ row, onAssignSalesRep, onDeleteLead }) => {
             const lead = row.original;
             return (
                 <DropdownMenu>
@@ -157,9 +155,22 @@ export const columns = [
                         <a href={`/leads/${lead.id}`}>
                             <DropdownMenuItem>View details</DropdownMenuItem>
                         </a>
+                        <DropdownMenuItem
+                            onSelect={(e) => {
+                                e.preventDefault();
+                                onAssignSalesRep(lead);
+                            }}
+                        >
+                            Assign sales rep.
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <form
-                                action={deleteLead}
+                                action={async (formData) => {
+                                    await deleteLead(formData);
+                                    onDeleteLead(lead.id);
+                                }}
                                 className='group-hover:text-red-900 flex items-center justify-between w-full'
                             >
                                 <input
@@ -171,7 +182,7 @@ export const columns = [
                                 <input
                                     type='hidden'
                                     name='inPastLeads'
-                                    value={true}
+                                    value={false}
                                     readOnly
                                 />
                                 <button

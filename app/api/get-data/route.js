@@ -7,13 +7,16 @@ import {
     getAllCanvasserNames,
     getCanvasserData,
     getSalesRepData,
+    getSuperAdminData,
     salesRepDashboardData,
+    superAdminDashboardData,
 } from "@/lib/data-fetching";
-import { getSalesRepresentatives } from "@/lib/data";
+import { getBranches, getSalesRepresentatives } from "@/lib/data";
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");
+    const branchFromAPI = searchParams.get("branch");
 
     const session = await auth();
     if (!session) {
@@ -28,7 +31,7 @@ export async function GET(request) {
     switch (role) {
         case "admin":
             const { data, name, branch } = await getAdminData(session);
-            const sale_reps = await getSalesRepresentatives();
+            const sale_reps = await getSalesRepresentatives(branch);
             const {
                 totalLeads,
                 totalAssignedLeads,
@@ -86,6 +89,41 @@ export async function GET(request) {
                 totalDemo,
                 totalDead,
                 totalSale,
+            };
+            break;
+
+        case "superadmin":
+            const super_admin_sale_reps = await getSalesRepresentatives(
+                branchFromAPI
+            );
+            const { superAdminData, superAdminName } = await getSuperAdminData(
+                session,
+                branchFromAPI
+            );
+            const {
+                superAdminTotalLeads,
+                superAdminTotalAssignedLeads,
+                superAdminTotalUnassignedLeads,
+                superAdminLeadsPerTimeSlot,
+            } = await superAdminDashboardData(branchFromAPI);
+
+            const superAdmiListOfCanvassers = await getAllCanvasserNames(
+                branchFromAPI
+            );
+
+            responseData = {
+                data: superAdminData,
+                name: superAdminName,
+                sale_reps: super_admin_sale_reps,
+                totalLeads: superAdminTotalLeads,
+                totalAssignedLeads: superAdminTotalAssignedLeads,
+                totalUnassignedLeads: superAdminTotalUnassignedLeads,
+                listOfCanvassers: superAdmiListOfCanvassers,
+                slots_11: superAdminLeadsPerTimeSlot["11:00 AM"],
+                slots_01: superAdminLeadsPerTimeSlot["01:00 PM"],
+                slots_03: superAdminLeadsPerTimeSlot["03:00 PM"],
+                slots_05: superAdminLeadsPerTimeSlot["05:00 PM"],
+                slots_07: superAdminLeadsPerTimeSlot["07:00 PM"],
             };
             break;
         default:
