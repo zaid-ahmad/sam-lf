@@ -34,7 +34,7 @@ const AdminDashboard = ({
     return (
         <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
             <h2 className='text-xl sm:text-2xl font-semibold mb-4 sm:mb-7'>
-                Hello {name}! superadmin
+                Hello {name}!
             </h2>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-[1.74rem] mb-6 sm:mb-10'>
                 <InfoCard

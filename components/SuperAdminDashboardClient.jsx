@@ -34,7 +34,7 @@ export default function SuperAdminDashboardClient({
 
         intervalIdRef.current = setInterval(
             () => fetchData(selectedBranch),
-            30000
+            10000
         );
 
         return () => {
