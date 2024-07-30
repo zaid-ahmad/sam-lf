@@ -1,5 +1,6 @@
 "use server";
 
+import EmailToReps from "@/emails/EmailToReps";
 import ReassignmentEmail from "@/emails/ReassignmentEmail";
 import prisma from "@/lib/prisma";
 import resend from "@/lib/resend";
@@ -59,13 +60,20 @@ export async function assignLeadToSalesRep(leadId, salesRepId) {
 
         // Prepare the update data
         const updateData = {
-            salesRepId: salesRepId,
+            salesRep: {
+                connect: { id: salesRepId },
+            },
             status: lead.status === "APPOINTMENT" ? "ASSIGNED" : lead.status,
         };
 
         // If there's a previous sales rep, remove their association
         if (lead.salesRepId && lead.salesRepId !== salesRepId) {
             updateData.previousSalesRepId = lead.salesRepId;
+            updateData.salesRep = {
+                ...updateData.salesRep,
+                disconnect: true,
+                connect: { id: salesRepId },
+            };
         }
 
         // Update the lead with the new sales rep and change status if necessary
