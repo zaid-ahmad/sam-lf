@@ -10,8 +10,10 @@ export default function AdminDashboardClient({ initialData }) {
     const [dashboardData, setDashboardData] = useState(initialData);
     const [leadDate, setLeadDate] = useState(displayTodaysDate());
     const [isToday, setIsToday] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchData = async (date) => {
+        setIsLoading(true);
         const formattedDate = date ? moment(date).format("MMMM D, YYYY") : null;
         const response = await fetch(
             `/api/get-data?role=admin&date=${formattedDate}`
@@ -20,6 +22,7 @@ export default function AdminDashboardClient({ initialData }) {
             const newData = await response.json();
             setDashboardData(newData);
         }
+        setIsLoading(false);
     };
 
     useEffect(() => {
@@ -56,6 +59,7 @@ export default function AdminDashboardClient({ initialData }) {
             onNextDate={handleNextDate}
             isToday={isToday}
             assignLeadToSalesRep={assignLeadToSalesRep}
+            isLoading={isLoading}
         />
     );
 }

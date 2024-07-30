@@ -2,6 +2,7 @@ import InfoCard from "@/app/dashboard/info-card";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
+import Spinner from "../spinner";
 
 const AdminDashboard = ({
     data,
@@ -21,6 +22,7 @@ const AdminDashboard = ({
     onPreviousDate,
     onNextDate,
     isToday,
+    isLoading,
 }) => {
     const statusOptions = [
         "APPOINTMENT",
@@ -34,9 +36,21 @@ const AdminDashboard = ({
 
     return (
         <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
-            <h2 className='text-xl sm:text-2xl font-semibold mb-4 sm:mb-7'>
+            <h2 className='flex items-center gap-5 text-xl sm:text-2xl font-semibold mb-4 sm:mb-7'>
                 Hello {name}!
+                {isLoading && (
+                    <>
+                        <span>
+                            <Spinner
+                                color={"text-emerald-800"}
+                                height={0.1}
+                                padding={0}
+                            />
+                        </span>
+                    </>
+                )}
             </h2>
+
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-[1.74rem] mb-6 sm:mb-10'>
                 <InfoCard
                     title='Total Leads for Today'

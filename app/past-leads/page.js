@@ -22,13 +22,13 @@ async function getAdminPastLeads(session, branch = null) {
             branchCode: true,
         },
     });
-    const { startOfDayUTC } = getStartEndDateWithOffset(user.branchCode);
+    const { currentDateString } = getStartEndDateWithOffset(user.branchCode);
 
     const data = await prisma.lead.findMany({
         where: {
             branch: branch || user.branchCode,
-            createdAt: {
-                lt: startOfDayUTC,
+            appointmentDateTime: {
+                lt: currentDateString,
             },
         },
         orderBy: {
