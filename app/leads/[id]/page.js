@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import Image from "next/image";
 import Link from "next/link";
+import { getGoogleMapsUrl } from "@/lib/utils";
 
 async function getLeadDetails(id) {
     const lead = await prisma.lead.findUnique({
@@ -119,6 +120,7 @@ function formatSurroundingAwareness(surrounding_awareness) {
 
 export default async function LeadDetailsPage({ params }) {
     const lead = await getLeadDetails(params.id);
+    const mapsUrl = getGoogleMapsUrl(lead.address);
 
     return (
         <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
@@ -163,8 +165,14 @@ export default async function LeadDetailsPage({ params }) {
 
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
-                            <h3 className='font-semibold'>Address</h3>
-                            <p>{lead.address}</p>
+                            <a
+                                href={mapsUrl}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='text-blue-600 hover:underline ml-1'
+                            >
+                                {lead.address}
+                            </a>
                             <p>Postal Code: {lead.postalCode}</p>
                             <p>Quadrant: {lead.quadrant}</p>
                         </div>
