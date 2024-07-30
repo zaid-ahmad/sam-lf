@@ -35,6 +35,14 @@ const AdminDashboard = ({
         "CANCELLED",
     ];
 
+    const timeOptions = [
+        "11:00 AM",
+        "01:00 PM",
+        "03:00 PM",
+        "05:00 PM",
+        "07:00 PM",
+    ];
+
     return (
         <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
             <h2 className='flex items-center gap-5 text-xl sm:text-2xl font-semibold mb-4 sm:mb-7'>
@@ -116,6 +124,7 @@ const AdminDashboard = ({
                 saleReps={sale_reps}
                 assignLeadToSalesRep={assignLeadToSalesRep}
                 statusOptions={statusOptions}
+                timeOptions={timeOptions}
                 canvasserOptions={listOfCanvassers}
                 salesRepOptions={listOfSalesReps}
             />

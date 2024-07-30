@@ -38,6 +38,7 @@ export function DataTable({
     saleReps,
     assignLeadToSalesRep,
     statusOptions,
+    timeOptions,
     canvasserOptions,
     salesRepOptions,
 }) {
@@ -52,6 +53,7 @@ export function DataTable({
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
     const [salesRepFilter, setSalesRepFilter] = useState("all");
+    const [timeFilter, setTimeFilter] = useState("all");
 
     useEffect(() => {
         setData(initialData);
@@ -67,9 +69,18 @@ export function DataTable({
             const matchesSalesRep =
                 salesRepFilter === "all" || item.salesRep === salesRepFilter;
 
-            return matchesStatus && matchesCanvasser && matchesSalesRep;
+            const matchesTime =
+                timeFilter === "all" ||
+                item.appointmentDateTime.split(" at ")[1] === timeFilter;
+
+            return (
+                matchesStatus &&
+                matchesCanvasser &&
+                matchesSalesRep &&
+                matchesTime
+            );
         });
-    }, [data, statusFilter, canvasserFilter, salesRepFilter]);
+    }, [data, statusFilter, canvasserFilter, salesRepFilter, timeFilter]);
 
     const handleAssignSalesRep = (lead) => {
         setSelectedLeadId(lead.id);
@@ -183,6 +194,25 @@ export function DataTable({
                         {salesRepOptions.map((saleRep) => (
                             <SelectItem key={saleRep} value={saleRep}>
                                 {saleRep}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <Select
+                    onValueChange={setTimeFilter}
+                    value={timeFilter || "all"}
+                >
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Filter by Time Slots' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>
+                            Filter by Time Slots
+                        </SelectItem>
+                        {timeOptions.map((timeSlot) => (
+                            <SelectItem key={timeSlot} value={timeSlot}>
+                                {timeSlot}
                             </SelectItem>
                         ))}
                     </SelectContent>
