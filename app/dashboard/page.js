@@ -30,6 +30,9 @@ const Dashboard = async () => {
         } = await adminDashboardData(branch);
 
         const listOfCanvassers = await getAllCanvasserNames(branch);
+        const listOfSalesPeople = sale_reps.map((s) =>
+            `${s.firstName} ${s.lastName}`.trim()
+        );
 
         const initialData = {
             data,
@@ -39,6 +42,7 @@ const Dashboard = async () => {
             totalAssignedLeads,
             totalUnassignedLeads,
             listOfCanvassers,
+            listOfSalesReps: listOfSalesPeople,
             slots_11: leadsPerTimeSlot["11:00 AM"],
             slots_01: leadsPerTimeSlot["01:00 PM"],
             slots_03: leadsPerTimeSlot["03:00 PM"],

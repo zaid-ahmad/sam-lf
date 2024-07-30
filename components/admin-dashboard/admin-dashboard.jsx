@@ -12,6 +12,7 @@ const AdminDashboard = ({
     totalAssignedLeads,
     totalUnassignedLeads,
     listOfCanvassers,
+    listOfSalesReps,
     slots_11,
     slots_01,
     slots_03,
@@ -116,6 +117,7 @@ const AdminDashboard = ({
                 assignLeadToSalesRep={assignLeadToSalesRep}
                 statusOptions={statusOptions}
                 canvasserOptions={listOfCanvassers}
+                salesRepOptions={listOfSalesReps}
             />
         </div>
     );

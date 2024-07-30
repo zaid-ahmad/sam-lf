@@ -39,6 +39,7 @@ export function DataTable({
     assignLeadToSalesRep,
     statusOptions,
     canvasserOptions,
+    salesRepOptions,
 }) {
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
@@ -50,6 +51,7 @@ export function DataTable({
 
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
+    const [salesRepFilter, setSalesRepFilter] = useState("all");
 
     useEffect(() => {
         setData(initialData);
@@ -62,9 +64,12 @@ export function DataTable({
             const matchesCanvasser =
                 canvasserFilter === "all" || item.canvasser === canvasserFilter;
 
-            return matchesStatus && matchesCanvasser;
+            const matchesSalesRep =
+                salesRepFilter === "all" || item.salesRep === salesRepFilter;
+
+            return matchesStatus && matchesCanvasser && matchesSalesRep;
         });
-    }, [data, statusFilter, canvasserFilter]);
+    }, [data, statusFilter, canvasserFilter, salesRepFilter]);
 
     const handleAssignSalesRep = (lead) => {
         setSelectedLeadId(lead.id);
@@ -161,6 +166,23 @@ export function DataTable({
                         {canvasserOptions.map((canvasser) => (
                             <SelectItem key={canvasser} value={canvasser}>
                                 {canvasser}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <Select
+                    onValueChange={setSalesRepFilter}
+                    value={salesRepFilter || "all"}
+                >
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Filter by Sales Rep' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>All Sales Reps.</SelectItem>
+                        {salesRepOptions.map((saleRep) => (
+                            <SelectItem key={saleRep} value={saleRep}>
+                                {saleRep}
                             </SelectItem>
                         ))}
                     </SelectContent>
