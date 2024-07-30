@@ -1,5 +1,6 @@
 "use server";
 
+import { sendMessage } from "@/app/api/twilio-webhook/route";
 import { auth } from "@/auth";
 import NewLeadEmail from "@/emails/NewLeadEmail";
 import prisma from "@/lib/prisma";
@@ -128,6 +129,13 @@ export async function addLeadToDatabase(formData) {
         });
 
         const admin_email_list = admin_emails.map((admin) => admin.email);
+
+        if (user.branchCode === "3CGY") {
+            sendMessage(
+                "+14039885931",
+                "There's a new appointment on SAM 2.0. Please assign it."
+            );
+        }
 
         const isEmailSent = await sendEmail(
             admin_email_list,
