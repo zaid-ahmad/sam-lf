@@ -11,7 +11,8 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getBranches } from "@/lib/data";
+import { getBranches, getSalesRepresentatives } from "@/lib/data";
+import { assignLeadToSalesRep } from "@/server/actions/assign-to-sales-rep";
 
 async function getAdminPastLeads(session, branch = null) {
     const user = await prisma.user.findUnique({
@@ -138,6 +139,7 @@ const PastLeads = async () => {
     if (session.user.role === "ADMIN" || session.user.role === "SUPERADMIN") {
         const { data, branch } = await getAdminPastLeads(session);
         const listOfCanvassers = await getAllCanvasserNames(branch);
+        const sale_reps = await getSalesRepresentatives();
         const statusOptions = [
             "APPOINTMENT",
             "ASSIGNED",
@@ -168,8 +170,10 @@ const PastLeads = async () => {
                 </Breadcrumb>
                 <h1 className='my-5 text-2xl font-bold'>Past Leads</h1>
                 <DataTable
-                    columns={columns}
-                    data={data}
+                    initialColumns={columns}
+                    initialData={data}
+                    saleReps={sale_reps}
+                    assignLeadToSalesRep={assignLeadToSalesRep}
                     statusOptions={statusOptions}
                     canvasserOptions={listOfCanvassers}
                     allBranches={allBranches}

@@ -31,6 +31,8 @@ import {
 
 import { useEffect, useMemo, useState } from "react";
 import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
+import { ChangeLeadStatusDialog } from "../change-lead-status-dialog";
+import { changeLeadStatus } from "@/server/actions/change-lead-status";
 
 export function DataTable({
     initialColumns,
@@ -46,7 +48,10 @@ export function DataTable({
     const [columnFilters, setColumnFilters] = useState([]);
     const [data, setData] = useState(initialData);
     const [columnVisibility, setColumnVisibility] = useState({});
+
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+    const [isChangeLeadStatusDialogOpen, setIsChangeLeadStatusDialogOpen] =
+        useState(false);
     const [selectedLeadId, setSelectedLeadId] = useState(null);
     const [leadDetails, setLeadDetails] = useState(null);
 
@@ -82,6 +87,28 @@ export function DataTable({
         });
     }, [data, statusFilter, canvasserFilter, salesRepFilter, timeFilter]);
 
+    const handleLeadStatusChange = async (leadId, action, formData) => {
+        const updatedData = await changeLeadStatus(leadId, action, formData);
+        setData(
+            data.map((lead) =>
+                lead.id === leadId
+                    ? {
+                          ...lead,
+                          salesRep:
+                              updatedData.salesRep.firstName +
+                              " " +
+                              updatedData.salesRep.lastName,
+
+                          status: updatedData.status,
+                      }
+                    : lead
+            )
+        );
+        setIsAssignDialogOpen(false);
+        setSelectedLeadId(null);
+        setLeadDetails(null);
+    };
+
     const handleAssignSalesRep = (lead) => {
         setSelectedLeadId(lead.id);
         setLeadDetails(lead);
@@ -111,6 +138,12 @@ export function DataTable({
         }
     };
 
+    const handleColumnStatusChange = (lead) => {
+        setSelectedLeadId(lead.id);
+        setLeadDetails(lead);
+        setIsChangeLeadStatusDialogOpen(true);
+    };
+
     const handleDeleteLead = (id) => {
         setData(data.filter((lead) => lead.id !== id));
     };
@@ -124,6 +157,7 @@ export function DataTable({
                         row,
                         onAssignSalesRep: handleAssignSalesRep,
                         onDeleteLead: handleDeleteLead,
+                        onStatusChange: handleColumnStatusChange,
                     }),
             };
         }
@@ -276,6 +310,13 @@ export function DataTable({
                     leadId={selectedLeadId}
                     onAssign={handleAssignComplete}
                     saleReps={saleReps}
+                    leadDetails={leadDetails}
+                />
+                <ChangeLeadStatusDialog
+                    isOpen={isChangeLeadStatusDialogOpen}
+                    onClose={() => setIsChangeLeadStatusDialogOpen(false)}
+                    leadId={selectedLeadId}
+                    onStatusChange={handleLeadStatusChange}
                     leadDetails={leadDetails}
                 />
                 <div className='flex items-center justify-end space-x-2 py-4'>

@@ -26,23 +26,35 @@ import {
 } from "@/components/ui/select";
 
 import { Button } from "@/components/ui/button";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { isSameDay, parse } from "date-fns";
+import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
 
 export function DataTable({
-    columns,
-    data,
+    initialColumns,
+    initialData,
+    saleReps,
+    assignLeadToSalesRep,
     statusOptions,
     canvasserOptions,
     allBranches,
     isSuperAdmin,
 }) {
     const [sorting, setSorting] = useState([]);
+    const [data, setData] = useState(initialData);
+
+    const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+    const [selectedLeadId, setSelectedLeadId] = useState(null);
+    const [leadDetails, setLeadDetails] = useState(null);
 
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
     const [branchFilter, setBranchFilter] = useState("all");
     const [dateFilter, setDateFilter] = useState("");
+
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
 
     const filteredData = useMemo(() => {
         return data.filter((item) => {
@@ -72,6 +84,54 @@ export function DataTable({
             );
         });
     }, [data, statusFilter, canvasserFilter, branchFilter, dateFilter]);
+
+    const handleAssignSalesRep = (lead) => {
+        setSelectedLeadId(lead.id);
+        setLeadDetails(lead);
+        setIsAssignDialogOpen(true);
+    };
+
+    const handleAssignComplete = async (leadId, salesRepId) => {
+        try {
+            const updatedLead = await assignLeadToSalesRep(leadId, salesRepId);
+            setData(
+                data.map((lead) =>
+                    lead.id === leadId
+                        ? {
+                              ...lead,
+                              salesRep: `${updatedLead.salesRep.firstName} ${updatedLead.salesRep.lastName}`,
+                              status: updatedLead.status,
+                          }
+                        : lead
+                )
+            );
+            setIsAssignDialogOpen(false);
+            setSelectedLeadId(null);
+            setLeadDetails(null);
+        } catch (error) {
+            console.error("Error assigning lead:", error);
+            // Handle error (e.g., show an error message to the user)
+        }
+    };
+
+    const handleDeleteLead = (id) => {
+        setData(data.filter((lead) => lead.id !== id));
+    };
+
+    const columns = initialColumns.map((col) => {
+        if (col.id === "actions") {
+            return {
+                ...col,
+                cell: ({ row }) =>
+                    col.cell({
+                        row,
+                        onAssignSalesRep: handleAssignSalesRep,
+                        onDeleteLead: handleDeleteLead,
+                    }),
+            };
+        }
+        return col;
+    });
 
     const table = useReactTable({
         data: filteredData,
@@ -200,6 +260,14 @@ export function DataTable({
                         )}
                     </TableBody>
                 </Table>
+                <AssignSalesRepDialog
+                    isOpen={isAssignDialogOpen}
+                    onClose={() => setIsAssignDialogOpen(false)}
+                    leadId={selectedLeadId}
+                    onAssign={handleAssignComplete}
+                    saleReps={saleReps}
+                    leadDetails={leadDetails}
+                />
                 <div className='flex items-center justify-end space-x-2 py-4'>
                     <Button
                         variant='outline'
