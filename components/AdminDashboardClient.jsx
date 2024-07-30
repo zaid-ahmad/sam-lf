@@ -6,9 +6,9 @@ import AdminDashboard from "./admin-dashboard/admin-dashboard";
 import { displayTodaysDate, displayTomorrowsDate } from "@/lib/utils";
 import moment from "moment";
 
-export default function AdminDashboardClient({ initialData }) {
+export default function AdminDashboardClient({ initialData, branch }) {
     const [dashboardData, setDashboardData] = useState(initialData);
-    const [leadDate, setLeadDate] = useState(displayTodaysDate());
+    const [leadDate, setLeadDate] = useState(displayTodaysDate(branch));
     const [isToday, setIsToday] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -41,17 +41,17 @@ export default function AdminDashboardClient({ initialData }) {
 
     const handlePreviousDate = () => {
         if (!isToday) {
-            setLeadDate(displayTodaysDate());
+            setLeadDate(displayTodaysDate(branch));
             setIsToday(true);
-            fetchData(displayTodaysDate());
+            fetchData(displayTodaysDate(branch));
         }
     };
 
     const handleNextDate = () => {
         if (isToday) {
-            setLeadDate(displayTomorrowsDate());
+            setLeadDate(displayTomorrowsDate(branch));
             setIsToday(false);
-            fetchData(displayTomorrowsDate());
+            fetchData(displayTomorrowsDate(branch));
         }
     };
 
