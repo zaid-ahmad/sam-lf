@@ -17,6 +17,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");
     const branchFromAPI = searchParams.get("branch");
+    const date = searchParams.get("date");
 
     const session = await auth();
     if (!session) {
@@ -30,14 +31,14 @@ export async function GET(request) {
 
     switch (role) {
         case "admin":
-            const { data, name, branch } = await getAdminData(session);
+            const { data, name, branch } = await getAdminData(session, date);
             const sale_reps = await getSalesRepresentatives(branch);
             const {
                 totalLeads,
                 totalAssignedLeads,
                 totalUnassignedLeads,
                 leadsPerTimeSlot,
-            } = await adminDashboardData(branch);
+            } = await adminDashboardData(branch, date);
             const listOfCanvassers = await getAllCanvasserNames(branch);
 
             responseData = {

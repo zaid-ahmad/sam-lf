@@ -2,7 +2,6 @@ import InfoCard from "@/app/dashboard/info-card";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
-import { displayTodaysDate } from "@/lib/utils";
 
 const AdminDashboard = ({
     data,
@@ -18,6 +17,10 @@ const AdminDashboard = ({
     slots_05,
     slots_07,
     assignLeadToSalesRep,
+    leadDate,
+    onPreviousDate,
+    onNextDate,
+    isToday,
 }) => {
     const statusOptions = [
         "APPOINTMENT",
@@ -36,9 +39,13 @@ const AdminDashboard = ({
             </h2>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-[1.74rem] mb-6 sm:mb-10'>
                 <InfoCard
-                    title='Leads booked today'
+                    title='Total Leads for Today'
                     value={totalLeads}
-                    description={displayTodaysDate()}
+                    description={leadDate}
+                    changeLeadDate={true}
+                    onPreviousDate={onPreviousDate}
+                    onNextDate={onNextDate}
+                    isToday={isToday}
                 />
                 <InfoCard
                     title='11 AM'
