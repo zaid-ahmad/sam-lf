@@ -21,11 +21,7 @@ export default function AdminDashboardClient({ initialData }) {
         );
         if (response.ok) {
             const newData = await response.json();
-            setDashboardData((prevData) => ({
-                ...prevData,
-                data: newData.data, // Only update the data array
-                // Update other fields as necessary
-            }));
+            setDashboardData(newData);
         }
         setIsLoading(false);
     };
