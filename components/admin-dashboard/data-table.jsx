@@ -48,7 +48,10 @@ export function DataTable({
     const [columnFilters, setColumnFilters] = useState([]);
     const [data, setData] = useState(initialData);
     const [columnVisibility, setColumnVisibility] = useState({});
-
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 20,
+    });
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
     const [isChangeLeadStatusDialogOpen, setIsChangeLeadStatusDialogOpen] =
         useState(false);
@@ -70,10 +73,8 @@ export function DataTable({
                 statusFilter === "all" || item.status === statusFilter;
             const matchesCanvasser =
                 canvasserFilter === "all" || item.canvasser === canvasserFilter;
-
             const matchesSalesRep =
                 salesRepFilter === "all" || item.salesRep === salesRepFilter;
-
             const matchesTime =
                 timeFilter === "all" ||
                 item.appointmentDateTime.split(" at ")[1] === timeFilter;
@@ -172,11 +173,14 @@ export function DataTable({
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
+        onPaginationChange: setPagination,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
+            pagination,
         },
+        pageCount: Math.ceil(filteredData.length / pagination.pageSize),
     });
 
     return (
@@ -328,6 +332,10 @@ export function DataTable({
                     >
                         Previous
                     </Button>
+                    <span className='text-xs'>
+                        Page {table.getState().pagination.pageIndex + 1} of{" "}
+                        {table.getPageCount()}
+                    </span>
                     <Button
                         variant='outline'
                         size='sm'
