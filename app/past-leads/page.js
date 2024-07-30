@@ -11,24 +11,32 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getBranches } from "@/lib/data";
+import { getBranches, getSalesRepresentatives } from "@/lib/data";
+import { assignLeadToSalesRep } from "@/server/actions/assign-to-sales-rep";
 
 async function getAdminPastLeads(session, branch = null) {
-    const user = await prisma.user.findUnique({
-        where: {
-            id: session.user.id,
-        },
-        select: {
-            branchCode: true,
-        },
-    });
-    const { startOfDayUTC } = getStartEndDateWithOffset(user.branchCode);
+    let branchCode;
+    if (session.user.role === "SUPERADMIN") {
+        branchCode = branch; // Use the provided branch for superadmin
+    } else {
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { branchCode: true },
+        });
+        branchCode = user.branchCode;
+    }
+
+    if (!branchCode) {
+        throw new Error("No branch specified for superadmin");
+    }
+
+    const { currentDateString } = getStartEndDateWithOffset(branchCode);
 
     const data = await prisma.lead.findMany({
         where: {
-            branch: branch || user.branchCode,
-            createdAt: {
-                lt: startOfDayUTC,
+            branch: branchCode,
+            appointmentDateTime: {
+                lt: currentDateString,
             },
         },
         orderBy: {
@@ -53,6 +61,7 @@ async function getAdminPastLeads(session, branch = null) {
             status: true,
             quadrant: true,
             appointmentDateTime: true,
+            branch: true,
         },
     });
 
@@ -67,16 +76,21 @@ async function getAdminPastLeads(session, branch = null) {
             : null,
     }));
 
-    return { data: transformedData, branch: user.branchCode };
+    return { data: transformedData, branch: branchCode };
 }
 
 async function getCanvasserPastLeads(user_id) {
-    const { today } = getTodayAndTomorrow();
+    const user = await prisma.user.findUnique({
+        where: { id: user_id },
+        select: { branchCode: true },
+    });
+    const { currentDateString } = getStartEndDateWithOffset(user.branchCode);
+
     const data = await prisma.lead.findMany({
         where: {
             canvasserId: user_id,
-            createdAt: {
-                lt: today,
+            appointmentDateTime: {
+                lt: currentDateString,
             },
         },
         select: {
@@ -98,6 +112,7 @@ async function getCanvasserPastLeads(user_id) {
             status: true,
             quadrant: true,
             appointmentDateTime: true,
+            branch: true,
         },
     });
 
@@ -136,8 +151,22 @@ const PastLeads = async () => {
     const session = await auth();
 
     if (session.user.role === "ADMIN" || session.user.role === "SUPERADMIN") {
-        const { data, branch } = await getAdminPastLeads(session);
+        let data, branch, allBranches;
+
+        if (session.user.role === "SUPERADMIN") {
+            allBranches = await getBranches();
+            // If no branch is specified, use the first branch in the list
+            const defaultBranch = allBranches[0]?.code;
+            ({ data, branch } = await getAdminPastLeads(
+                session,
+                defaultBranch
+            ));
+        } else {
+            ({ data, branch } = await getAdminPastLeads(session));
+        }
+
         const listOfCanvassers = await getAllCanvasserNames(branch);
+        const sale_reps = await getSalesRepresentatives(branch);
         const statusOptions = [
             "APPOINTMENT",
             "ASSIGNED",
@@ -147,10 +176,6 @@ const PastLeads = async () => {
             "REBOOK",
             "CANCELLED",
         ];
-
-        const allBranches =
-            session.user.role === "SUPERADMIN" ? await getBranches() : null;
-
         return (
             <div className='container'>
                 <Breadcrumb className='my-5'>
@@ -168,12 +193,15 @@ const PastLeads = async () => {
                 </Breadcrumb>
                 <h1 className='my-5 text-2xl font-bold'>Past Leads</h1>
                 <DataTable
-                    columns={columns}
-                    data={data}
+                    initialColumns={columns}
+                    initialData={data}
+                    saleReps={sale_reps}
+                    assignLeadToSalesRep={assignLeadToSalesRep}
                     statusOptions={statusOptions}
                     canvasserOptions={listOfCanvassers}
                     allBranches={allBranches}
                     isSuperAdmin={session.user.role === "SUPERADMIN"}
+                    currentBranch={branch}
                 />
             </div>
         );
@@ -208,9 +236,11 @@ const PastLeads = async () => {
                 </Breadcrumb>
                 <h1 className='my-5 text-2xl font-bold'>Past Leads</h1>
                 <DataTable
-                    columns={columns}
-                    data={data}
+                    initialColumns={columns}
+                    initialData={data}
                     statusOptions={statusOptions}
+                    isSuperAdmin={false}
+                    isCanvasser={true}
                 />
             </div>
         );

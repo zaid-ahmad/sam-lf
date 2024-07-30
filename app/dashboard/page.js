@@ -8,7 +8,9 @@ import {
     getAllCanvasserNames,
     getCanvasserData,
     getSalesRepData,
+    getSuperAdminData,
     salesRepDashboardData,
+    superAdminDashboardData,
 } from "@/lib/data-fetching";
 import AdminDashboardClient from "@/components/AdminDashboardClient";
 import CanvasserDashboardClient from "@/components/CanvasserDashboardClient";
@@ -30,6 +32,9 @@ const Dashboard = async () => {
         } = await adminDashboardData(branch);
 
         const listOfCanvassers = await getAllCanvasserNames(branch);
+        const listOfSalesPeople = sale_reps.map((s) =>
+            `${s.firstName} ${s.lastName}`.trim()
+        );
 
         const initialData = {
             data,
@@ -39,6 +44,7 @@ const Dashboard = async () => {
             totalAssignedLeads,
             totalUnassignedLeads,
             listOfCanvassers,
+            listOfSalesReps: listOfSalesPeople,
             slots_11: leadsPerTimeSlot["11:00 AM"],
             slots_01: leadsPerTimeSlot["01:00 PM"],
             slots_03: leadsPerTimeSlot["03:00 PM"],
@@ -85,29 +91,36 @@ const Dashboard = async () => {
         const sale_reps = await getSalesRepresentatives();
         const allBranches = await getBranches();
         const defaultBranch = allBranches[0].code;
-        const { data, name } = await getAdminData(session, defaultBranch);
+        const { superAdminData, superAdminName } = await getSuperAdminData(
+            session,
+            defaultBranch
+        );
         const {
-            totalLeads,
-            totalAssignedLeads,
-            totalUnassignedLeads,
-            leadsPerTimeSlot,
-        } = await adminDashboardData(defaultBranch);
+            superAdminTotalLeads,
+            superAdminTotalAssignedLeads,
+            superAdminTotalUnassignedLeads,
+            superAdminLeadsPerTimeSlot,
+        } = await superAdminDashboardData(defaultBranch);
 
         const listOfCanvassers = await getAllCanvasserNames(defaultBranch);
+        const listOfSalesPeople = sale_reps.map((s) =>
+            `${s.firstName} ${s.lastName}`.trim()
+        );
 
         const initialData = {
-            data,
-            name,
+            data: superAdminData,
+            name: superAdminName,
             sale_reps,
-            totalLeads,
-            totalAssignedLeads,
-            totalUnassignedLeads,
+            totalLeads: superAdminTotalLeads,
+            totalAssignedLeads: superAdminTotalAssignedLeads,
+            totalUnassignedLeads: superAdminTotalUnassignedLeads,
             listOfCanvassers,
-            slots_11: leadsPerTimeSlot["11:00 AM"],
-            slots_01: leadsPerTimeSlot["01:00 PM"],
-            slots_03: leadsPerTimeSlot["03:00 PM"],
-            slots_05: leadsPerTimeSlot["05:00 PM"],
-            slots_07: leadsPerTimeSlot["07:00 PM"],
+            listOfSalesReps: listOfSalesPeople,
+            slots_11: superAdminLeadsPerTimeSlot["11:00 AM"],
+            slots_01: superAdminLeadsPerTimeSlot["01:00 PM"],
+            slots_03: superAdminLeadsPerTimeSlot["03:00 PM"],
+            slots_05: superAdminLeadsPerTimeSlot["05:00 PM"],
+            slots_07: superAdminLeadsPerTimeSlot["07:00 PM"],
             branch: defaultBranch,
         };
 

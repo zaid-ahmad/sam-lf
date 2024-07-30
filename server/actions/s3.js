@@ -2,7 +2,11 @@
 
 import { auth } from "@/auth";
 
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+    S3Client,
+    PutObjectCommand,
+    DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import crypto from "crypto";
@@ -59,4 +63,14 @@ export async function getSignedURL({ fileType, fileSize, checksum }) {
     );
 
     return { success: { url } };
+}
+
+export async function deleteFile(fileURL) {
+    const fileName = fileURL.split("/").pop();
+    const deleteObjectCommand = new DeleteObjectCommand({
+        Bucket: process.env.S3_AWS_BUCKET_NAME,
+        Key: fileName,
+    });
+
+    await s3Client.send(deleteObjectCommand);
 }

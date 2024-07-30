@@ -141,7 +141,7 @@ export const columns = [
     },
     {
         id: "actions",
-        cell: ({ row, onAssignSalesRep, onDeleteLead }) => {
+        cell: ({ row, onAssignSalesRep, onDeleteLead, onStatusChange }) => {
             const lead = row.original;
             return (
                 <DropdownMenu>
@@ -155,6 +155,9 @@ export const columns = [
                         <a href={`/leads/${lead.id}`}>
                             <DropdownMenuItem>View details</DropdownMenuItem>
                         </a>
+                        <a href={`/leads/edit/${lead.id}`}>
+                            <DropdownMenuItem>Edit details</DropdownMenuItem>
+                        </a>
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();
@@ -162,6 +165,14 @@ export const columns = [
                             }}
                         >
                             Assign sales rep.
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={(e) => {
+                                e.preventDefault();
+                                onStatusChange(lead);
+                            }}
+                        >
+                            Change lead status
                         </DropdownMenuItem>
 
                         <DropdownMenuSeparator />

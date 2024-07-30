@@ -1,6 +1,8 @@
-const Spinner = ({ color }) => {
+const Spinner = ({ color, height = 140, padding = 6 }) => {
     return (
-        <div className='grid min-h-[140px] w-full place-items-center overflow-x-scroll rounded-lg p-6 lg:overflow-visible'>
+        <div
+            className={`grid min-h-[${height}] w-full place-items-center overflow-x-scroll rounded-lg p-${padding} lg:overflow-visible`}
+        >
             <svg
                 className={`${color} animate-spin duration-300`}
                 viewBox='0 0 64 64'

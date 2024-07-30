@@ -17,6 +17,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");
     const branchFromAPI = searchParams.get("branch");
+    const date = searchParams.get("date");
 
     const session = await auth();
     if (!session) {
@@ -30,15 +31,18 @@ export async function GET(request) {
 
     switch (role) {
         case "admin":
-            const { data, name, branch } = await getAdminData(session);
+            const { data, name, branch } = await getAdminData(session, date);
             const sale_reps = await getSalesRepresentatives(branch);
             const {
                 totalLeads,
                 totalAssignedLeads,
                 totalUnassignedLeads,
                 leadsPerTimeSlot,
-            } = await adminDashboardData(branch);
+            } = await adminDashboardData(branch, date);
             const listOfCanvassers = await getAllCanvasserNames(branch);
+            const listOfSalesPeople = sale_reps.map((s) =>
+                `${s.firstName} ${s.lastName}`.trim()
+            );
 
             responseData = {
                 data,
@@ -48,6 +52,7 @@ export async function GET(request) {
                 totalAssignedLeads,
                 totalUnassignedLeads,
                 listOfCanvassers,
+                listOfSalesReps: listOfSalesPeople,
                 slots_11: leadsPerTimeSlot["11:00 AM"],
                 slots_01: leadsPerTimeSlot["01:00 PM"],
                 slots_03: leadsPerTimeSlot["03:00 PM"],
@@ -78,9 +83,9 @@ export async function GET(request) {
             break;
         case "canvasser":
             const { canvasserData, canvasserFirstName } =
-                await getCanvasserData(session);
+                await getCanvasserData(session, date);
             const { totalCanvasserLeads, totalDemo, totalDead, totalSale } =
-                await canvasserDashboardData(session.user.id);
+                await canvasserDashboardData(session.user.id, date);
 
             responseData = {
                 data: canvasserData,
@@ -98,17 +103,21 @@ export async function GET(request) {
             );
             const { superAdminData, superAdminName } = await getSuperAdminData(
                 session,
-                branchFromAPI
+                branchFromAPI,
+                date
             );
             const {
                 superAdminTotalLeads,
                 superAdminTotalAssignedLeads,
                 superAdminTotalUnassignedLeads,
                 superAdminLeadsPerTimeSlot,
-            } = await superAdminDashboardData(branchFromAPI);
+            } = await superAdminDashboardData(branchFromAPI, date);
 
             const superAdmiListOfCanvassers = await getAllCanvasserNames(
                 branchFromAPI
+            );
+            const superAdmiListOfSalesPeople = super_admin_sale_reps.map((s) =>
+                `${s.firstName} ${s.lastName}`.trim()
             );
 
             responseData = {
@@ -119,6 +128,7 @@ export async function GET(request) {
                 totalAssignedLeads: superAdminTotalAssignedLeads,
                 totalUnassignedLeads: superAdminTotalUnassignedLeads,
                 listOfCanvassers: superAdmiListOfCanvassers,
+                listOfSalesReps: superAdmiListOfSalesPeople,
                 slots_11: superAdminLeadsPerTimeSlot["11:00 AM"],
                 slots_01: superAdminLeadsPerTimeSlot["01:00 PM"],
                 slots_03: superAdminLeadsPerTimeSlot["03:00 PM"],

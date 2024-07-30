@@ -3,28 +3,67 @@
 import { useState, useEffect } from "react";
 import { assignLeadToSalesRep } from "@/server/actions/assign-to-sales-rep";
 import AdminDashboard from "./admin-dashboard/admin-dashboard";
+import { displayTodaysDate, displayTomorrowsDate } from "@/lib/utils";
+import moment from "moment";
 
 export default function AdminDashboardClient({ initialData }) {
     const [dashboardData, setDashboardData] = useState(initialData);
+    const [leadDate, setLeadDate] = useState(displayTodaysDate());
+    const [isToday, setIsToday] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const fetchData = async (date) => {
+        setIsLoading(true);
+        const formattedDate = date ? moment(date).format("MMMM D, YYYY") : null;
+        const response = await fetch(
+            `/api/get-data?role=admin&date=${formattedDate}`
+        );
+        if (response.ok) {
+            const newData = await response.json();
+            setDashboardData((prevData) => ({
+                ...prevData,
+                data: newData.data, // Only update the data array
+                // Update other fields as necessary
+            }));
+        }
+        setIsLoading(false);
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetch("/api/get-data?role=admin");
-            if (response.ok) {
-                const newData = await response.json();
-                setDashboardData(newData);
-            }
-        };
+        const intervalId = setInterval(() => fetchData(leadDate), 30000);
+        return () => clearInterval(intervalId);
+    }, [leadDate]);
 
-        const intervalId = setInterval(fetchData, 30000); // Poll every 30 seconds
+    useEffect(() => {
+        const intervalId = setInterval(() => fetchData(leadDate), 30000);
+        return () => clearInterval(intervalId);
+    }, [leadDate]);
 
-        return () => clearInterval(intervalId); // Cleanup on unmount
-    }, []);
+    const handlePreviousDate = () => {
+        if (!isToday) {
+            setLeadDate(displayTodaysDate());
+            setIsToday(true);
+            fetchData(displayTodaysDate());
+        }
+    };
+
+    const handleNextDate = () => {
+        if (isToday) {
+            setLeadDate(displayTomorrowsDate());
+            setIsToday(false);
+            fetchData(displayTomorrowsDate());
+        }
+    };
 
     return (
         <AdminDashboard
             {...dashboardData}
+            leadDate={leadDate}
+            onPreviousDate={handlePreviousDate}
+            onNextDate={handleNextDate}
+            isToday={isToday}
             assignLeadToSalesRep={assignLeadToSalesRep}
+            isLoading={isLoading}
         />
     );
 }

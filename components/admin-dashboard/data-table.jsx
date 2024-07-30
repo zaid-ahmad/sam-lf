@@ -31,6 +31,8 @@ import {
 
 import { useEffect, useMemo, useState } from "react";
 import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
+import { ChangeLeadStatusDialog } from "../change-lead-status-dialog";
+import { changeLeadStatus } from "@/server/actions/change-lead-status";
 
 export function DataTable({
     initialColumns,
@@ -38,18 +40,28 @@ export function DataTable({
     saleReps,
     assignLeadToSalesRep,
     statusOptions,
+    timeOptions,
     canvasserOptions,
+    salesRepOptions,
 }) {
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [data, setData] = useState(initialData);
     const [columnVisibility, setColumnVisibility] = useState({});
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 20,
+    });
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+    const [isChangeLeadStatusDialogOpen, setIsChangeLeadStatusDialogOpen] =
+        useState(false);
     const [selectedLeadId, setSelectedLeadId] = useState(null);
     const [leadDetails, setLeadDetails] = useState(null);
 
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
+    const [salesRepFilter, setSalesRepFilter] = useState("all");
+    const [timeFilter, setTimeFilter] = useState("all");
 
     useEffect(() => {
         setData(initialData);
@@ -61,10 +73,42 @@ export function DataTable({
                 statusFilter === "all" || item.status === statusFilter;
             const matchesCanvasser =
                 canvasserFilter === "all" || item.canvasser === canvasserFilter;
+            const matchesSalesRep =
+                salesRepFilter === "all" || item.salesRep === salesRepFilter;
+            const matchesTime =
+                timeFilter === "all" ||
+                item.appointmentDateTime.split(" at ")[1] === timeFilter;
 
-            return matchesStatus && matchesCanvasser;
+            return (
+                matchesStatus &&
+                matchesCanvasser &&
+                matchesSalesRep &&
+                matchesTime
+            );
         });
-    }, [data, statusFilter, canvasserFilter]);
+    }, [data, statusFilter, canvasserFilter, salesRepFilter, timeFilter]);
+
+    const handleLeadStatusChange = async (leadId, action, formData) => {
+        const updatedData = await changeLeadStatus(leadId, action, formData);
+        setData(
+            data.map((lead) =>
+                lead.id === leadId
+                    ? {
+                          ...lead,
+                          salesRep:
+                              updatedData.salesRep.firstName +
+                              " " +
+                              updatedData.salesRep.lastName,
+
+                          status: updatedData.status,
+                      }
+                    : lead
+            )
+        );
+        setIsAssignDialogOpen(false);
+        setSelectedLeadId(null);
+        setLeadDetails(null);
+    };
 
     const handleAssignSalesRep = (lead) => {
         setSelectedLeadId(lead.id);
@@ -95,6 +139,12 @@ export function DataTable({
         }
     };
 
+    const handleColumnStatusChange = (lead) => {
+        setSelectedLeadId(lead.id);
+        setLeadDetails(lead);
+        setIsChangeLeadStatusDialogOpen(true);
+    };
+
     const handleDeleteLead = (id) => {
         setData(data.filter((lead) => lead.id !== id));
     };
@@ -108,6 +158,7 @@ export function DataTable({
                         row,
                         onAssignSalesRep: handleAssignSalesRep,
                         onDeleteLead: handleDeleteLead,
+                        onStatusChange: handleColumnStatusChange,
                     }),
             };
         }
@@ -122,11 +173,14 @@ export function DataTable({
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
+        onPaginationChange: setPagination,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
+            pagination,
         },
+        pageCount: Math.ceil(filteredData.length / pagination.pageSize),
     });
 
     return (
@@ -161,6 +215,42 @@ export function DataTable({
                         {canvasserOptions.map((canvasser) => (
                             <SelectItem key={canvasser} value={canvasser}>
                                 {canvasser}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <Select
+                    onValueChange={setSalesRepFilter}
+                    value={salesRepFilter || "all"}
+                >
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Filter by Sales Rep' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>All Sales Reps.</SelectItem>
+                        {salesRepOptions.map((saleRep) => (
+                            <SelectItem key={saleRep} value={saleRep}>
+                                {saleRep}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <Select
+                    onValueChange={setTimeFilter}
+                    value={timeFilter || "all"}
+                >
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Filter by Time Slots' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='all'>
+                            Filter by Time Slots
+                        </SelectItem>
+                        {timeOptions.map((timeSlot) => (
+                            <SelectItem key={timeSlot} value={timeSlot}>
+                                {timeSlot}
                             </SelectItem>
                         ))}
                     </SelectContent>
@@ -226,6 +316,13 @@ export function DataTable({
                     saleReps={saleReps}
                     leadDetails={leadDetails}
                 />
+                <ChangeLeadStatusDialog
+                    isOpen={isChangeLeadStatusDialogOpen}
+                    onClose={() => setIsChangeLeadStatusDialogOpen(false)}
+                    leadId={selectedLeadId}
+                    onStatusChange={handleLeadStatusChange}
+                    leadDetails={leadDetails}
+                />
                 <div className='flex items-center justify-end space-x-2 py-4'>
                     <Button
                         variant='outline'
@@ -235,6 +332,10 @@ export function DataTable({
                     >
                         Previous
                     </Button>
+                    <span className='text-xs'>
+                        Page {table.getState().pagination.pageIndex + 1} of{" "}
+                        {table.getPageCount()}
+                    </span>
                     <Button
                         variant='outline'
                         size='sm'

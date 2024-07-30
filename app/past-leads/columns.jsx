@@ -6,6 +6,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { deleteLead } from "@/server/actions/delete-lead";
@@ -143,7 +144,7 @@ export const columns = [
     },
     {
         id: "actions",
-        cell: ({ row }) => {
+        cell: ({ row, onAssignSalesRep, onDeleteLead }) => {
             const lead = row.original;
             return (
                 <DropdownMenu>
@@ -157,9 +158,25 @@ export const columns = [
                         <a href={`/leads/${lead.id}`}>
                             <DropdownMenuItem>View details</DropdownMenuItem>
                         </a>
+                        <a href={`/leads/edit/${lead.id}`}>
+                            <DropdownMenuItem>Edit details</DropdownMenuItem>
+                        </a>
+                        <DropdownMenuItem
+                            onSelect={(e) => {
+                                e.preventDefault();
+                                onAssignSalesRep(lead);
+                            }}
+                        >
+                            Assign sales rep.
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <form
-                                action={deleteLead}
+                                action={async (formData) => {
+                                    await deleteLead(formData);
+                                    onDeleteLead(lead.id);
+                                }}
                                 className='group-hover:text-red-900 flex items-center justify-between w-full'
                             >
                                 <input
@@ -171,7 +188,7 @@ export const columns = [
                                 <input
                                     type='hidden'
                                     name='inPastLeads'
-                                    value={true}
+                                    value={false}
                                     readOnly
                                 />
                                 <button
