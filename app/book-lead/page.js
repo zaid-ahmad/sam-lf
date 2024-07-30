@@ -273,7 +273,7 @@ function AppointmentRequestForm() {
                     >
                         <div className='grid grid-cols-1 gap-6'>
                             <div className='flex flex-col gap-20'>
-                                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
+                                <div className='grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-6'>
                                     {/* First Name */}
 
                                     <div className='col-span-2'>
@@ -289,7 +289,10 @@ function AppointmentRequestForm() {
                                                         </span>
                                                     </FormLabel>
                                                     <FormControl>
-                                                        <Input {...field} />
+                                                        <Input
+                                                            {...field}
+                                                            className='h-12 text-base'
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -310,7 +313,10 @@ function AppointmentRequestForm() {
                                                     </span>
                                                 </FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <Input
+                                                        {...field}
+                                                        className='h-12 text-base'
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -338,6 +344,7 @@ function AppointmentRequestForm() {
                                                             onChange={
                                                                 handlePhone1Change
                                                             }
+                                                            className='h-12 text-base'
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -363,6 +370,7 @@ function AppointmentRequestForm() {
                                                         onChange={
                                                             handlePhone2Change
                                                         }
+                                                        className='h-12 text-base'
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -385,6 +393,7 @@ function AppointmentRequestForm() {
                                                             type='email'
                                                             placeholder='example@example.com'
                                                             {...field}
+                                                            className='h-12 text-base'
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -442,6 +451,7 @@ function AppointmentRequestForm() {
                                                     {...field}
                                                     readOnly
                                                     disabled
+                                                    className='h-12 text-base'
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -459,7 +469,10 @@ function AppointmentRequestForm() {
                                                 Extra Address Notes
                                             </FormLabel>
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Textarea
+                                                    {...field}
+                                                    className='h-12 text-base'
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -520,7 +533,7 @@ function AppointmentRequestForm() {
                                                         }
                                                         value={field.value}
                                                     >
-                                                        <SelectTrigger className='w-full'>
+                                                        <SelectTrigger className='w-full h-12 text-base'>
                                                             <SelectValue placeholder='Please Select' />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -568,7 +581,7 @@ function AppointmentRequestForm() {
                                                         }
                                                         value={field.value}
                                                     >
-                                                        <SelectTrigger className='w-full'>
+                                                        <SelectTrigger className='w-full h-12 text-base'>
                                                             <SelectValue placeholder='Please Select' />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -623,6 +636,7 @@ function AppointmentRequestForm() {
                                                                     value={
                                                                         item.id
                                                                     }
+                                                                    className='w-6 h-6'
                                                                 />
                                                             </FormControl>
                                                             <FormLabel className='font-normal'>
@@ -668,6 +682,7 @@ function AppointmentRequestForm() {
                                                         >
                                                             <FormControl>
                                                                 <Checkbox
+                                                                    className='w-6 h-6'
                                                                     checked={
                                                                         isChecked
                                                                     }
@@ -758,6 +773,7 @@ function AppointmentRequestForm() {
                                                         >
                                                             <FormControl>
                                                                 <Checkbox
+                                                                    className='w-6 h-6'
                                                                     checked={field.value?.includes(
                                                                         item.id
                                                                     )}
@@ -812,6 +828,7 @@ function AppointmentRequestForm() {
                                         </div>
                                         {services.map((item) => (
                                             <FormField
+                                                className='w-6 h-6'
                                                 key={item.id}
                                                 control={form.control}
                                                 name='serviceNeeds'
@@ -823,6 +840,7 @@ function AppointmentRequestForm() {
                                                         >
                                                             <FormControl>
                                                                 <Checkbox
+                                                                    className='w-6 h-6'
                                                                     checked={field.value?.includes(
                                                                         item.id.toUpperCase()
                                                                     )}
