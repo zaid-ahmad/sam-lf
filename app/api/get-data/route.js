@@ -58,6 +58,7 @@ export async function GET(request) {
                 slots_03: leadsPerTimeSlot["03:00 PM"],
                 slots_05: leadsPerTimeSlot["05:00 PM"],
                 slots_07: leadsPerTimeSlot["07:00 PM"],
+                branch,
             };
             break;
         case "sales_rep":
