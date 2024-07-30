@@ -42,17 +42,18 @@ export const RescheduleRequest = ({
                             <Column>
                                 <Heading
                                     style={{
-                                        fontSize: 32,
+                                        fontSize: 26,
                                         fontWeight: "bold",
                                         textAlign: "center",
                                     }}
                                 >
-                                    Hi admin,
+                                    Hey there!
                                 </Heading>
                                 <Heading
                                     as='h2'
                                     style={{
-                                        fontSize: 22,
+                                        fontSize: 18,
+                                        fontWeight: "normal",
                                         textAlign: "center",
                                     }}
                                 >
@@ -130,10 +131,10 @@ const button = {
     backgroundColor: "#00a74f",
     borderRadius: 3,
     color: "#FFF",
-    fontWeight: "bold",
+    fontWeight: "normal",
     border: "1px solid rgb(0,0,0, 0.1)",
     cursor: "pointer",
-    padding: "12px 30px",
+    padding: "12px 24px",
 };
 
 const content = {

@@ -42,23 +42,25 @@ export const NewLeadEmail = ({
                             <Column>
                                 <Heading
                                     style={{
-                                        fontSize: 32,
+                                        fontSize: 26,
                                         fontWeight: "bold",
                                         textAlign: "center",
                                     }}
                                 >
-                                    Hi admin,
+                                    Hey there!
                                 </Heading>
                                 <Heading
                                     as='h2'
                                     style={{
-                                        fontSize: 22,
+                                        fontSize: 18,
+                                        fontWeight: "normal",
                                         textAlign: "center",
                                     }}
                                 >
-                                    A new appointment has been scheduled.
+                                    A new appointment has been scheduled. Please
+                                    assign it to the appropriate representative.
                                 </Heading>
-                                <Text style={paragraph}>
+                                <Text style={{ ...paragraph, marginTop: 25 }}>
                                     <b>Customer Name: </b>
                                     {customerName}
                                 </Text>
@@ -129,10 +131,10 @@ const button = {
     backgroundColor: "#00a74f",
     borderRadius: 3,
     color: "#FFF",
-    fontWeight: "bold",
+    fontWeight: "normal",
     border: "1px solid rgb(0,0,0, 0.1)",
     cursor: "pointer",
-    padding: "12px 30px",
+    padding: "12px 24px",
 };
 
 const content = {

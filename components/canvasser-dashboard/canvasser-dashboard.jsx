@@ -7,6 +7,7 @@ import { columns } from "./columns";
 import { displayTodaysDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Link from "next/link";
 
 const CanvasserDashboard = ({
     data,
@@ -37,9 +38,16 @@ const CanvasserDashboard = ({
 
     return (
         <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
-            <h2 className='text-xl sm:text-2xl font-semibold mb-4 sm:mb-7'>
-                Hello {name}!
-            </h2>
+            <div className='flex items-center justify-between gap-6 mt-4 md:mt-0 md:gap-2 mb-8 sm:mb-7'>
+                <h2 className='text-xl sm:text-2xl font-semibold'>
+                    Hello {name}!
+                </h2>
+                <Link href='/book-lead' aria-current='page'>
+                    <span className='py-3 px-4 text-sm text-white bg-primary rounded'>
+                        Appointment request form
+                    </span>
+                </Link>
+            </div>
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-[1.74rem] mb-6 sm:mb-10'>
                 <InfoCard
                     title='Leads booked today'
