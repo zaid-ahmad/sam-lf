@@ -73,25 +73,26 @@ export function DataTable({
     };
 
     const handleAssignComplete = async (leadId, salesRepId) => {
-        const updatedData = await assignLeadToSalesRep(leadId, salesRepId);
-        setData(
-            data.map((lead) =>
-                lead.id === leadId
-                    ? {
-                          ...lead,
-                          salesRep:
-                              updatedData.salesRep.firstName +
-                              " " +
-                              updatedData.salesRep.lastName,
-
-                          status: updatedData.status,
-                      }
-                    : lead
-            )
-        );
-        setIsAssignDialogOpen(false);
-        setSelectedLeadId(null);
-        setLeadDetails(null);
+        try {
+            const updatedLead = await assignLeadToSalesRep(leadId, salesRepId);
+            setData(
+                data.map((lead) =>
+                    lead.id === leadId
+                        ? {
+                              ...lead,
+                              salesRep: `${updatedLead.salesRep.firstName} ${updatedLead.salesRep.lastName}`,
+                              status: updatedLead.status,
+                          }
+                        : lead
+                )
+            );
+            setIsAssignDialogOpen(false);
+            setSelectedLeadId(null);
+            setLeadDetails(null);
+        } catch (error) {
+            console.error("Error assigning lead:", error);
+            // Handle error (e.g., show an error message to the user)
+        }
     };
 
     const handleDeleteLead = (id) => {

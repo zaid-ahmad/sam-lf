@@ -18,8 +18,6 @@ const AdminDashboard = ({
     slots_05,
     slots_07,
     assignLeadToSalesRep,
-    allBranches,
-    isSuperAdmin,
 }) => {
     const statusOptions = [
         "APPOINTMENT",
