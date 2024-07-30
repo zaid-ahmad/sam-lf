@@ -31,7 +31,6 @@ export async function GET(request) {
 
     switch (role) {
         case "admin":
-            console.log(date);
             const { data, name, branch } = await getAdminData(session, date);
             const sale_reps = await getSalesRepresentatives(branch);
             const {
@@ -43,13 +42,6 @@ export async function GET(request) {
             const listOfCanvassers = await getAllCanvasserNames(branch);
             const listOfSalesPeople = sale_reps.map((s) =>
                 `${s.firstName} ${s.lastName}`.trim()
-            );
-
-            console.log(
-                totalLeads,
-                totalAssignedLeads,
-                totalUnassignedLeads,
-                leadsPerTimeSlot
             );
 
             responseData = {
