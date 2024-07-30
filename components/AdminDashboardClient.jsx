@@ -6,8 +6,9 @@ import AdminDashboard from "./admin-dashboard/admin-dashboard";
 import { displayTodaysDate, displayTomorrowsDate } from "@/lib/utils";
 import moment from "moment";
 
-export default function AdminDashboardClient({ initialData, branch }) {
+export default function AdminDashboardClient({ initialData }) {
     const [dashboardData, setDashboardData] = useState(initialData);
+    const { branch } = dashboardData;
     const [leadDate, setLeadDate] = useState(displayTodaysDate(branch));
     const [isToday, setIsToday] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
