@@ -87,14 +87,6 @@ export async function assignLeadToSalesRep(leadId, salesRepId) {
                         lastName: true,
                     },
                 },
-                previousSalesRep: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                    },
-                },
             },
         });
 
