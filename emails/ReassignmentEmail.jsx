@@ -17,8 +17,8 @@ import * as React from "react";
 
 const baseUrl = process.env.BASE_URL || "http://localhost:3000";
 
-export const EmailToReps = ({
-    saleRepName,
+export const ReassignmentEmail = ({
+    salesRepName,
     customerName,
     customerPhone,
     customerAddress,
@@ -28,7 +28,7 @@ export const EmailToReps = ({
     return (
         <Html>
             <Head />
-            <Preview>A new lead has been assigned to you.</Preview>
+            <Preview>Oops.. this lead was assigned to you by mistake.</Preview>
             <Body style={main}>
                 <Container>
                     <Section style={logo}>
@@ -43,57 +43,26 @@ export const EmailToReps = ({
                             <Column>
                                 <Heading
                                     style={{
-                                        fontSize: 26,
+                                        fontSize: 24,
                                         fontWeight: "bold",
-                                        textAlign: "center",
+                                        textAlign: "left",
                                     }}
                                 >
-                                    Hi {saleRepName},
+                                    Hi {salesRepName},
                                 </Heading>
                                 <Heading
                                     as='h2'
                                     style={{
                                         fontSize: 18,
+                                        textAlign: "left",
                                         fontWeight: "normal",
-                                        textAlign: "center",
                                     }}
                                 >
-                                    A new lead has been assigned to you.
+                                    This is to inform you that the lead assigned
+                                    to you has been reassigned to another
+                                    representative. This was an error on our
+                                    part, and we kindly ask you to disregard it.
                                 </Heading>
-                                <Text style={{ ...paragraph, marginTop: 25 }}>
-                                    <b>Customer Name: </b>
-                                    {customerName}
-                                </Text>
-                                <Text style={{ ...paragraph, marginTop: -5 }}>
-                                    <b>Phone: </b>
-                                    {customerPhone}
-                                </Text>
-                                <Text style={{ ...paragraph, marginTop: -5 }}>
-                                    <b>Address: </b>
-                                    {customerAddress}
-                                </Text>
-                                <Text style={{ ...paragraph, marginTop: -5 }}>
-                                    <b>Quadrant: </b>
-                                    {customerQuadrant}
-                                </Text>
-                                <Link href={`${baseUrl}/leads/${leadId}`}>
-                                    Click here to view more details.
-                                </Link>
-
-                                <Text style={paragraph}>
-                                    For further actions, please log in to the
-                                    dashboard.
-                                </Text>
-                            </Column>
-                        </Row>
-                        <Row style={{ ...boxInfos, paddingTop: "0" }}>
-                            <Column style={containerButton} colSpan={2}>
-                                <Button
-                                    style={button}
-                                    href={`${baseUrl}/dashboard`}
-                                >
-                                    Login to SAM 2.0
-                                </Button>
                             </Column>
                         </Row>
                     </Section>
@@ -103,7 +72,7 @@ export const EmailToReps = ({
     );
 };
 
-export default EmailToReps;
+export default ReassignmentEmail;
 
 const main = {
     backgroundColor: "#fff",
@@ -117,7 +86,7 @@ const paragraph = {
 
 const logo = {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "left",
     padding: "30px 20px",
 };
 
@@ -131,10 +100,10 @@ const button = {
     backgroundColor: "#00a74f",
     borderRadius: 3,
     color: "#FFF",
-    fontWeight: "normal",
+    fontWeight: "bold",
     border: "1px solid rgb(0,0,0, 0.1)",
     cursor: "pointer",
-    padding: "12px 24px",
+    padding: "12px 30px",
 };
 
 const content = {
