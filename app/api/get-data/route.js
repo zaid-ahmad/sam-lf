@@ -103,17 +103,21 @@ export async function GET(request) {
             );
             const { superAdminData, superAdminName } = await getSuperAdminData(
                 session,
-                branchFromAPI
+                branchFromAPI,
+                date
             );
             const {
                 superAdminTotalLeads,
                 superAdminTotalAssignedLeads,
                 superAdminTotalUnassignedLeads,
                 superAdminLeadsPerTimeSlot,
-            } = await superAdminDashboardData(branchFromAPI);
+            } = await superAdminDashboardData(branchFromAPI, date);
 
             const superAdmiListOfCanvassers = await getAllCanvasserNames(
                 branchFromAPI
+            );
+            const superAdmiListOfSalesPeople = super_admin_sale_reps.map((s) =>
+                `${s.firstName} ${s.lastName}`.trim()
             );
 
             responseData = {
@@ -124,6 +128,7 @@ export async function GET(request) {
                 totalAssignedLeads: superAdminTotalAssignedLeads,
                 totalUnassignedLeads: superAdminTotalUnassignedLeads,
                 listOfCanvassers: superAdmiListOfCanvassers,
+                listOfSalesReps: superAdmiListOfSalesPeople,
                 slots_11: superAdminLeadsPerTimeSlot["11:00 AM"],
                 slots_01: superAdminLeadsPerTimeSlot["01:00 PM"],
                 slots_03: superAdminLeadsPerTimeSlot["03:00 PM"],

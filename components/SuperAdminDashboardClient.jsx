@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { assignLeadToSalesRep } from "@/server/actions/assign-to-sales-rep";
 import SuperAdminDashboard from "./super-admin-dashboard/super-admin-dashboard";
+import { displayTodaysDate, displayTomorrowsDate } from "@/lib/utils";
+import moment from "moment";
 
 export default function SuperAdminDashboardClient({
     initialData,
@@ -10,13 +12,19 @@ export default function SuperAdminDashboardClient({
 }) {
     const [dashboardData, setDashboardData] = useState(initialData);
     const [selectedBranch, setSelectedBranch] = useState(initialData.branch);
-    const [loading, setLoading] = useState(true);
+    const [leadDate, setLeadDate] = useState(displayTodaysDate());
+    const [isToday, setIsToday] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const intervalIdRef = useRef(null);
 
-    const fetchData = useCallback(async (branch) => {
+    const fetchData = useCallback(async (branch, date) => {
+        setIsLoading(true);
         try {
+            const formattedDate = date
+                ? moment(date).format("MMMM D, YYYY")
+                : null;
             const response = await fetch(
-                `/api/get-data?role=superadmin&branch=${branch}`
+                `/api/get-data?role=superadmin&branch=${branch}&date=${formattedDate}`
             );
             if (response.ok) {
                 const newData = await response.json();
@@ -25,16 +33,16 @@ export default function SuperAdminDashboardClient({
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        fetchData(selectedBranch); // Fetch data immediately when component mounts or branch changes
+        fetchData(selectedBranch, leadDate);
 
         intervalIdRef.current = setInterval(
-            () => fetchData(selectedBranch),
-            10000
+            () => fetchData(selectedBranch, leadDate),
+            30000
         );
 
         return () => {
@@ -42,23 +50,33 @@ export default function SuperAdminDashboardClient({
                 clearInterval(intervalIdRef.current);
             }
         };
-    }, [fetchData, selectedBranch]);
+    }, [fetchData, selectedBranch, leadDate]);
 
     const handleBranchChange = useCallback(
         (branch) => {
             setSelectedBranch(branch);
-            fetchData(branch);
+            fetchData(branch, leadDate);
         },
-        [fetchData]
+        [fetchData, leadDate]
     );
 
-    if (loading) {
-        return (
-            <div className='h-screen flex items-center justify-center text-2xl font-medium'>
-                Loading...
-            </div>
-        );
-    }
+    const handlePreviousDate = () => {
+        if (!isToday) {
+            const newDate = displayTodaysDate();
+            setLeadDate(newDate);
+            setIsToday(true);
+            fetchData(selectedBranch, newDate);
+        }
+    };
+
+    const handleNextDate = () => {
+        if (isToday) {
+            const newDate = displayTomorrowsDate();
+            setLeadDate(newDate);
+            setIsToday(false);
+            fetchData(selectedBranch, newDate);
+        }
+    };
 
     return (
         <SuperAdminDashboard
@@ -66,6 +84,12 @@ export default function SuperAdminDashboardClient({
             assignLeadToSalesRep={assignLeadToSalesRep}
             onBranchChange={handleBranchChange}
             allBranches={allBranches}
+            leadDate={leadDate}
+            onPreviousDate={handlePreviousDate}
+            onNextDate={handleNextDate}
+            isToday={isToday}
+            isLoading={isLoading}
+            selectedBranch={selectedBranch}
         />
     );
 }
