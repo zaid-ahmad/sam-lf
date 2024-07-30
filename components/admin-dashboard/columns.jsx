@@ -155,6 +155,9 @@ export const columns = [
                         <a href={`/leads/${lead.id}`}>
                             <DropdownMenuItem>View details</DropdownMenuItem>
                         </a>
+                        <a href={`/leads/edit/${lead.id}`}>
+                            <DropdownMenuItem>Edit details</DropdownMenuItem>
+                        </a>
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();
