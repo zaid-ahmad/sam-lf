@@ -2,7 +2,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { getTodayAndTomorrow } from "@/lib/utils";
+import { getStartEndDateWithOffset, getTodayAndTomorrow } from "@/lib/utils";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -14,7 +14,6 @@ import {
 import { getBranches } from "@/lib/data";
 
 async function getAdminPastLeads(session, branch = null) {
-    const { today } = getTodayAndTomorrow();
     const user = await prisma.user.findUnique({
         where: {
             id: session.user.id,
@@ -23,12 +22,17 @@ async function getAdminPastLeads(session, branch = null) {
             branchCode: true,
         },
     });
+    const { startOfDayUTC } = getStartEndDateWithOffset(user.branchCode);
+
     const data = await prisma.lead.findMany({
         where: {
             branch: branch || user.branchCode,
             createdAt: {
-                lt: today,
+                lt: startOfDayUTC,
             },
+        },
+        orderBy: {
+            createdAt: "desc",
         },
         select: {
             id: true,
