@@ -1,24 +1,66 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CanvasserDashboard from "./canvasser-dashboard/canvasser-dashboard";
+import { displayTodaysDate, displayTomorrowsDate } from "@/lib/utils";
+import moment from "moment";
 
 export default function CanvasserDashboardClient({ initialData }) {
     const [dashboardData, setDashboardData] = useState(initialData);
+    const [leadDate, setLeadDate] = useState(displayTodaysDate());
+    const [isToday, setIsToday] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetch("/api/get-data?role=canvasser");
+    const fetchData = useCallback(async (date) => {
+        setIsLoading(true);
+        const formattedDate = date ? moment(date).format("MMMM D, YYYY") : null;
+        try {
+            const response = await fetch(
+                `/api/get-data?role=canvasser&date=${formattedDate}`
+            );
             if (response.ok) {
                 const newData = await response.json();
                 setDashboardData(newData);
             }
-        };
-
-        const intervalId = setInterval(fetchData, 30000); // Poll every 30 seconds
-
-        return () => clearInterval(intervalId); // Cleanup on unmount
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
-    return <CanvasserDashboard {...dashboardData} />;
+    useEffect(() => {
+        fetchData(leadDate);
+        const intervalId = setInterval(() => fetchData(leadDate), 30000);
+        return () => clearInterval(intervalId);
+    }, [fetchData, leadDate]);
+
+    const handlePreviousDate = () => {
+        if (!isToday) {
+            const newDate = displayTodaysDate();
+            setLeadDate(newDate);
+            setIsToday(true);
+            fetchData(newDate);
+        }
+    };
+
+    const handleNextDate = () => {
+        if (isToday) {
+            const newDate = displayTomorrowsDate();
+            setLeadDate(newDate);
+            setIsToday(false);
+            fetchData(newDate);
+        }
+    };
+
+    return (
+        <CanvasserDashboard
+            {...dashboardData}
+            leadDate={leadDate}
+            onPreviousDate={handlePreviousDate}
+            onNextDate={handleNextDate}
+            isToday={isToday}
+            isLoading={isLoading}
+        />
+    );
 }

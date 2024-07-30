@@ -83,9 +83,9 @@ export async function GET(request) {
             break;
         case "canvasser":
             const { canvasserData, canvasserFirstName } =
-                await getCanvasserData(session);
+                await getCanvasserData(session, date);
             const { totalCanvasserLeads, totalDemo, totalDead, totalSale } =
-                await canvasserDashboardData(session.user.id);
+                await canvasserDashboardData(session.user.id, date);
 
             responseData = {
                 data: canvasserData,

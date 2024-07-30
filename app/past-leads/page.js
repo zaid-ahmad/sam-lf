@@ -80,12 +80,17 @@ async function getAdminPastLeads(session, branch = null) {
 }
 
 async function getCanvasserPastLeads(user_id) {
-    const { today } = getTodayAndTomorrow();
+    const user = await prisma.user.findUnique({
+        where: { id: user_id },
+        select: { branchCode: true },
+    });
+    const { currentDateString } = getStartEndDateWithOffset(user.branchCode);
+
     const data = await prisma.lead.findMany({
         where: {
             canvasserId: user_id,
-            createdAt: {
-                lt: today,
+            appointmentDateTime: {
+                lt: currentDateString,
             },
         },
         select: {
@@ -107,6 +112,7 @@ async function getCanvasserPastLeads(user_id) {
             status: true,
             quadrant: true,
             appointmentDateTime: true,
+            branch: true,
         },
     });
 
@@ -230,9 +236,11 @@ const PastLeads = async () => {
                 </Breadcrumb>
                 <h1 className='my-5 text-2xl font-bold'>Past Leads</h1>
                 <DataTable
-                    columns={columns}
-                    data={data}
+                    initialColumns={columns}
+                    initialData={data}
                     statusOptions={statusOptions}
+                    isSuperAdmin={false}
+                    isCanvasser={true}
                 />
             </div>
         );

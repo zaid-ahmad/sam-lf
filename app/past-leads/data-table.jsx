@@ -39,6 +39,7 @@ export function DataTable({
     canvasserOptions,
     allBranches,
     isSuperAdmin,
+    isCanvasser = false,
 }) {
     const [sorting, setSorting] = useState([]);
     const [data, setData] = useState(initialData);
@@ -60,12 +61,22 @@ export function DataTable({
         return data.filter((item) => {
             const matchesStatus =
                 statusFilter === "all" || item.status === statusFilter;
-            const matchesCanvasser =
-                canvasserFilter === "all" || item.canvasser === canvasserFilter;
-            const matchesBranch =
-                branchFilter === "all" || item.branch === branchFilter;
 
+            let matchesCanvasser = true;
+            let matchesBranch = true;
             let matchesDate = true;
+
+            if (!isCanvasser) {
+                matchesCanvasser =
+                    canvasserFilter === "all" ||
+                    item.canvasser === canvasserFilter;
+
+                if (isSuperAdmin) {
+                    matchesBranch =
+                        branchFilter === "all" || item.branch === branchFilter;
+                }
+            }
+
             if (dateFilter && item.appointmentDateTime) {
                 const appointmentDate = parse(
                     item.appointmentDateTime.split(" at ")[0],
@@ -83,7 +94,15 @@ export function DataTable({
                 matchesDate
             );
         });
-    }, [data, statusFilter, canvasserFilter, branchFilter, dateFilter]);
+    }, [
+        data,
+        statusFilter,
+        canvasserFilter,
+        branchFilter,
+        dateFilter,
+        isSuperAdmin,
+        isCanvasser,
+    ]);
 
     const handleAssignSalesRep = (lead) => {
         setSelectedLeadId(lead.id);
@@ -164,45 +183,57 @@ export function DataTable({
                         ))}
                     </SelectContent>
                 </Select>
-                {canvasserOptions && (
-                    <Select
-                        onValueChange={setCanvasserFilter}
-                        value={canvasserFilter || "all"}
-                    >
-                        <SelectTrigger className='w-[180px]'>
-                            <SelectValue placeholder='Filter by Canvasser' />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value='all'>All Canvassers</SelectItem>
-                            {canvasserOptions.map((canvasser) => (
-                                <SelectItem key={canvasser} value={canvasser}>
-                                    {canvasser}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                {!isCanvasser && (
+                    <>
+                        {canvasserOptions && (
+                            <Select
+                                onValueChange={setCanvasserFilter}
+                                value={canvasserFilter || "all"}
+                            >
+                                <SelectTrigger className='w-[180px]'>
+                                    <SelectValue placeholder='Filter by Canvasser' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value='all'>
+                                        All Canvassers
+                                    </SelectItem>
+                                    {canvasserOptions.map((canvasser) => (
+                                        <SelectItem
+                                            key={canvasser}
+                                            value={canvasser}
+                                        >
+                                            {canvasser}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )}
+                        {isSuperAdmin && allBranches && (
+                            <Select
+                                onValueChange={setBranchFilter}
+                                value={branchFilter || "all"}
+                            >
+                                <SelectTrigger className='w-[180px]'>
+                                    <SelectValue placeholder='Filter by Branch' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value='all'>
+                                        All Branches
+                                    </SelectItem>
+                                    {allBranches.map((branch) => (
+                                        <SelectItem
+                                            key={branch.code}
+                                            value={branch.code}
+                                        >
+                                            {branch.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )}
+                    </>
                 )}
-                {isSuperAdmin && allBranches && (
-                    <Select
-                        onValueChange={setBranchFilter}
-                        value={branchFilter || "all"}
-                    >
-                        <SelectTrigger className='w-[180px]'>
-                            <SelectValue placeholder='Filter by Branch' />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value='all'>All Branches</SelectItem>
-                            {allBranches.map((branch) => (
-                                <SelectItem
-                                    key={branch.code}
-                                    value={branch.code}
-                                >
-                                    {branch.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                )}
+
                 <input
                     type='date'
                     onChange={(e) => setDateFilter(e.target.value)}
@@ -260,14 +291,16 @@ export function DataTable({
                         )}
                     </TableBody>
                 </Table>
-                <AssignSalesRepDialog
-                    isOpen={isAssignDialogOpen}
-                    onClose={() => setIsAssignDialogOpen(false)}
-                    leadId={selectedLeadId}
-                    onAssign={handleAssignComplete}
-                    saleReps={saleReps}
-                    leadDetails={leadDetails}
-                />
+                {!isCanvasser && (
+                    <AssignSalesRepDialog
+                        isOpen={isAssignDialogOpen}
+                        onClose={() => setIsAssignDialogOpen(false)}
+                        leadId={selectedLeadId}
+                        onAssign={handleAssignComplete}
+                        saleReps={saleReps}
+                        leadDetails={leadDetails}
+                    />
+                )}
                 <div className='flex items-center justify-end space-x-2 py-4'>
                     <Button
                         variant='outline'
