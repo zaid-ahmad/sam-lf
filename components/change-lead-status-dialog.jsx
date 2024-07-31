@@ -114,6 +114,10 @@ export function ChangeLeadStatusDialog({
             } finally {
                 setLoading(false);
             }
+        } else if (selectedAction === "INSTALL_CANCELLED") {
+            onStatusChange(leadId, selectedAction, {});
+            onClose();
+            return;
         } else {
             onStatusChange(leadId, selectedAction, data);
             onClose();
@@ -163,14 +167,18 @@ export function ChangeLeadStatusDialog({
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            {["Dead", "Demo", "Sale"].map((action) => (
-                                <SelectItem
-                                    key={action}
-                                    value={action.toUpperCase()}
-                                >
-                                    {action}
-                                </SelectItem>
-                            ))}
+                            {["Dead", "Demo", "Sale", "Install Cancelled"].map(
+                                (action) => (
+                                    <SelectItem
+                                        key={action}
+                                        value={action
+                                            .toUpperCase()
+                                            .replace(" ", "_")}
+                                    >
+                                        {action}
+                                    </SelectItem>
+                                )
+                            )}
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -346,6 +354,13 @@ export function ChangeLeadStatusDialog({
                             </DialogFooter>
                         </form>
                     </Form>
+                )}
+                {selectedAction === "INSTALL_CANCELLED" && (
+                    <DialogFooter>
+                        <Button onClick={() => handleStatusChange({})}>
+                            Save
+                        </Button>
+                    </DialogFooter>
                 )}
             </DialogContent>
         </Dialog>

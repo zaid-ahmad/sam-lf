@@ -9,9 +9,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { colorMap } from "@/lib/utils";
 import { deleteLead } from "@/server/actions/delete-lead";
 import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
-import Link from "next/link";
 
 export const columns = [
     {
@@ -32,23 +32,14 @@ export const columns = [
         cell: ({ row }) => {
             const status = row.getValue("status") || "UNASSIGNED";
 
-            // Define color based on status
-            const colorMap = {
-                APPOINTMENT: "blue",
-                ASSIGNED: "yellow",
-                DEMO: "purple",
-                SALE: "green",
-                DEAD: "red",
-                UNASSIGNED: "gray",
-                REBOOK: "pink",
-            };
-
             return (
                 <Badge
                     variant='outline'
                     className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
                 >
-                    {status}
+                    {status === "INSTALL_CANCELLED"
+                        ? "INSTALL CANCELLED"
+                        : status}
                 </Badge>
             );
         },

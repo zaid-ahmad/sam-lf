@@ -33,6 +33,7 @@ const AdminDashboard = ({
         "DEAD",
         "REBOOK",
         "CANCELLED",
+        "INSTALL_CANCELLED",
     ];
 
     const timeOptions = [

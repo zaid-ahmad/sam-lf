@@ -44,6 +44,12 @@ export async function changeLeadStatus(leadId, action, formData) {
                 updateData.amount = formData.salePrice;
                 updateData.installationDate = formData.installationDate;
                 break;
+
+            case "INSTALL_CANCELLED":
+                updateData.jobNumber = null;
+                updateData.amount = null;
+                updateData.installationDate = null;
+                break;
         }
 
         const updatedLead = await prisma.lead.update({
