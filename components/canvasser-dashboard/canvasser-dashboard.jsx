@@ -44,7 +44,7 @@ const CanvasserDashboard = ({
 
     return (
         <div className='container mx-auto py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
-            <div className='flex items-center justify-between gap-6 mt-4 md:mt-0 md:gap-2 mb-8 sm:mb-7'>
+            <div className='flex flex-col md:flex-row items-center justify-between gap-3 md:gap-2 mb-8 sm:mb-7'>
                 <h2 className='flex items-center gap-5 text-xl sm:text-2xl font-semibold mb-4 sm:mb-7'>
                     Hello {name}!
                     {isLoading && (
@@ -74,6 +74,7 @@ const CanvasserDashboard = ({
                     onPreviousDate={onPreviousDate}
                     onNextDate={onNextDate}
                     isToday={isToday}
+                    className={"w-full md:w-auto"}
                 />
                 <Separator
                     orientation='horizontal'
