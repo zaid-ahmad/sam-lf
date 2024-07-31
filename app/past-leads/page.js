@@ -167,6 +167,9 @@ const PastLeads = async () => {
 
         const listOfCanvassers = await getAllCanvasserNames(branch);
         const sale_reps = await getSalesRepresentatives(branch);
+        const listOfSalesPeople = sale_reps.map((s) =>
+            `${s.firstName} ${s.lastName}`.trim()
+        );
         const statusOptions = [
             "APPOINTMENT",
             "ASSIGNED",
@@ -199,6 +202,7 @@ const PastLeads = async () => {
                     assignLeadToSalesRep={assignLeadToSalesRep}
                     statusOptions={statusOptions}
                     canvasserOptions={listOfCanvassers}
+                    salesPersonOptions={listOfSalesPeople}
                     allBranches={allBranches}
                     isSuperAdmin={session.user.role === "SUPERADMIN"}
                     currentBranch={branch}
