@@ -40,6 +40,7 @@ const CanvasserDashboard = ({
         "DEAD",
         "REBOOK",
         "CANCELLED",
+        "INSTALL_CANCELLED",
     ];
 
     return (
