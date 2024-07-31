@@ -15,9 +15,15 @@ export default function AdminDashboardClient({ initialData }) {
 
     const fetchData = async (date) => {
         setIsLoading(true);
-        const formattedDate = date ? moment(date).format("MMMM D, YYYY") : null;
+        const parsedDate = moment(date, "MMMM D, YYYY");
+        if (!parsedDate.isValid()) {
+            console.error("Invalid date:", date);
+            setIsLoading(false);
+            return;
+        }
+        const formattedDate = parsedDate.format("YYYY-MM-DD");
         const response = await fetch(
-            `/api/get-data?role=admin&date=${formattedDate}`
+            `/api/get-data?role=admin&date=${encodeURIComponent(formattedDate)}`
         );
         if (response.ok) {
             const newData = await response.json();
@@ -27,12 +33,7 @@ export default function AdminDashboardClient({ initialData }) {
     };
 
     useEffect(() => {
-        const intervalId = setInterval(() => fetchData(leadDate), 1000000);
-        return () => clearInterval(intervalId);
-    }, [leadDate]);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => fetchData(leadDate), 1000000);
+        const intervalId = setInterval(() => fetchData(leadDate), 1500000);
         return () => clearInterval(intervalId);
     }, [leadDate]);
 

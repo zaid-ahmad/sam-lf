@@ -9,14 +9,25 @@ export default function SaleRepDashboardClient({ initialData }) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch("/api/get-data?role=sales_rep");
+            const parsedDate = moment(date, "MMMM D, YYYY");
+            if (!parsedDate.isValid()) {
+                console.error("Invalid date:", date);
+                setIsLoading(false);
+                return;
+            }
+            const formattedDate = parsedDate.format("YYYY-MM-DD");
+            const response = await fetch(
+                `/api/get-data?role=admin&date=${encodeURIComponent(
+                    formattedDate
+                )}`
+            );
             if (response.ok) {
                 const newData = await response.json();
                 setDashboardData(newData);
             }
         };
 
-        const intervalId = setInterval(fetchData, 1000000); // Poll every 10 minutes
+        const intervalId = setInterval(fetchData, 1500000); // Poll every 15 minutes
 
         return () => clearInterval(intervalId); // Cleanup on unmount
     }, []);

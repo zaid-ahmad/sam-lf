@@ -17,7 +17,17 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");
     const branchFromAPI = searchParams.get("branch");
-    const date = searchParams.get("date");
+    let date = searchParams.get("date");
+
+    if (date) {
+        const parsedDate = moment(date, "YYYY-MM-DD");
+        if (parsedDate.isValid()) {
+            date = parsedDate.format("MMMM D, YYYY");
+        } else {
+            console.error("Invalid date format received:", date);
+            // You might want to handle this error case appropriately
+        }
+    }
 
     const session = await auth();
     if (!session) {

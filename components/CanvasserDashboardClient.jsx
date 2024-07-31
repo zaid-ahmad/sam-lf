@@ -13,10 +13,18 @@ export default function CanvasserDashboardClient({ initialData, branch }) {
 
     const fetchData = useCallback(async (date) => {
         setIsLoading(true);
-        const formattedDate = date ? moment(date).format("MMMM D, YYYY") : null;
         try {
+            const parsedDate = moment(date, "MMMM D, YYYY");
+            if (!parsedDate.isValid()) {
+                console.error("Invalid date:", date);
+                setIsLoading(false);
+                return;
+            }
+            const formattedDate = parsedDate.format("YYYY-MM-DD");
             const response = await fetch(
-                `/api/get-data?role=canvasser&date=${formattedDate}`
+                `/api/get-data?role=admin&date=${encodeURIComponent(
+                    formattedDate
+                )}`
             );
             if (response.ok) {
                 const newData = await response.json();
@@ -31,7 +39,7 @@ export default function CanvasserDashboardClient({ initialData, branch }) {
 
     useEffect(() => {
         fetchData(leadDate);
-        const intervalId = setInterval(() => fetchData(leadDate), 1000000);
+        const intervalId = setInterval(() => fetchData(leadDate), 1500000);
         return () => clearInterval(intervalId);
     }, [fetchData, leadDate]);
 
