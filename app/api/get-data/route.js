@@ -13,6 +13,7 @@ import {
 } from "@/lib/data-fetching";
 import { getSalesRepresentatives } from "@/lib/data";
 import moment from "moment-timezone";
+import { getStartEndDateWithOffset } from "@/lib/utils";
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -54,6 +55,13 @@ export async function GET(request) {
             const listOfSalesPeople = sale_reps.map((s) =>
                 `${s.firstName} ${s.lastName}`.trim()
             );
+
+            console.log("hi from route");
+            const { currentDateString } = getStartEndDateWithOffset(
+                branch,
+                date
+            );
+            console.log("DATE FROM FUNCTION: ", currentDateString);
 
             responseData = {
                 data,
