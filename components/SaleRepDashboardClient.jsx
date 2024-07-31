@@ -17,7 +17,7 @@ export default function SaleRepDashboardClient({ initialData }) {
             }
             const formattedDate = parsedDate.format("YYYY-MM-DD");
             const response = await fetch(
-                `/api/get-data?role=admin&date=${encodeURIComponent(
+                `/api/get-data?role=sales_rep&date=${encodeURIComponent(
                     formattedDate
                 )}`
             );
