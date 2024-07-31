@@ -23,7 +23,7 @@ export async function GET(request) {
     if (date) {
         const parsedDate = moment(date, "YYYY-MM-DD");
         if (parsedDate.isValid()) {
-            date = parsedDate.format("MMMM D, YYYY");
+            date = parsedDate.format("MMMM Do, YYYY");
         } else {
             console.error("Invalid date format received:", date);
             // You might want to handle this error case appropriately
