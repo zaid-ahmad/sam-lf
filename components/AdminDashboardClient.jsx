@@ -27,12 +27,12 @@ export default function AdminDashboardClient({ initialData }) {
     };
 
     useEffect(() => {
-        const intervalId = setInterval(() => fetchData(leadDate), 30000);
+        const intervalId = setInterval(() => fetchData(leadDate), 1000000);
         return () => clearInterval(intervalId);
     }, [leadDate]);
 
     useEffect(() => {
-        const intervalId = setInterval(() => fetchData(leadDate), 30000);
+        const intervalId = setInterval(() => fetchData(leadDate), 1000000);
         return () => clearInterval(intervalId);
     }, [leadDate]);
 

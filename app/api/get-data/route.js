@@ -60,6 +60,7 @@ export async function GET(request) {
                 slots_07: leadsPerTimeSlot["07:00 PM"],
                 branch,
             };
+
             break;
         case "sales_rep":
             const { saleRepData, saleRepFirstName } = await getSalesRepData(
