@@ -14,7 +14,7 @@ export default function CanvasserDashboardClient({ initialData, branch }) {
     const fetchData = useCallback(async (date) => {
         setIsLoading(true);
         try {
-            const parsedDate = moment(date, "MMMM D, YYYY");
+            const parsedDate = moment(date, "MMMM Do, YYYY");
             if (!parsedDate.isValid()) {
                 console.error("Invalid date:", date);
                 setIsLoading(false);
@@ -22,7 +22,7 @@ export default function CanvasserDashboardClient({ initialData, branch }) {
             }
             const formattedDate = parsedDate.format("YYYY-MM-DD");
             const response = await fetch(
-                `/api/get-data?role=admin&date=${encodeURIComponent(
+                `/api/get-data?role=canvasser&date=${encodeURIComponent(
                     formattedDate
                 )}`
             );
