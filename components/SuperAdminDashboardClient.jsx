@@ -9,10 +9,11 @@ import moment from "moment";
 export default function SuperAdminDashboardClient({
     initialData,
     allBranches,
+    branch,
 }) {
     const [dashboardData, setDashboardData] = useState(initialData);
     const [selectedBranch, setSelectedBranch] = useState(initialData.branch);
-    const [leadDate, setLeadDate] = useState(displayTodaysDate());
+    const [leadDate, setLeadDate] = useState(displayTodaysDate(branch));
     const [isToday, setIsToday] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const intervalIdRef = useRef(null);
@@ -68,7 +69,7 @@ export default function SuperAdminDashboardClient({
 
     const handlePreviousDate = () => {
         if (!isToday) {
-            const newDate = displayTodaysDate();
+            const newDate = displayTodaysDate(branch);
             setLeadDate(newDate);
             setIsToday(true);
             fetchData(selectedBranch, newDate);
@@ -77,7 +78,7 @@ export default function SuperAdminDashboardClient({
 
     const handleNextDate = () => {
         if (isToday) {
-            const newDate = displayTomorrowsDate();
+            const newDate = displayTomorrowsDate(branch);
             setLeadDate(newDate);
             setIsToday(false);
             fetchData(selectedBranch, newDate);

@@ -55,9 +55,8 @@ const Dashboard = async () => {
 
         return <AdminDashboardClient initialData={initialData} />;
     } else if (role === "CANVASSER") {
-        const { canvasserData, canvasserFirstName } = await getCanvasserData(
-            session
-        );
+        const { canvasserData, canvasserFirstName, branch } =
+            await getCanvasserData(session);
         const { totalCanvasserLeads, totalDemo, totalDead, totalSale } =
             await canvasserDashboardData(session.user.id);
 
@@ -70,7 +69,12 @@ const Dashboard = async () => {
             totalSale,
         };
 
-        return <CanvasserDashboardClient initialData={initialData} />;
+        return (
+            <CanvasserDashboardClient
+                initialData={initialData}
+                branch={branch}
+            />
+        );
     } else if (role === "SALES_REP") {
         const { saleRepData, saleRepFirstName } = await getSalesRepData(
             session
@@ -129,6 +133,7 @@ const Dashboard = async () => {
             <SuperAdminDashboardClient
                 initialData={initialData}
                 allBranches={allBranches}
+                branch={defaultBranch}
             />
         );
     } else {

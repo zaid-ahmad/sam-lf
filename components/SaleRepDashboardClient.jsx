@@ -15,7 +15,6 @@ export default function SaleRepDashboardClient({ initialData }) {
                 setDashboardData(newData);
             }
         };
-
         const intervalId = setInterval(fetchData, 1500000); // Poll every 15 minutes
 
         return () => clearInterval(intervalId); // Cleanup on unmount
