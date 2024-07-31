@@ -2,7 +2,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { getStartEndDateWithOffset, getTodayAndTomorrow } from "@/lib/utils";
+import { displayTodaysDate, getStartEndDateWithOffset } from "@/lib/utils";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { getBranches, getSalesRepresentatives } from "@/lib/data";
 import { assignLeadToSalesRep } from "@/server/actions/assign-to-sales-rep";
+import moment from "moment";
 
 async function getAdminPastLeads(session, branch = null) {
     let branchCode;
@@ -30,14 +31,12 @@ async function getAdminPastLeads(session, branch = null) {
         throw new Error("No branch specified for superadmin");
     }
 
-    const { currentDateString } = getStartEndDateWithOffset(branchCode);
+    const todaysDate = displayTodaysDate(branchCode);
+    const currentDate = moment(todaysDate, "MMMM Do, YYYY");
 
     const data = await prisma.lead.findMany({
         where: {
             branch: branchCode,
-            appointmentDateTime: {
-                lt: currentDateString,
-            },
         },
         orderBy: {
             createdAt: "desc",
@@ -65,7 +64,16 @@ async function getAdminPastLeads(session, branch = null) {
         },
     });
 
-    const transformedData = data.map((lead) => ({
+    // Filter the data after fetching
+    const pastLeads = data.filter((lead) => {
+        const appointmentDate = moment(
+            lead.appointmentDateTime,
+            "MMMM Do, YYYY"
+        );
+        return appointmentDate.isBefore(currentDate);
+    });
+
+    const transformedData = pastLeads.map((lead) => ({
         ...lead,
         name: lead.firstName,
         canvasser: lead.canvasser
@@ -84,7 +92,9 @@ async function getCanvasserPastLeads(user_id) {
         where: { id: user_id },
         select: { branchCode: true },
     });
-    const { currentDateString } = getStartEndDateWithOffset(user.branchCode);
+
+    const todaysDate = displayTodaysDate(branchCode);
+    const currentDate = moment(todaysDate, "MMMM Do, YYYY");
 
     const data = await prisma.lead.findMany({
         where: {
@@ -116,7 +126,15 @@ async function getCanvasserPastLeads(user_id) {
         },
     });
 
-    const transformedData = data.map((lead) => ({
+    const pastLeads = data.filter((lead) => {
+        const appointmentDate = moment(
+            lead.appointmentDateTime,
+            "MMMM Do, YYYY"
+        );
+        return appointmentDate.isBefore(currentDate);
+    });
+
+    const transformedData = pastLeads.map((lead) => ({
         ...lead,
         name: lead.firstName,
         canvasser: lead.canvasser
