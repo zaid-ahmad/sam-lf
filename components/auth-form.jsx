@@ -24,9 +24,9 @@ import {
 import handleAuth from "@/server/actions/handle-auth";
 import { useState } from "react";
 import Spinner from "./spinner";
-import { useToast } from "@/components/ui/use-toast";
 import { loginSchema, registerSchema } from "@/lib/validations/schema";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const FormFields = ({
     form,
@@ -219,13 +219,20 @@ const FormFields = ({
                 >
                     {isLoading ? (
                         <div className='flex items-center justify-center'>
-                            <Spinner color='text-gray-100' />
+                            <p>Redirecting you to the dashboard...</p>
                         </div>
                     ) : (
                         <p>{isLogin ? "Log In" : "Create Account"}</p>
                     )}
                 </Button>
             </div>
+            {isLogin && (
+                <Link href='/forgot-password'>
+                    <p className='text-left mt-3 text-sm text-gray-500'>
+                        Forgot password?
+                    </p>
+                </Link>
+            )}
         </form>
     </Form>
 );
@@ -248,7 +255,6 @@ function AuthForm() {
     const [formError, setFormError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
-    const { toast } = useToast();
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
