@@ -11,13 +11,24 @@ import {
     salesRepDashboardData,
     superAdminDashboardData,
 } from "@/lib/data-fetching";
-import { getBranches, getSalesRepresentatives } from "@/lib/data";
+import { getSalesRepresentatives } from "@/lib/data";
+import moment from "moment-timezone";
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");
     const branchFromAPI = searchParams.get("branch");
-    const date = searchParams.get("date");
+    let date = searchParams.get("date");
+
+    if (date) {
+        const parsedDate = moment(date, "YYYY-MM-DD");
+        if (parsedDate.isValid()) {
+            date = parsedDate.format("MMMM D, YYYY");
+        } else {
+            console.error("Invalid date format received:", date);
+            // You might want to handle this error case appropriately
+        }
+    }
 
     const session = await auth();
     if (!session) {
@@ -58,6 +69,7 @@ export async function GET(request) {
                 slots_03: leadsPerTimeSlot["03:00 PM"],
                 slots_05: leadsPerTimeSlot["05:00 PM"],
                 slots_07: leadsPerTimeSlot["07:00 PM"],
+                branch,
             };
             break;
         case "sales_rep":

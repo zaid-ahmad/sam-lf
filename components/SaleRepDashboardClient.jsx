@@ -16,7 +16,7 @@ export default function SaleRepDashboardClient({ initialData }) {
             }
         };
 
-        const intervalId = setInterval(fetchData, 30000); // Poll every 30 seconds
+        const intervalId = setInterval(fetchData, 1500000); // Poll every 15 minutes
 
         return () => clearInterval(intervalId); // Cleanup on unmount
     }, []);

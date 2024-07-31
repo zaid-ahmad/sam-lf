@@ -8,50 +8,49 @@ import moment from "moment";
 
 export default function AdminDashboardClient({ initialData }) {
     const [dashboardData, setDashboardData] = useState(initialData);
-    const [leadDate, setLeadDate] = useState(displayTodaysDate());
+    const { branch } = initialData;
+    const [leadDate, setLeadDate] = useState(displayTodaysDate(branch));
     const [isToday, setIsToday] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
     const fetchData = async (date) => {
         setIsLoading(true);
-        const formattedDate = date ? moment(date).format("MMMM D, YYYY") : null;
+        const parsedDate = moment(date, "MMMM D, YYYY");
+        if (!parsedDate.isValid()) {
+            console.error("Invalid date:", date);
+            setIsLoading(false);
+            return;
+        }
+        const formattedDate = parsedDate.format("YYYY-MM-DD");
         const response = await fetch(
-            `/api/get-data?role=admin&date=${formattedDate}`
+            `/api/get-data?role=admin&date=${encodeURIComponent(formattedDate)}`
         );
         if (response.ok) {
             const newData = await response.json();
-            setDashboardData((prevData) => ({
-                ...prevData,
-                data: newData.data, // Only update the data array
-                // Update other fields as necessary
-            }));
+            setDashboardData(newData);
         }
         setIsLoading(false);
     };
 
     useEffect(() => {
-        const intervalId = setInterval(() => fetchData(leadDate), 30000);
-        return () => clearInterval(intervalId);
-    }, [leadDate]);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => fetchData(leadDate), 30000);
+        const intervalId = setInterval(() => fetchData(leadDate), 1500000);
         return () => clearInterval(intervalId);
     }, [leadDate]);
 
     const handlePreviousDate = () => {
         if (!isToday) {
-            setLeadDate(displayTodaysDate());
+            setLeadDate(displayTodaysDate(branch));
             setIsToday(true);
-            fetchData(displayTodaysDate());
+            fetchData(displayTodaysDate(branch));
         }
     };
 
     const handleNextDate = () => {
         if (isToday) {
-            setLeadDate(displayTomorrowsDate());
+            const nextDate = displayTomorrowsDate(branch);
+            setLeadDate(nextDate);
             setIsToday(false);
-            fetchData(displayTomorrowsDate());
+            fetchData(nextDate);
         }
     };
 

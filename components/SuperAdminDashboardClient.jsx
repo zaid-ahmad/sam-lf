@@ -20,11 +20,17 @@ export default function SuperAdminDashboardClient({
     const fetchData = useCallback(async (branch, date) => {
         setIsLoading(true);
         try {
-            const formattedDate = date
-                ? moment(date).format("MMMM D, YYYY")
-                : null;
+            const parsedDate = moment(date, "MMMM D, YYYY");
+            if (!parsedDate.isValid()) {
+                console.error("Invalid date:", date);
+                setIsLoading(false);
+                return;
+            }
+            const formattedDate = parsedDate.format("YYYY-MM-DD");
             const response = await fetch(
-                `/api/get-data?role=superadmin&branch=${branch}&date=${formattedDate}`
+                `/api/get-data?role=superadmin&branch=${branch}&date=${encodeURIComponent(
+                    formattedDate
+                )}`
             );
             if (response.ok) {
                 const newData = await response.json();
@@ -42,7 +48,7 @@ export default function SuperAdminDashboardClient({
 
         intervalIdRef.current = setInterval(
             () => fetchData(selectedBranch, leadDate),
-            30000
+            1500000
         );
 
         return () => {
