@@ -95,6 +95,7 @@ enum LeadStatus {
   SALE
   REBOOK
   CANCELLED
+  INSTALL_CANCELLED
 }
 
 enum TypesOfServices {

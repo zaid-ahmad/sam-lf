@@ -8,61 +8,26 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import parseAppointmentDateTime from "@/lib/formatDateTime";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+import { colorMap } from "@/lib/utils";
 
 export const columns = [
     {
         accessorKey: "status",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant='ghost'
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Status
-                    <ArrowUpDown className='ml-2 h-4 w-4' />
-                </Button>
-            );
-        },
+        header: "Status",
         cell: ({ row }) => {
             const status = row.getValue("status") || "UNASSIGNED";
-
-            // Define color based on status
-            const colorMap = {
-                APPOINTMENT: "blue",
-                ASSIGNED: "yellow",
-                DEMO: "purple",
-                SALE: "green",
-                DEAD: "red",
-                UNASSIGNED: "gray",
-                REBOOK: "pink",
-            };
 
             return (
                 <Badge
                     variant='outline'
                     className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
                 >
-                    {status}
+                    {status === "INSTALL_CANCELLED"
+                        ? "INSTALL CANCELLED"
+                        : status}
                 </Badge>
             );
-        },
-        sortingFn: (rowA, rowB, columnId) => {
-            const statusOrder = [
-                "APPOINTMENT",
-                "ASSIGNED",
-                "DEMO",
-                "SOLD",
-                "DEAD",
-                "UNASSIGNED",
-            ];
-            const statusA = rowA.getValue(columnId) || "UNASSIGNED";
-            const statusB = rowB.getValue(columnId) || "UNASSIGNED";
-            return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
         },
     },
     {
@@ -83,19 +48,7 @@ export const columns = [
     },
     {
         accessorKey: "salesRep",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant='ghost'
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Sales Rep.
-                    <ArrowUpDown className='ml-2 h-4 w-4' />
-                </Button>
-            );
-        },
+        header: "Sales Rep.",
         cell: ({ row }) => {
             const salesRep = row.getValue("salesRep");
             return salesRep === null ? (
@@ -104,37 +57,12 @@ export const columns = [
                 salesRep
             );
         },
-        sortingFn: (rowA, rowB, columnId) => {
-            const repA = rowA.getValue(columnId);
-            const repB = rowB.getValue(columnId);
-            if (repA === null && repB === null) return 0;
-            if (repA === null) return 1;
-            if (repB === null) return -1;
-            return repA.localeCompare(repB);
-        },
     },
     {
         accessorKey: "appointmentDateTime",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant='ghost'
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Appointment
-                    <ArrowUpDown className='ml-2 h-4 w-4' />
-                </Button>
-            );
-        },
+        header: "Appointment Date & Time",
         cell: ({ row }) => {
             return row.getValue("appointmentDateTime");
-        },
-        sortingFn: (rowA, rowB, columnId) => {
-            const dateA = parseAppointmentDateTime(rowA.getValue(columnId));
-            const dateB = parseAppointmentDateTime(rowB.getValue(columnId));
-            return dateA.getTime() - dateB.getTime();
         },
     },
     {

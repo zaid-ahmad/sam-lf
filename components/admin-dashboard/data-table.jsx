@@ -33,6 +33,8 @@ import { useEffect, useMemo, useState } from "react";
 import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
 import { ChangeLeadStatusDialog } from "../change-lead-status-dialog";
 import { changeLeadStatus } from "@/server/actions/change-lead-status";
+import { Badge } from "../ui/badge";
+import { colorMap } from "@/lib/utils";
 
 export function DataTable({
     initialColumns,
@@ -197,7 +199,14 @@ export function DataTable({
                         <SelectItem value='all'>All Statuses</SelectItem>
                         {statusOptions.map((status) => (
                             <SelectItem key={status} value={status}>
-                                {status}
+                                <Badge
+                                    variant='outline'
+                                    className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
+                                >
+                                    {status === "INSTALL_CANCELLED"
+                                        ? "INSTALL CANCELLED"
+                                        : status}
+                                </Badge>
                             </SelectItem>
                         ))}
                     </SelectContent>
