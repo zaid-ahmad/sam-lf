@@ -16,22 +16,36 @@ import AdminDashboardClient from "@/components/AdminDashboardClient";
 import CanvasserDashboardClient from "@/components/CanvasserDashboardClient";
 import SaleRepDashboardClient from "@/components/SaleRepDashboardClient";
 import SuperAdminDashboardClient from "@/components/SuperAdminDashboardClient";
+import { displayTodaysDate } from "@/lib/utils";
+import prisma from "@/lib/prisma";
 
 const Dashboard = async () => {
     const session = await auth();
+
     const role = session?.user?.role;
 
     if (role === "ADMIN") {
+        const fetchedUser = await prisma.user.findUnique({
+            where: {
+                id: session?.user?.id,
+            },
+            select: {
+                branchCode: true,
+            },
+        });
+        const todaysDate = displayTodaysDate(fetchedUser.branchCode);
         const sale_reps = await getSalesRepresentatives();
-        const { data, name, branch } = await getAdminData(session);
+        const { data, name } = await getAdminData(session, todaysDate);
         const {
             totalLeads,
             totalAssignedLeads,
             totalUnassignedLeads,
             leadsPerTimeSlot,
-        } = await adminDashboardData(branch);
+        } = await adminDashboardData(fetchedUser.branchCode, todaysDate);
 
-        const listOfCanvassers = await getAllCanvasserNames(branch);
+        const listOfCanvassers = await getAllCanvasserNames(
+            fetchedUser.branchCode
+        );
         const listOfSalesPeople = sale_reps.map((s) =>
             `${s.firstName} ${s.lastName}`.trim()
         );
@@ -50,7 +64,7 @@ const Dashboard = async () => {
             slots_03: leadsPerTimeSlot["03:00 PM"],
             slots_05: leadsPerTimeSlot["05:00 PM"],
             slots_07: leadsPerTimeSlot["07:00 PM"],
-            branch,
+            branch: fetchedUser.branchCode,
         };
 
         return <AdminDashboardClient initialData={initialData} />;
