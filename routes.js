@@ -1,4 +1,8 @@
-export const publicRoutes = ["/leads/:id", "/api/twilio-webhook"];
+export const publicRoutes = [
+    "/leads/:id",
+    "/api/twilio-webhook",
+    "/forgot-password",
+];
 
 export const authRoutes = ["/auth"];
 

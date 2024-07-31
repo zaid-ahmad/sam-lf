@@ -37,6 +37,7 @@ export function DataTable({
     assignLeadToSalesRep,
     statusOptions,
     canvasserOptions,
+    salesPersonOptions,
     allBranches,
     isSuperAdmin,
     isCanvasser = false,
@@ -50,6 +51,7 @@ export function DataTable({
 
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
+    const [salesRepFilter, setSalesRepFilter] = useState("all");
     const [branchFilter, setBranchFilter] = useState("all");
     const [dateFilter, setDateFilter] = useState("");
 
@@ -65,11 +67,16 @@ export function DataTable({
             let matchesCanvasser = true;
             let matchesBranch = true;
             let matchesDate = true;
+            let matchesSalesRep = true;
 
             if (!isCanvasser) {
                 matchesCanvasser =
                     canvasserFilter === "all" ||
                     item.canvasser === canvasserFilter;
+
+                matchesSalesRep =
+                    salesRepFilter === "all" ||
+                    item.salesRep === salesRepFilter;
 
                 if (isSuperAdmin) {
                     matchesBranch =
@@ -91,6 +98,7 @@ export function DataTable({
                 matchesStatus &&
                 matchesCanvasser &&
                 matchesBranch &&
+                matchesSalesRep &&
                 matchesDate
             );
         });
@@ -102,6 +110,7 @@ export function DataTable({
         dateFilter,
         isSuperAdmin,
         isCanvasser,
+        salesRepFilter,
     ]);
 
     const handleAssignSalesRep = (lead) => {
@@ -203,6 +212,29 @@ export function DataTable({
                                             value={canvasser}
                                         >
                                             {canvasser}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )}
+                        {salesPersonOptions && (
+                            <Select
+                                onValueChange={setSalesRepFilter}
+                                value={salesRepFilter || "all"}
+                            >
+                                <SelectTrigger className='w-[180px]'>
+                                    <SelectValue placeholder='Filter by Sales Rep.' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value='all'>
+                                        All Sales Reps.
+                                    </SelectItem>
+                                    {salesPersonOptions.map((salesPerson) => (
+                                        <SelectItem
+                                            key={salesPerson}
+                                            value={salesPerson}
+                                        >
+                                            {salesPerson}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
