@@ -31,7 +31,7 @@ export default function CanvasserDashboardClient({ initialData, branch }) {
 
     useEffect(() => {
         fetchData(leadDate);
-        const intervalId = setInterval(() => fetchData(leadDate), 30000);
+        const intervalId = setInterval(() => fetchData(leadDate), 1000000);
         return () => clearInterval(intervalId);
     }, [fetchData, leadDate]);
 
