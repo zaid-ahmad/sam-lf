@@ -56,13 +56,6 @@ export async function GET(request) {
                 `${s.firstName} ${s.lastName}`.trim()
             );
 
-            console.log("hi from route");
-            const { currentDateString } = getStartEndDateWithOffset(
-                branch,
-                date
-            );
-            console.log("DATE FROM FUNCTION: ", currentDateString);
-
             responseData = {
                 data,
                 name,

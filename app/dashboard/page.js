@@ -19,21 +19,26 @@ import SuperAdminDashboardClient from "@/components/SuperAdminDashboardClient";
 import { displayTodaysDate } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
+async function getUserBranch(userId) {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+        select: {
+            branchCode: true,
+        },
+    });
+    return user.branchCode;
+}
+
 const Dashboard = async () => {
     const session = await auth();
 
     const role = session?.user?.role;
 
     if (role === "ADMIN") {
-        const fetchedUser = await prisma.user.findUnique({
-            where: {
-                id: session?.user?.id,
-            },
-            select: {
-                branchCode: true,
-            },
-        });
-        const todaysDate = displayTodaysDate(fetchedUser.branchCode);
+        const branch = await getUserBranch(session?.user?.id);
+        const todaysDate = displayTodaysDate(branch);
         const sale_reps = await getSalesRepresentatives();
         const { data, name } = await getAdminData(session, todaysDate);
         const {
@@ -41,11 +46,9 @@ const Dashboard = async () => {
             totalAssignedLeads,
             totalUnassignedLeads,
             leadsPerTimeSlot,
-        } = await adminDashboardData(fetchedUser.branchCode, todaysDate);
+        } = await adminDashboardData(branch, todaysDate);
 
-        const listOfCanvassers = await getAllCanvasserNames(
-            fetchedUser.branchCode
-        );
+        const listOfCanvassers = await getAllCanvasserNames(branch);
         const listOfSalesPeople = sale_reps.map((s) =>
             `${s.firstName} ${s.lastName}`.trim()
         );
@@ -64,15 +67,19 @@ const Dashboard = async () => {
             slots_03: leadsPerTimeSlot["03:00 PM"],
             slots_05: leadsPerTimeSlot["05:00 PM"],
             slots_07: leadsPerTimeSlot["07:00 PM"],
-            branch: fetchedUser.branchCode,
+            branch,
         };
 
         return <AdminDashboardClient initialData={initialData} />;
     } else if (role === "CANVASSER") {
-        const { canvasserData, canvasserFirstName, branch } =
-            await getCanvasserData(session);
+        const branch = await getUserBranch(session?.user?.id);
+        const todaysDate = displayTodaysDate(branch);
+        const { canvasserData, canvasserFirstName } = await getCanvasserData(
+            session,
+            todaysDate
+        );
         const { totalCanvasserLeads, totalDemo, totalDead, totalSale } =
-            await canvasserDashboardData(session.user.id);
+            await canvasserDashboardData(session.user.id, todaysDate);
 
         const initialData = {
             data: canvasserData,
@@ -110,16 +117,20 @@ const Dashboard = async () => {
         const sale_reps = await getSalesRepresentatives();
         const allBranches = await getBranches();
         const defaultBranch = allBranches[0].code;
+
+        const todaysDate = displayTodaysDate(defaultBranch);
+
         const { superAdminData, superAdminName } = await getSuperAdminData(
             session,
-            defaultBranch
+            defaultBranch,
+            todaysDate
         );
         const {
             superAdminTotalLeads,
             superAdminTotalAssignedLeads,
             superAdminTotalUnassignedLeads,
             superAdminLeadsPerTimeSlot,
-        } = await superAdminDashboardData(defaultBranch);
+        } = await superAdminDashboardData(defaultBranch, todaysDate);
 
         const listOfCanvassers = await getAllCanvasserNames(defaultBranch);
         const listOfSalesPeople = sale_reps.map((s) =>
