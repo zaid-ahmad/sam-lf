@@ -15,7 +15,7 @@ export default function AdminDashboardClient({ initialData }) {
 
     const fetchData = async (date) => {
         setIsLoading(true);
-        const parsedDate = moment(date, "MMMM D, YYYY");
+        const parsedDate = moment(date, "MMMM Do, YYYY");
         if (!parsedDate.isValid()) {
             console.error("Invalid date:", date);
             setIsLoading(false);
