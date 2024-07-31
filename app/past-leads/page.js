@@ -93,15 +93,12 @@ async function getCanvasserPastLeads(user_id) {
         select: { branchCode: true },
     });
 
-    const todaysDate = displayTodaysDate(branchCode);
+    const todaysDate = displayTodaysDate(user.branchCode);
     const currentDate = moment(todaysDate, "MMMM Do, YYYY");
 
     const data = await prisma.lead.findMany({
         where: {
             canvasserId: user_id,
-            appointmentDateTime: {
-                lt: currentDateString,
-            },
         },
         select: {
             id: true,
