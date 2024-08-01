@@ -68,6 +68,15 @@ const AdminNavbar = () => {
                         </li>
 
                         <li>
+                            <Link
+                                href='/manage-slots'
+                                className='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0'
+                            >
+                                Manage Time Slots
+                            </Link>
+                        </li>
+
+                        <li>
                             <form
                                 action={async (formData) => {
                                     "use server";

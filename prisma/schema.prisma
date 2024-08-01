@@ -68,9 +68,17 @@ model Lead {
   updatedAt       DateTime      @updatedAt
 }
 
-model Timings {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  time            String
+model Slots {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  branchCode String
+  date      DateTime
+  timeSlot  String
+  limit     Int      @default(5)
+  booked    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([branchCode, date, timeSlot])
 }
 
 enum Quadrant {
