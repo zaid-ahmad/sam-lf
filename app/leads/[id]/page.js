@@ -14,6 +14,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { getGoogleMapsUrl } from "@/lib/utils";
+import { ExternalLinkIcon } from "lucide-react";
 
 async function getLeadDetails(id) {
     const lead = await prisma.lead.findUnique({
@@ -134,7 +135,7 @@ export default async function LeadDetailsPage({ params }) {
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                         <BreadcrumbPage>
-                            Lead Details for {lead.firstName}
+                            Appointment Details for {lead.firstName}
                         </BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
@@ -142,7 +143,7 @@ export default async function LeadDetailsPage({ params }) {
             <Card className='w-full max-w-3xl mx-auto'>
                 <CardHeader>
                     <CardTitle className='text-xl sm:text-2xl font-bold'>
-                        Lead Details
+                        Appointment Details
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -165,16 +166,20 @@ export default async function LeadDetailsPage({ params }) {
 
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
+                            <h3 className='font-semibold'>Address</h3>
+                            <p>{lead.address}</p>
+                            <p>Postal Code: {lead.postalCode}</p>
+                            <p>Quadrant: {lead.quadrant}</p>
+
                             <a
                                 href={mapsUrl}
                                 target='_blank'
                                 rel='noopener noreferrer'
-                                className='text-blue-600 hover:underline ml-1'
+                                className='flex items-start w-36 gap-1 mt-4 text-blue-600 hover:underline'
                             >
-                                {lead.address}
+                                Open in Maps
+                                <ExternalLinkIcon size={14} />
                             </a>
-                            <p>Postal Code: {lead.postalCode}</p>
-                            <p>Quadrant: {lead.quadrant}</p>
                         </div>
                         <div>
                             <h3 className='font-semibold'>Appointment</h3>
@@ -214,7 +219,7 @@ export default async function LeadDetailsPage({ params }) {
                     {lead.images && lead.images.length > 0 && (
                         <div>
                             <h3 className='font-semibold mt-4'>Images</h3>
-                            <div className='flex flex-wrap gap-2 mt-2'>
+                            <div className='flex flex-wrap gap-2 my-3'>
                                 {lead.images.map((image, index) => (
                                     <Image
                                         src={image}
@@ -222,7 +227,7 @@ export default async function LeadDetailsPage({ params }) {
                                         alt={`Image ${index}`}
                                         width={400}
                                         height={200}
-                                        className='w-full sm:w-auto'
+                                        className='w-full sm:w-auto rounded-lg'
                                     />
                                 ))}
                             </div>
@@ -231,6 +236,8 @@ export default async function LeadDetailsPage({ params }) {
 
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
+                            <Separator className='my-4' />
+
                             <h3 className='font-semibold'>Status</h3>
                             <Badge
                                 variant='outline'
