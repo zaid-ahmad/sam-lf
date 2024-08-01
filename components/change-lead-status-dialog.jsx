@@ -284,6 +284,7 @@ export function ChangeLeadStatusDialog({
                                             <Input
                                                 {...field}
                                                 placeholder='Enter job number'
+                                                className='uppercase'
                                             />
                                         </FormControl>
                                         <FormMessage />
