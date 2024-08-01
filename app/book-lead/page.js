@@ -48,7 +48,7 @@ const concerns = [
     },
     {
         id: "clogging-damages",
-        label: "Cloging / Damages",
+        label: "Clogging / Damages",
     },
     {
         id: "new-gutters",
