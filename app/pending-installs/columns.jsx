@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPrice } from "@/lib/utils";
+
 export const columns = [
     {
         accessorKey: "jobNumber",
@@ -20,7 +22,13 @@ export const columns = [
     {
         accessorKey: "amount",
         header: "Price",
-        cell: ({ row }) => `$${row.original.amount}`,
+        cell: ({ row }) => `${formatPrice(row.original.amount)}`,
+    },
+    {
+        accessorKey: "commission_amount",
+        header: "Commission",
+        cell: ({ row }) =>
+            `${formatPrice(Math.ceil(row.original.amount * 0.02))}`,
     },
     {
         accessorKey: "funded",

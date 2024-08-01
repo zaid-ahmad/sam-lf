@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import Image from "next/image";
 import Link from "next/link";
-import { getGoogleMapsUrl } from "@/lib/utils";
+import { formatPrice, getGoogleMapsUrl } from "@/lib/utils";
 import { ExternalLinkIcon } from "lucide-react";
 
 async function getLeadDetails(id) {
@@ -236,7 +236,9 @@ export default async function LeadDetailsPage({ params }) {
 
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
-                            <Separator className='my-4' />
+                            {lead.images && lead.images.length > 0 && (
+                                <Separator className='my-4' />
+                            )}
 
                             <h3 className='font-semibold'>Status</h3>
                             <Badge
@@ -253,7 +255,7 @@ export default async function LeadDetailsPage({ params }) {
                         {lead.amount && (
                             <div>
                                 <h3 className='font-semibold'>Amount</h3>
-                                <p>{`$${lead.amount.toFixed(2)}`}</p>
+                                <p>{`${formatPrice(lead.amount)}`}</p>
                             </div>
                         )}
 
