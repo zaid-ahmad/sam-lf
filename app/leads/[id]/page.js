@@ -259,6 +259,15 @@ export default async function LeadDetailsPage({ params }) {
                             </div>
                         )}
 
+                        {lead.quote && (
+                            <div>
+                                <h3 className='font-semibold'>
+                                    Price left with customer
+                                </h3>
+                                <p>{`${formatPrice(lead.quote)}`}</p>
+                            </div>
+                        )}
+
                         {lead.reason && (
                             <div>
                                 <h3 className='font-semibold'>Reason</h3>
@@ -288,7 +297,7 @@ export default async function LeadDetailsPage({ params }) {
 
                         {lead.DNSFile && (
                             <div>
-                                <h3 className='font-semibold'>DNS File</h3>
+                                <h3 className='font-semibold'>DNS Report</h3>
                                 <Link
                                     href={lead.DNSFile}
                                     download

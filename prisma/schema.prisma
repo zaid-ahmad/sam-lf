@@ -57,6 +57,7 @@ model Lead {
   serviceNeeded   TypesOfServices[]
   status          LeadStatus?   @default(APPOINTMENT)
   amount          Float?
+  quote           Float?
   reason          String?
   jobNumber       String?
   DNSFile         String?

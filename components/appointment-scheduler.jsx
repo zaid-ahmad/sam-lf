@@ -58,8 +58,11 @@ export default function AppointmentScheduler({
             }
 
             onSchedule(formattedDateTime);
-            setLeadDate(date);
-            setTimeSlot(selectedTime);
+
+            if (showTimeSlots) {
+                setLeadDate(date);
+                setTimeSlot(selectedTime);
+            }
         }
     }, [
         date,
