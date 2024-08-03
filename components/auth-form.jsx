@@ -277,11 +277,10 @@ function AuthForm() {
             } else if (result?.success) {
                 router.push(result.redirectUrl);
             }
+            setIsLoading(false);
         } catch (error) {
             setFormError("An unexpected error occurred.");
             console.error("Error submitting form:", error);
-        } finally {
-            setIsLoading(false);
         }
     }
 

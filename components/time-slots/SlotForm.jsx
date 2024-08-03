@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,15 +14,27 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 
-export function SlotForm({ onSubmit, initialData, onCancel }) {
+export function SlotForm({ onSubmit, initialData, onCancel, branchCode }) {
     const form = useForm({
         defaultValues: initialData || {
-            branchCode: "",
-            date: "",
+            branchCode: branchCode,
             timeSlot: "",
             limit: 5,
         },
     });
+
+    useEffect(() => {
+        if (initialData && initialData.date) {
+            // Create a new Date object
+            const date = new Date(initialData.date);
+            // Adjust for timezone offset
+            const timezoneOffset = date.getTimezoneOffset() * 60000; // offset in milliseconds
+            const adjustedDate = new Date(date.getTime() - timezoneOffset);
+            // Format the date as YYYY-MM-DD
+            const formattedDate = adjustedDate.toISOString().split("T")[0];
+            form.setValue("date", formattedDate);
+        }
+    }, [initialData, form]);
 
     return (
         <Form {...form}>
@@ -31,23 +43,10 @@ export function SlotForm({ onSubmit, initialData, onCancel }) {
                     control={form.control}
                     name='branchCode'
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='hidden'>
                             <FormLabel>Branch Code</FormLabel>
                             <FormControl>
                                 <Input placeholder='3CGY' {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name='date'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Date</FormLabel>
-                            <FormControl>
-                                <Input type='date' {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -79,10 +78,12 @@ export function SlotForm({ onSubmit, initialData, onCancel }) {
                         </FormItem>
                     )}
                 />
-                <Button type='submit'>Submit</Button>
-                <Button type='button' variant='outline' onClick={onCancel}>
-                    Cancel
-                </Button>
+                <div className='flex gap-5'>
+                    <Button type='submit'>Submit</Button>
+                    <Button type='button' variant='outline' onClick={onCancel}>
+                        Cancel
+                    </Button>
+                </div>
             </form>
         </Form>
     );

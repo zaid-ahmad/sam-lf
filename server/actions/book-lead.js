@@ -9,6 +9,7 @@ import { formatPhoneNumber } from "@/lib/utils";
 import { appointmentSchema } from "@/lib/validations/schema";
 import { revalidatePath } from "next/cache";
 import twilio from "twilio";
+import { bookSlot } from "./slotActions";
 
 async function sendEmail(
     admin_emails,
@@ -65,7 +66,7 @@ STOP - To unsubscribe.
     return false;
 }
 
-export async function addLeadToDatabase(formData) {
+export async function addLeadToDatabase(formData, date, timeSlot) {
     try {
         const session = await auth();
 
@@ -106,6 +107,8 @@ export async function addLeadToDatabase(formData) {
                 images: validatedData.images || [],
                 addressNotes: validatedData.addressNotes,
                 appointmentDateTime: validatedData.appointmentDateTime,
+                date: date,
+                timeslot: timeSlot,
                 homeOwnerType: validatedData.homeownerType,
                 age: validatedData.age,
                 concerns: validatedData.concerns,
@@ -129,12 +132,14 @@ export async function addLeadToDatabase(formData) {
         });
 
         const admin_email_list = admin_emails.map((admin) => admin.email);
+        /*
         if (user.branchCode === "3CGY") {
             sendMessage(
                 "+14039885931",
                 "There's a new appointment on SAM 2.0. Please assign it."
             );
         }
+         */
         const isEmailSent = await sendEmail(
             admin_email_list,
             validatedData.firstName + " " + validatedData.lastName,

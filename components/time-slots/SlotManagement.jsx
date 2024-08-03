@@ -4,40 +4,69 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { SlotForm } from "./SlotForm";
 import { SlotTable } from "./SlotTable";
+import {
+    getSlots,
+    createSlot,
+    updateSlot,
+    deleteSlot,
+} from "@/server/actions/slotActions";
 
 export function SlotManagement() {
     const [slots, setSlots] = useState([]);
     const [editingSlot, setEditingSlot] = useState(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [branchCode, setBranchCode] = useState("");
 
     useEffect(() => {
-        // Fetch slots from API
-        // setSlots(fetchedSlots)
+        fetchSlots();
     }, []);
 
-    const handleCreate = (newSlot) => {
-        // API call to create slot
-        // Then update slots state
-        setSlots([...slots, { ...newSlot, id: "temp-id" }]);
-        setIsFormOpen(false);
+    const fetchSlots = async () => {
+        const result = await getSlots();
+        if (result.success) {
+            setSlots(result.data);
+            setBranchCode(result.branchCode);
+        } else {
+            console.error(result.error);
+            // Handle error, maybe set an error state and display to user
+        }
     };
 
-    const handleUpdate = (updatedSlot) => {
-        // API call to update slot
-        // Then update slots state
-        setSlots(
-            slots.map((slot) =>
-                slot.id === updatedSlot.id ? updatedSlot : slot
-            )
-        );
-        setEditingSlot(null);
-        setIsFormOpen(false);
+    const handleCreate = async (newSlot) => {
+        const result = await createSlot(newSlot);
+        if (result.success) {
+            setSlots([...slots, result.data]);
+            setIsFormOpen(false);
+        } else {
+            console.error(result.error);
+            // Handle error, maybe set an error state and display to user
+        }
     };
 
-    const handleDelete = (id) => {
-        // API call to delete slot
-        // Then update slots state
-        setSlots(slots.filter((slot) => slot.id !== id));
+    const handleUpdate = async (updatedSlot) => {
+        const result = await updateSlot(updatedSlot.id, updatedSlot);
+        if (result.success) {
+            setSlots(
+                slots.map((slot) =>
+                    slot.id === result.data.id ? result.data : slot
+                )
+            );
+            setEditingSlot(null);
+            setIsFormOpen(false);
+        } else {
+            console.error(result.error);
+            // Handle error, maybe set an error state and display to user
+        }
+    };
+
+    const handleDelete = async (id) => {
+        const result = await deleteSlot(id);
+        if (result.success) {
+            setSlots(slots.filter((slot) => slot.id !== id));
+        } else {
+            console.error(result.error);
+            // Handle error, maybe set an error state and display to user
+        }
     };
 
     return (
@@ -51,6 +80,7 @@ export function SlotManagement() {
                         setIsFormOpen(false);
                         setEditingSlot(null);
                     }}
+                    branchCode={branchCode}
                 />
             )}
             <SlotTable
