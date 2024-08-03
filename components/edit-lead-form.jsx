@@ -40,6 +40,9 @@ const quadrants = [
 export default function LeadEditPage({ data, id }) {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [appointmentDateTime, setAppointmentDateTime] = useState("");
+    const [date, setDate] = useState("");
+    const [timeSlot, setTimeSlot] = useState("");
     const router = useRouter();
 
     const form = useForm({
@@ -55,10 +58,19 @@ export default function LeadEditPage({ data, id }) {
             quadrant: data.quadrant,
             addressNotes: data.addressNotes,
             appointmentDateTime: data.appointmentDateTime,
+            date: data.date,
+            timeslot: data.timeslot,
             homeOwnerType: data.homeOwnerType,
             age: data.age,
         },
     });
+
+    const handleScheduleAppointment = (formattedDateTime) => {
+        setAppointmentDateTime(formattedDateTime);
+        form.setValue("appointmentDateTime", formattedDateTime);
+        form.setValue("date", date);
+        form.setValue("timeslot", timeSlot);
+    };
 
     async function onSubmit(values) {
         try {
@@ -300,6 +312,8 @@ export default function LeadEditPage({ data, id }) {
                                                             formattedDateTime
                                                         );
                                                     }}
+                                                    setLeadDate={setDate}
+                                                    setTimeSlot={setTimeSlot}
                                                 />
                                             </FormControl>
                                             <FormMessage />
