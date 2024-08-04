@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { SlotManagement } from "@/components/time-slots/SlotManagement";
 import {
     Breadcrumb,
@@ -7,8 +8,15 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { redirect } from "next/navigation";
 
-function ManageSlotsPage() {
+async function ManageSlotsPage() {
+    const session = await auth();
+
+    if (session.user.role !== "ADMIN") {
+        return redirect("/dashboard");
+    }
+
     return (
         <div className='container'>
             <div className='py-6'>

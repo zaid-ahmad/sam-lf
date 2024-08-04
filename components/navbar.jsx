@@ -33,7 +33,7 @@ const LogoutNavbar = () => {
     );
 };
 
-const AdminNavbar = () => {
+const AdminNavbar = ({ role }) => {
     return (
         <nav className='bg-white border-gray-200'>
             <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4'>
@@ -67,14 +67,16 @@ const AdminNavbar = () => {
                             </Link>
                         </li>
 
-                        <li>
-                            <Link
-                                href='/manage-slots'
-                                className='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0'
-                            >
-                                Manage Time Slots
-                            </Link>
-                        </li>
+                        {role === "admin" && (
+                            <li>
+                                <Link
+                                    href='/manage-slots'
+                                    className='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0'
+                                >
+                                    Manage Time Slots
+                                </Link>
+                            </li>
+                        )}
 
                         <li>
                             <form
@@ -191,7 +193,7 @@ const Navbar = async () => {
     const role = session?.user?.role;
 
     return role === "ADMIN" || role === "SUPERADMIN" ? (
-        <AdminNavbar />
+        <AdminNavbar role={role} />
     ) : role === "CANVASSER" ? (
         <CanvasserNavbar />
     ) : role === "SALES_REP" ? (
