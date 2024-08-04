@@ -38,19 +38,15 @@ export default function AdminDashboardClient({ initialData }) {
     }, [leadDate]);
 
     const handlePreviousDate = () => {
-        if (!isToday) {
-            setLeadDate(displayTodaysDate(branch));
-            setIsToday(true);
-            fetchData(displayTodaysDate(branch));
-        }
+        setLeadDate(displayTodaysDate(branch));
+        setIsToday(true);
+        fetchData(displayTodaysDate(branch));
     };
 
     const handleNextDate = () => {
-        if (isToday) {
-            setLeadDate(displayTomorrowsDate(branch));
-            setIsToday(false);
-            fetchData(displayTomorrowsDate(branch));
-        }
+        setLeadDate(displayTomorrowsDate(branch));
+        setIsToday(false);
+        fetchData(displayTomorrowsDate(branch));
     };
 
     return (

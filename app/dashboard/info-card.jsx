@@ -24,23 +24,29 @@ const InfoCard = ({
         : title;
     return (
         <Card
-            className={`text-center flex flex-col items-center justify-center h-36 w-56 ${className}`}
+            className={`text-center flex flex-col items-center justify-center h-36  ${
+                changeLeadDate ? "w-64" : "w-56"
+            } ${className}`}
         >
             <CardHeader className='pb-2 flex flex-col items-center'>
                 <CardTitle className='text-lg'>{displayTitle}</CardTitle>
                 {changeLeadDate && (
                     <div className='flex items-center gap-2'>
-                        <ChevronLeft
-                            size={16}
-                            onClick={onPreviousDate}
-                            className='cursor-pointer'
-                        />
+                        {!isToday && (
+                            <ChevronLeft
+                                size={16}
+                                onClick={onPreviousDate}
+                                className='cursor-pointer'
+                            />
+                        )}
                         <CardDescription>{description}</CardDescription>
-                        <ChevronRight
-                            size={16}
-                            onClick={onNextDate}
-                            className='cursor-pointer'
-                        />
+                        {isToday && (
+                            <ChevronRight
+                                size={16}
+                                onClick={onNextDate}
+                                className='cursor-pointer'
+                            />
+                        )}
                     </div>
                 )}
             </CardHeader>

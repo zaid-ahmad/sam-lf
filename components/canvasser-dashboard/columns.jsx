@@ -31,8 +31,11 @@ export const columns = [
         },
     },
     {
-        accessorKey: "homeOwnerType",
-        header: "Home Owner Type",
+        accessorKey: "customerName",
+        header: "Customer Name",
+        cell: ({ row }) => {
+            return <p className='capitalize'>{row.getValue("customerName")}</p>;
+        },
     },
     {
         accessorKey: "quadrant",
