@@ -9,7 +9,6 @@ import { formatPhoneNumber } from "@/lib/utils";
 import { appointmentSchema } from "@/lib/validations/schema";
 import { revalidatePath } from "next/cache";
 import twilio from "twilio";
-import { bookSlot } from "./slotActions";
 
 async function sendEmail(
     admin_emails,
@@ -19,22 +18,43 @@ async function sendEmail(
     customerQuadrant,
     leadId
 ) {
-    const data = await resend.emails.send({
-        from: "SAM 2.0 <noreply@leadflowmanager.com>",
-        to: admin_emails,
-        subject: "New Lead | Awaiting Assignment",
-        react: NewLeadEmail({
-            customerName,
-            customerPhone,
-            customerAddress,
-            customerQuadrant,
-            leadId,
-        }),
-    });
+    const results = await Promise.all(
+        admin_emails.map(async (email) => {
+            try {
+                const data = await resend.emails.send({
+                    from: "SAM 2.0 <noreply@leadflowmanager.com>",
+                    to: email,
+                    subject: "New Lead | Awaiting Assignment",
+                    react: NewLeadEmail({
+                        customerName,
+                        customerPhone,
+                        customerAddress,
+                        customerQuadrant,
+                        leadId,
+                    }),
+                });
+
+                return {
+                    email,
+                    success: true,
+                    data: data,
+                };
+            } catch (error) {
+                console.error(`Failed to send email to ${email}:`, error);
+                return {
+                    email,
+                    success: false,
+                    error: error.message,
+                };
+            }
+        })
+    );
+
+    const allSuccessful = results.every((result) => result.success);
 
     return {
-        success: true,
-        data: data,
+        success: allSuccessful,
+        results: results,
     };
 }
 
