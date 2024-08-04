@@ -48,7 +48,9 @@ export function DataTable({
     const [columnFilters, setColumnFilters] = useState([]);
     const [data, setData] = useState(initialData);
 
-    const [columnVisibility, setColumnVisibility] = useState({});
+    const [columnVisibility, setColumnVisibility] = useState({
+        createdAt: false,
+    });
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 20,
@@ -64,13 +66,14 @@ export function DataTable({
     const [canvasserFilter, setCanvasserFilter] = useState("all");
     const [salesRepFilter, setSalesRepFilter] = useState("all");
     const [timeFilter, setTimeFilter] = useState("all");
+    const [dateSortOrder, setDateSortOrder] = useState("none");
 
     useEffect(() => {
         setData(initialData);
     }, [initialData]);
 
     const filteredData = useMemo(() => {
-        return data.filter((item) => {
+        let result = data.filter((item) => {
             const matchesStatus =
                 statusFilter === "all" || item.status === statusFilter;
             const matchesCanvasser =
@@ -88,7 +91,26 @@ export function DataTable({
                 matchesTime
             );
         });
-    }, [data, statusFilter, canvasserFilter, salesRepFilter, timeFilter]);
+
+        if (dateSortOrder !== "none") {
+            result.sort((a, b) => {
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+                return dateSortOrder === "oldToNew"
+                    ? dateA - dateB
+                    : dateB - dateA;
+            });
+        }
+
+        return result;
+    }, [
+        data,
+        statusFilter,
+        canvasserFilter,
+        salesRepFilter,
+        timeFilter,
+        dateSortOrder,
+    ]);
 
     const handleLeadStatusChange = async (leadId, action, formData) => {
         const updatedData = await changeLeadStatus(leadId, action, formData);
@@ -187,84 +209,101 @@ export function DataTable({
 
     return (
         <div>
-            <div className='flex space-x-4 mt-7 mb-4'>
-                <Select
-                    onValueChange={setStatusFilter}
-                    value={statusFilter || "all"}
-                >
-                    <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder='Filter by Status' />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value='all'>All Statuses</SelectItem>
-                        {statusOptions.map((status) => (
-                            <SelectItem key={status} value={status}>
-                                <Badge
-                                    variant='outline'
-                                    className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
-                                >
-                                    {status === "INSTALL_CANCELLED"
-                                        ? "INSTALL CANCELLED"
-                                        : status}
-                                </Badge>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+            <div className='flex items-center justify-between'>
+                <div className='flex space-x-4 mt-7 mb-4'>
+                    <Select
+                        onValueChange={setStatusFilter}
+                        value={statusFilter || "all"}
+                    >
+                        <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Filter by Status' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='all'>All Statuses</SelectItem>
+                            {statusOptions.map((status) => (
+                                <SelectItem key={status} value={status}>
+                                    <Badge
+                                        variant='outline'
+                                        className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
+                                    >
+                                        {status === "INSTALL_CANCELLED"
+                                            ? "INSTALL CANCELLED"
+                                            : status}
+                                    </Badge>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    onValueChange={setCanvasserFilter}
-                    value={canvasserFilter || "all"}
-                >
-                    <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder='Filter by Canvasser' />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value='all'>All Canvassers</SelectItem>
-                        {canvasserOptions.map((canvasser) => (
-                            <SelectItem key={canvasser} value={canvasser}>
-                                {canvasser}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    <Select
+                        onValueChange={setCanvasserFilter}
+                        value={canvasserFilter || "all"}
+                    >
+                        <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Filter by Canvasser' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='all'>All Canvassers</SelectItem>
+                            {canvasserOptions.map((canvasser) => (
+                                <SelectItem key={canvasser} value={canvasser}>
+                                    {canvasser}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    onValueChange={setSalesRepFilter}
-                    value={salesRepFilter || "all"}
-                >
-                    <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder='Filter by Sales Rep' />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value='all'>All Sales Reps.</SelectItem>
-                        {salesRepOptions.map((saleRep) => (
-                            <SelectItem key={saleRep} value={saleRep}>
-                                {saleRep}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    <Select
+                        onValueChange={setSalesRepFilter}
+                        value={salesRepFilter || "all"}
+                    >
+                        <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Filter by Sales Rep' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='all'>All Sales Reps.</SelectItem>
+                            {salesRepOptions.map((saleRep) => (
+                                <SelectItem key={saleRep} value={saleRep}>
+                                    {saleRep}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    onValueChange={setTimeFilter}
-                    value={timeFilter || "all"}
-                >
+                    <Select
+                        onValueChange={setTimeFilter}
+                        value={timeFilter || "all"}
+                    >
+                        <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Filter by Time Slots' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='all'>
+                                Filter by Time Slots
+                            </SelectItem>
+                            {timeOptions.map((timeSlot) => (
+                                <SelectItem key={timeSlot} value={timeSlot}>
+                                    {timeSlot}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <Select onValueChange={setDateSortOrder} value={dateSortOrder}>
                     <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder='Filter by Time Slots' />
+                        <SelectValue placeholder='Sort by Date' />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value='all'>
-                            Filter by Time Slots
+                        <SelectItem value='none'>Sort</SelectItem>
+                        <SelectItem value='oldToNew'>
+                            Oldest to Newest
                         </SelectItem>
-                        {timeOptions.map((timeSlot) => (
-                            <SelectItem key={timeSlot} value={timeSlot}>
-                                {timeSlot}
-                            </SelectItem>
-                        ))}
+                        <SelectItem value='newToOld'>
+                            Newest to Oldest
+                        </SelectItem>
                     </SelectContent>
                 </Select>
             </div>
+
             <div className='rounded-md border'>
                 <Table className='bg-white rounded-lg'>
                     <TableHeader>

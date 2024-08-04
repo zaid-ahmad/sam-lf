@@ -68,6 +68,10 @@ export const columns = [
         },
     },
     {
+        accessorKey: "createdAt",
+        header: "Created At",
+    },
+    {
         id: "actions",
         cell: ({ row, onAssignSalesRep, onDeleteLead, onStatusChange }) => {
             const lead = row.original;
