@@ -36,14 +36,25 @@ export function DataTable({
     changeLeadStatus,
     statusOptions,
 }) {
-    const [sorting, setSorting] = useState([]);
-    const [columnFilters, setColumnFilters] = useState([]);
     const [data, setData] = useState(initialData);
-    const [columnVisibility, setColumnVisibility] = useState({});
+
+    const [columnFilters, setColumnFilters] = useState([]);
+    const [columnVisibility, setColumnVisibility] = useState({
+        createdAt: false,
+    });
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 20,
+    });
+
+    const [sorting, setSorting] = useState([]);
+
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
     const [selectedLeadId, setSelectedLeadId] = useState(null);
     const [leadDetails, setLeadDetails] = useState(null);
 
+    const [timeFilter, setTimeFilter] = useState("all");
+    const [dateSortOrder, setDateSortOrder] = useState("none");
     const [statusFilter, setStatusFilter] = useState("all");
 
     useEffect(() => {
@@ -51,13 +62,30 @@ export function DataTable({
     }, [initialData]);
 
     const filteredData = useMemo(() => {
-        return data.filter((item) => {
+        const filtered = data.filter((item) => {
             const matchesStatus =
                 statusFilter === "all" || item.status === statusFilter;
 
-            return matchesStatus;
+            const matchesTime =
+                timeFilter === "all" ||
+                item.appointmentDateTime.split(" at ")[1] === timeFilter;
+
+            return matchesStatus && matchesTime;
         });
-    }, [data, statusFilter]);
+
+        if (dateSortOrder !== "none") {
+            return filtered.sort((a, b) => {
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+                return dateSortOrder === "oldToNew"
+                    ? dateA - dateB
+                    : dateB - dateA;
+            });
+        }
+
+        // If no sorting is needed, return the filtered data as is
+        return filtered;
+    }, [data, statusFilter, timeFilter, dateSortOrder]);
 
     const handleColumnStatusChange = (lead) => {
         setSelectedLeadId(lead.id);
@@ -106,16 +134,20 @@ export function DataTable({
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
+        onColumnVisibilityChange: setColumnVisibility,
+        onPaginationChange: setPagination,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
+            pagination,
         },
+        pageCount: Math.ceil(filteredData.length / pagination.pageSize),
     });
 
     return (
         <div>
-            <div className='mt-7 mb-4'>
+            <div className='flex items-center gap-3 mt-7 mb-4'>
                 <Select
                     onValueChange={setStatusFilter}
                     value={statusFilter || "all"}
@@ -137,6 +169,21 @@ export function DataTable({
                                 </Badge>
                             </SelectItem>
                         ))}
+                    </SelectContent>
+                </Select>
+
+                <Select onValueChange={setDateSortOrder} value={dateSortOrder}>
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Sort by Date' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='none'>Sort by</SelectItem>
+                        <SelectItem value='oldToNew'>
+                            Oldest to Newest
+                        </SelectItem>
+                        <SelectItem value='newToOld'>
+                            Newest to Oldest
+                        </SelectItem>
                     </SelectContent>
                 </Select>
             </div>

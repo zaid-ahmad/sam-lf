@@ -26,7 +26,6 @@ const SalesRepDashboard = ({
         return () => clearInterval(intervalId);
     }, [router]);
     const statusOptions = [
-        "APPOINTMENT",
         "ASSIGNED",
         "DEMO",
         "SALE",

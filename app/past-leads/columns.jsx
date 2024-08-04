@@ -12,6 +12,7 @@ import {
 import { colorMap } from "@/lib/utils";
 import { deleteLead } from "@/server/actions/delete-lead";
 import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
+import Link from "next/link";
 
 export const columns = [
     {
@@ -150,12 +151,12 @@ export const columns = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                        <a href={`/leads/${lead.id}`}>
+                        <Link href={`/leads/${lead.id}`} target='_blank'>
                             <DropdownMenuItem>View details</DropdownMenuItem>
-                        </a>
-                        <a href={`/leads/edit/${lead.id}`}>
+                        </Link>
+                        <Link href={`/leads/edit/${lead.id}`} target='_blank'>
                             <DropdownMenuItem>Edit details</DropdownMenuItem>
-                        </a>
+                        </Link>
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();
