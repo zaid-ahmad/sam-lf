@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/select";
 import handleAuth from "@/server/actions/handle-auth";
 import { useState } from "react";
-import Spinner from "./spinner";
 import { loginSchema, registerSchema } from "@/lib/validations/schema";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

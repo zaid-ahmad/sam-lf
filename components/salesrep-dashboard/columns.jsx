@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,

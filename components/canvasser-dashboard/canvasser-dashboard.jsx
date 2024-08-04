@@ -4,7 +4,6 @@ import InfoCard from "@/app/dashboard/info-card";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
-import { displayTodaysDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";

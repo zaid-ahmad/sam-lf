@@ -2,7 +2,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { displayTodaysDate, getStartEndDateWithOffset } from "@/lib/utils";
+import { displayTodaysDate } from "@/lib/utils";
 import {
     Breadcrumb,
     BreadcrumbItem,

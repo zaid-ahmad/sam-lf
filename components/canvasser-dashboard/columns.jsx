@@ -1,15 +1,13 @@
 "use client";
 
-import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import parseAppointmentDateTime from "@/lib/formatDateTime";
 import { Badge } from "@/components/ui/badge";
 import { colorMap } from "@/lib/utils";
 
