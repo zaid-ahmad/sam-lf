@@ -49,6 +49,14 @@ export function PendingInstallsTable({
     const [sorting, setSorting] = useState([]);
     const [data, setData] = useState(initialData);
 
+    const [columnVisibility, setColumnVisibility] = useState({
+        createdAt: false,
+    });
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 20,
+    });
+
     const [canvasserFilter, setCanvasserFilter] = useState("all");
     const [branchFilter, setBranchFilter] = useState("all");
     const [startDate, setStartDate] = useState("");
@@ -86,9 +94,13 @@ export function PendingInstallsTable({
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
+        onPaginationChange: setPagination,
         state: {
             sorting,
+            columnVisibility,
+            pagination,
         },
+        pageCount: Math.ceil(filteredData.length / pagination.pageSize),
     });
 
     const handleMarkAsFunded = async (id) => {
