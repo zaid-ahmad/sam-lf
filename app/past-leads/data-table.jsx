@@ -27,10 +27,12 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
-import { isSameDay, parse } from "date-fns";
+import { isSameDay, parse, isWithinInterval } from "date-fns";
 import { AssignSalesRepDialog } from "@/components/assign-sale-rep-dialog";
 import { Badge } from "@/components/ui/badge";
 import { colorMap } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function DataTable({
     initialColumns,
@@ -46,9 +48,6 @@ export function DataTable({
 }) {
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
-    const [columnVisibility, setColumnVisibility] = useState({
-        createdAt: false,
-    });
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 20,
@@ -68,6 +67,9 @@ export function DataTable({
     const [timeFilter, setTimeFilter] = useState("all");
     const [dateSortOrder, setDateSortOrder] = useState("none");
 
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+
     useEffect(() => {
         setData(initialData);
     }, [initialData]);
@@ -86,6 +88,7 @@ export function DataTable({
             let matchesBranch = true;
             let matchesDate = true;
             let matchesSalesRep = true;
+            let matchesDateRange = true;
 
             if (!isCanvasser) {
                 matchesCanvasser =
@@ -112,13 +115,28 @@ export function DataTable({
                 matchesDate = isSameDay(appointmentDate, filterDate);
             }
 
+            if (startDate && endDate && item.appointmentDateTime) {
+                const appointmentDate = parse(
+                    item.appointmentDateTime.split(" at ")[0],
+                    "MMMM do, yyyy",
+                    new Date()
+                );
+                const start = parse(startDate, "yyyy-MM-dd", new Date());
+                const end = parse(endDate, "yyyy-MM-dd", new Date());
+                matchesDateRange = isWithinInterval(appointmentDate, {
+                    start,
+                    end,
+                });
+            }
+
             return (
                 matchesStatus &&
                 matchesCanvasser &&
                 matchesBranch &&
                 matchesSalesRep &&
                 matchesDate &&
-                matchesTime
+                matchesTime &&
+                matchesDateRange
             );
         });
 
@@ -146,8 +164,9 @@ export function DataTable({
         salesRepFilter,
         timeFilter,
         dateSortOrder,
+        startDate,
+        endDate,
     ]);
-
     const handleAssignSalesRep = (lead) => {
         setSelectedLeadId(lead.id);
         setLeadDetails(lead);
@@ -203,12 +222,10 @@ export function DataTable({
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
         onPaginationChange: setPagination,
         state: {
             sorting,
             columnFilters,
-            columnVisibility,
             pagination,
         },
         pageCount: Math.ceil(
@@ -218,131 +235,215 @@ export function DataTable({
 
     return (
         <div>
-            <div className='flex space-x-4 mt-7 mb-4'>
-                <div className='flex space-x-4 mt-7 mb-4'>
-                    <Select
-                        onValueChange={setStatusFilter}
-                        value={statusFilter || "all"}
-                    >
-                        <SelectTrigger className='w-[180px]'>
-                            <SelectValue placeholder='Filter by Status' />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value='all'>All Statuses</SelectItem>
-                            {statusOptions.map((status) => (
-                                <SelectItem key={status} value={status}>
-                                    <Badge
-                                        variant='outline'
-                                        className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
-                                    >
-                                        {status === "INSTALL_CANCELLED"
-                                            ? "INSTALL CANCELLED"
-                                            : status}
-                                    </Badge>
+            <div className='flex flex-col space-y-6 mt-7 mb-4'>
+                <div className='flex flex-wrap gap-4 items-end'>
+                    <div className='flex-1 min-w-[180px]'>
+                        <Label htmlFor='statusFilter' className='mb-2 block'>
+                            Status
+                        </Label>
+                        <Select
+                            onValueChange={setStatusFilter}
+                            value={statusFilter || "all"}
+                        >
+                            <SelectTrigger id='statusFilter' className='w-full'>
+                                <SelectValue placeholder='Filter by Status' />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value='all'>
+                                    All Statuses
                                 </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                                {statusOptions.map((status) => (
+                                    <SelectItem key={status} value={status}>
+                                        <Badge
+                                            variant='outline'
+                                            className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
+                                        >
+                                            {status === "INSTALL_CANCELLED"
+                                                ? "INSTALL CANCELLED"
+                                                : status}
+                                        </Badge>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     {!isCanvasser && (
                         <>
                             {canvasserOptions && (
-                                <Select
-                                    onValueChange={setCanvasserFilter}
-                                    value={canvasserFilter || "all"}
-                                >
-                                    <SelectTrigger className='w-[180px]'>
-                                        <SelectValue placeholder='Filter by Canvasser' />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value='all'>
-                                            All Canvassers
-                                        </SelectItem>
-                                        {canvasserOptions.map((canvasser) => (
-                                            <SelectItem
-                                                key={canvasser}
-                                                value={canvasser}
-                                            >
-                                                {canvasser}
+                                <div className='flex-1 min-w-[180px]'>
+                                    <Label
+                                        htmlFor='canvasserFilter'
+                                        className='mb-2 block'
+                                    >
+                                        Canvasser
+                                    </Label>
+                                    <Select
+                                        onValueChange={setCanvasserFilter}
+                                        value={canvasserFilter || "all"}
+                                    >
+                                        <SelectTrigger
+                                            id='canvasserFilter'
+                                            className='w-full'
+                                        >
+                                            <SelectValue placeholder='Filter by Canvasser' />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value='all'>
+                                                All Canvassers
                                             </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                            {canvasserOptions.map(
+                                                (canvasser) => (
+                                                    <SelectItem
+                                                        key={canvasser}
+                                                        value={canvasser}
+                                                    >
+                                                        {canvasser}
+                                                    </SelectItem>
+                                                )
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             )}
+
                             {salesPersonOptions && (
-                                <Select
-                                    onValueChange={setSalesRepFilter}
-                                    value={salesRepFilter || "all"}
-                                >
-                                    <SelectTrigger className='w-[180px]'>
-                                        <SelectValue placeholder='Filter by Sales Rep.' />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value='all'>
-                                            All Sales Reps.
-                                        </SelectItem>
-                                        {salesPersonOptions.map(
-                                            (salesPerson) => (
-                                                <SelectItem
-                                                    key={salesPerson}
-                                                    value={salesPerson}
-                                                >
-                                                    {salesPerson}
-                                                </SelectItem>
-                                            )
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                            )}
-                            {isSuperAdmin && allBranches && (
-                                <Select
-                                    onValueChange={setBranchFilter}
-                                    value={branchFilter || "all"}
-                                >
-                                    <SelectTrigger className='w-[180px]'>
-                                        <SelectValue placeholder='Filter by Branch' />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value='all'>
-                                            All Branches
-                                        </SelectItem>
-                                        {allBranches.map((branch) => (
-                                            <SelectItem
-                                                key={branch.code}
-                                                value={branch.code}
-                                            >
-                                                {branch.name}
+                                <div className='flex-1 min-w-[180px]'>
+                                    <Label
+                                        htmlFor='salesRepFilter'
+                                        className='mb-2 block'
+                                    >
+                                        Sales Rep
+                                    </Label>
+                                    <Select
+                                        onValueChange={setSalesRepFilter}
+                                        value={salesRepFilter || "all"}
+                                    >
+                                        <SelectTrigger
+                                            id='salesRepFilter'
+                                            className='w-full'
+                                        >
+                                            <SelectValue placeholder='Filter by Sales Rep.' />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value='all'>
+                                                All Sales Reps.
                                             </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                            {salesPersonOptions.map(
+                                                (salesPerson) => (
+                                                    <SelectItem
+                                                        key={salesPerson}
+                                                        value={salesPerson}
+                                                    >
+                                                        {salesPerson}
+                                                    </SelectItem>
+                                                )
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {isSuperAdmin && allBranches && (
+                                <div className='flex-1 min-w-[180px]'>
+                                    <Label
+                                        htmlFor='branchFilter'
+                                        className='mb-2 block'
+                                    >
+                                        Branch
+                                    </Label>
+                                    <Select
+                                        onValueChange={setBranchFilter}
+                                        value={branchFilter || "all"}
+                                    >
+                                        <SelectTrigger
+                                            id='branchFilter'
+                                            className='w-full'
+                                        >
+                                            <SelectValue placeholder='Filter by Branch' />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value='all'>
+                                                All Branches
+                                            </SelectItem>
+                                            {allBranches.map((branch) => (
+                                                <SelectItem
+                                                    key={branch.code}
+                                                    value={branch.code}
+                                                >
+                                                    {branch.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             )}
                         </>
                     )}
+                </div>
 
-                    <Select
-                        onValueChange={setDateSortOrder}
-                        value={dateSortOrder}
-                    >
-                        <SelectTrigger className='w-[180px]'>
-                            <SelectValue placeholder='Sort by Date' />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value='none'>Sort by</SelectItem>
-                            <SelectItem value='oldToNew'>
-                                Oldest to Newest
-                            </SelectItem>
-                            <SelectItem value='newToOld'>
-                                Newest to Oldest
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <input
-                        type='date'
-                        onChange={(e) => setDateFilter(e.target.value)}
-                        value={dateFilter}
-                        className='border rounded p-2'
-                    />
+                <div className='flex flex-wrap gap-4 items-end'>
+                    <div className='flex-1 min-w-[180px]'>
+                        <Label htmlFor='dateFilter' className='mb-2 block'>
+                            Filter by Date
+                        </Label>
+                        <Input
+                            type='date'
+                            id='dateFilter'
+                            onChange={(e) => setDateFilter(e.target.value)}
+                            value={dateFilter}
+                        />
+                    </div>
+                    <div className='flex-1 min-w-[320px]'>
+                        <Label htmlFor='dateRangeFilter' className='mb-2 block'>
+                            Filter by Date Range
+                        </Label>
+                        <div
+                            className='flex items-center space-x-2'
+                            id='dateRangeFilter'
+                        >
+                            <Input
+                                type='date'
+                                placeholder='Start Date'
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className='flex-1'
+                            />
+                            <span>to</span>
+                            <Input
+                                type='date'
+                                placeholder='End Date'
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className='flex-1'
+                            />
+                        </div>
+                    </div>
+                    <div className='flex-1 min-w-[180px] ml-auto'>
+                        <Label htmlFor='dateSortOrder' className='mb-2 block'>
+                            Sort chronologically
+                        </Label>
+                        <Select
+                            onValueChange={setDateSortOrder}
+                            value={dateSortOrder}
+                        >
+                            <SelectTrigger
+                                id='dateSortOrder'
+                                className='w-full'
+                            >
+                                <SelectValue placeholder='Sort by Date' />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value='none'>No sorting</SelectItem>
+                                <SelectItem value='oldToNew'>
+                                    Oldest to Newest
+                                </SelectItem>
+                                <SelectItem value='newToOld'>
+                                    Newest to Oldest
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </div>
             <div className='rounded-md border my-7'>

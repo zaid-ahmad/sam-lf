@@ -62,7 +62,6 @@ async function getAdminPastLeads(session, branch = null) {
             quadrant: true,
             appointmentDateTime: true,
             branch: true,
-            createdAt: true,
         },
     });
 
@@ -124,7 +123,6 @@ async function getCanvasserPastLeads(user_id) {
             quadrant: true,
             appointmentDateTime: true,
             branch: true,
-            createdAt: true,
         },
     });
 
