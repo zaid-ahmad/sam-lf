@@ -45,7 +45,10 @@ const demoSchema = z.object({
         .instanceof(File)
         .refine((file) => file.type === "application/pdf", {
             message: "File must be a PDF",
-        }),
+        })
+        .optional(),
+
+    quote: z.number().positive("Quote must be positive"),
 });
 
 const saleSchema = z.object({
@@ -72,6 +75,9 @@ export function ChangeLeadStatusDialog({
 
     const demoForm = useForm({
         resolver: zodResolver(demoSchema),
+        defaultValues: {
+            quote: 0,
+        },
     });
 
     const saleForm = useForm({
@@ -85,34 +91,46 @@ export function ChangeLeadStatusDialog({
     };
 
     const handleStatusChange = async (data) => {
-        if (data.pdfFile) {
-            const file = data.pdfFile;
-            try {
-                setLoading(true);
-                const signedURLResult = await getSignedURL({
-                    fileSize: file.size,
-                    fileType: file.type,
-                    checksum: await computeSHA256(file),
-                });
-                if (signedURLResult.failure !== undefined) {
-                    console.error(signedURLResult.failure);
+        if (selectedAction === "DEMO") {
+            if (data.pdfFile) {
+                const file = data.pdfFile;
+                try {
+                    setLoading(true);
+                    const signedURLResult = await getSignedURL({
+                        fileSize: file.size,
+                        fileType: file.type,
+                        checksum: await computeSHA256(file),
+                    });
+                    if (signedURLResult.failure !== undefined) {
+                        console.error(signedURLResult.failure);
+                    }
+
+                    const { url } = signedURLResult.success;
+
+                    await fetch(url, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": file.type,
+                        },
+                        body: file,
+                    });
+                    const statusData = {
+                        fileUrl: url.split("?")[0],
+                        quote: data.quote,
+                    };
+                    onStatusChange(leadId, selectedAction, statusData);
+                    onClose();
+                } catch (error) {
+                    console.error("Error uploading pdf:", error);
+                } finally {
+                    setLoading(false);
                 }
-
-                const { url } = signedURLResult.success;
-
-                await fetch(url, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": file.type,
-                    },
-                    body: file,
-                });
-                onStatusChange(leadId, selectedAction, url.split("?")[0]);
-                onClose();
-            } catch (error) {
-                console.error("Error uploading pdf:", error);
-            } finally {
+            } else {
+                setLoading(true);
+                onStatusChange(leadId, selectedAction, data);
                 setLoading(false);
+                onClose();
+                return;
             }
         } else if (selectedAction === "INSTALL_CANCELLED") {
             onStatusChange(leadId, selectedAction, {});
@@ -226,24 +244,54 @@ export function ChangeLeadStatusDialog({
                         >
                             <FormField
                                 control={demoForm.control}
-                                name='pdfFile'
+                                name='quote'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className='mt-6'>
-                                            Upload DNS PDF
+                                        <FormLabel>
+                                            Price left with customer
                                             <span className='text-red-600'>
                                                 *
                                             </span>
                                         </FormLabel>
                                         <FormControl>
                                             <Input
-                                                type='file'
-                                                accept='.pdf'
+                                                {...field}
+                                                type='number'
                                                 onChange={(e) =>
                                                     field.onChange(
-                                                        e.target.files[0]
+                                                        parseFloat(
+                                                            e.target.value
+                                                        )
                                                     )
                                                 }
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={demoForm.control}
+                                name='pdfFile'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className='mt-6'>
+                                            Upload DNS Report PDF{" "}
+                                            <span className='text-zinc-600'>
+                                                (optional)
+                                            </span>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type='file'
+                                                accept='.pdf'
+                                                onChange={(e) => {
+                                                    const file =
+                                                        e.target.files[0];
+                                                    field.onChange(
+                                                        file ? file : undefined
+                                                    );
+                                                }}
                                             />
                                         </FormControl>
                                         <FormMessage />

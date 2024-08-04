@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
+import { MoreHorizontal, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { deleteLead } from "@/server/actions/delete-lead";
 import { colorMap } from "@/lib/utils";
+import Link from "next/link";
 
 export const columns = [
     {
@@ -33,8 +34,11 @@ export const columns = [
         },
     },
     {
-        accessorKey: "homeOwnerType",
-        header: "Home Owner Type",
+        accessorKey: "customerName",
+        header: "Customer Name",
+        cell: ({ row }) => {
+            return <p className='capitalize'>{row.getValue("customerName")}</p>;
+        },
     },
     {
         accessorKey: "quadrant",
@@ -68,6 +72,10 @@ export const columns = [
         },
     },
     {
+        accessorKey: "createdAt",
+        header: "Created At",
+    },
+    {
         id: "actions",
         cell: ({ row, onAssignSalesRep, onDeleteLead, onStatusChange }) => {
             const lead = row.original;
@@ -80,12 +88,12 @@ export const columns = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                        <a href={`/leads/${lead.id}`}>
+                        <Link href={`/leads/${lead.id}`} target='_blank'>
                             <DropdownMenuItem>View details</DropdownMenuItem>
-                        </a>
-                        <a href={`/leads/edit/${lead.id}`}>
+                        </Link>
+                        <Link href={`/leads/edit/${lead.id}`} target='_blank'>
                             <DropdownMenuItem>Edit details</DropdownMenuItem>
-                        </a>
+                        </Link>
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();

@@ -22,6 +22,7 @@ export async function changeLeadStatus(leadId, action, formData) {
         if (lead.status !== action) {
             updateData.reason = null;
             updateData.DNSFile = null;
+            updateData.quote = null;
             updateData.jobNumber = null;
             updateData.amount = null;
             updateData.installationDate = null;
@@ -37,7 +38,8 @@ export async function changeLeadStatus(leadId, action, formData) {
                 updateData.reason = formData.reason;
                 break;
             case "DEMO":
-                updateData.DNSFile = formData;
+                updateData.DNSFile = formData.fileUrl;
+                updateData.quote = formData.quote;
                 break;
             case "SALE":
                 updateData.jobNumber = formData.jobNumber;
@@ -62,6 +64,7 @@ export async function changeLeadStatus(leadId, action, formData) {
                 status: true,
                 reason: true,
                 DNSFile: true,
+                quote: true,
                 jobNumber: true,
                 amount: true,
                 installationDate: true,

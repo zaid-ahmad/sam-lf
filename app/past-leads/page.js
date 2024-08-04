@@ -2,7 +2,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { displayTodaysDate, getStartEndDateWithOffset } from "@/lib/utils";
+import { displayTodaysDate } from "@/lib/utils";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -43,7 +43,8 @@ async function getAdminPastLeads(session, branch = null) {
         },
         select: {
             id: true,
-            homeOwnerType: true,
+            firstName: true,
+            lastName: true,
             address: true,
             canvasser: {
                 select: {
@@ -61,6 +62,7 @@ async function getAdminPastLeads(session, branch = null) {
             quadrant: true,
             appointmentDateTime: true,
             branch: true,
+            createdAt: true,
         },
     });
 
@@ -82,6 +84,7 @@ async function getAdminPastLeads(session, branch = null) {
         salesRep: lead.salesRep
             ? `${lead.salesRep.firstName} ${lead.salesRep.lastName}`.trim()
             : null,
+        customerName: `${lead.firstName} ${lead.lastName}`.trim(),
     }));
 
     return { data: transformedData, branch: branchCode };
@@ -102,7 +105,8 @@ async function getCanvasserPastLeads(user_id) {
         },
         select: {
             id: true,
-            homeOwnerType: true,
+            firstName: true,
+            lastName: true,
             address: true,
             canvasser: {
                 select: {
@@ -120,6 +124,7 @@ async function getCanvasserPastLeads(user_id) {
             quadrant: true,
             appointmentDateTime: true,
             branch: true,
+            createdAt: true,
         },
     });
 

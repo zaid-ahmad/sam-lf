@@ -45,6 +45,15 @@ export function DataTable({
     isCanvasser = false,
 }) {
     const [sorting, setSorting] = useState([]);
+    const [columnFilters, setColumnFilters] = useState([]);
+    const [columnVisibility, setColumnVisibility] = useState({
+        createdAt: false,
+    });
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 20,
+    });
+
     const [data, setData] = useState(initialData);
 
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
@@ -56,15 +65,22 @@ export function DataTable({
     const [salesRepFilter, setSalesRepFilter] = useState("all");
     const [branchFilter, setBranchFilter] = useState("all");
     const [dateFilter, setDateFilter] = useState("");
+    const [timeFilter, setTimeFilter] = useState("all");
+    const [dateSortOrder, setDateSortOrder] = useState("none");
 
     useEffect(() => {
         setData(initialData);
     }, [initialData]);
 
-    const filteredData = useMemo(() => {
-        return data.filter((item) => {
+    const filteredAndSortedData = useMemo(() => {
+        // First, filter the data
+        const filtered = data.filter((item) => {
             const matchesStatus =
                 statusFilter === "all" || item.status === statusFilter;
+
+            const matchesTime =
+                timeFilter === "all" ||
+                item.appointmentDateTime.split(" at ")[1] === timeFilter;
 
             let matchesCanvasser = true;
             let matchesBranch = true;
@@ -101,9 +117,24 @@ export function DataTable({
                 matchesCanvasser &&
                 matchesBranch &&
                 matchesSalesRep &&
-                matchesDate
+                matchesDate &&
+                matchesTime
             );
         });
+
+        // Then, sort the filtered data if necessary
+        if (dateSortOrder !== "none") {
+            return filtered.sort((a, b) => {
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+                return dateSortOrder === "oldToNew"
+                    ? dateA - dateB
+                    : dateB - dateA;
+            });
+        }
+
+        // If no sorting is needed, return the filtered data as is
+        return filtered;
     }, [
         data,
         statusFilter,
@@ -113,6 +144,8 @@ export function DataTable({
         isSuperAdmin,
         isCanvasser,
         salesRepFilter,
+        timeFilter,
+        dateSortOrder,
     ]);
 
     const handleAssignSalesRep = (lead) => {
@@ -164,123 +197,153 @@ export function DataTable({
     });
 
     const table = useReactTable({
-        data: filteredData,
+        data: filteredAndSortedData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
+        onColumnVisibilityChange: setColumnVisibility,
+        onPaginationChange: setPagination,
         state: {
             sorting,
+            columnFilters,
+            columnVisibility,
+            pagination,
         },
+        pageCount: Math.ceil(
+            filteredAndSortedData.length / pagination.pageSize
+        ),
     });
 
     return (
         <div>
             <div className='flex space-x-4 mt-7 mb-4'>
-                <Select
-                    onValueChange={setStatusFilter}
-                    value={statusFilter || "all"}
-                >
-                    <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder='Filter by Status' />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value='all'>All Statuses</SelectItem>
-                        {statusOptions.map((status) => (
-                            <SelectItem key={status} value={status}>
-                                <Badge
-                                    variant='outline'
-                                    className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
+                <div className='flex space-x-4 mt-7 mb-4'>
+                    <Select
+                        onValueChange={setStatusFilter}
+                        value={statusFilter || "all"}
+                    >
+                        <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Filter by Status' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='all'>All Statuses</SelectItem>
+                            {statusOptions.map((status) => (
+                                <SelectItem key={status} value={status}>
+                                    <Badge
+                                        variant='outline'
+                                        className={`bg-${colorMap[status]}-100 text-${colorMap[status]}-800 border-${colorMap[status]}-300`}
+                                    >
+                                        {status === "INSTALL_CANCELLED"
+                                            ? "INSTALL CANCELLED"
+                                            : status}
+                                    </Badge>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {!isCanvasser && (
+                        <>
+                            {canvasserOptions && (
+                                <Select
+                                    onValueChange={setCanvasserFilter}
+                                    value={canvasserFilter || "all"}
                                 >
-                                    {status === "INSTALL_CANCELLED"
-                                        ? "INSTALL CANCELLED"
-                                        : status}
-                                </Badge>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                {!isCanvasser && (
-                    <>
-                        {canvasserOptions && (
-                            <Select
-                                onValueChange={setCanvasserFilter}
-                                value={canvasserFilter || "all"}
-                            >
-                                <SelectTrigger className='w-[180px]'>
-                                    <SelectValue placeholder='Filter by Canvasser' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value='all'>
-                                        All Canvassers
-                                    </SelectItem>
-                                    {canvasserOptions.map((canvasser) => (
-                                        <SelectItem
-                                            key={canvasser}
-                                            value={canvasser}
-                                        >
-                                            {canvasser}
+                                    <SelectTrigger className='w-[180px]'>
+                                        <SelectValue placeholder='Filter by Canvasser' />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value='all'>
+                                            All Canvassers
                                         </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
-                        {salesPersonOptions && (
-                            <Select
-                                onValueChange={setSalesRepFilter}
-                                value={salesRepFilter || "all"}
-                            >
-                                <SelectTrigger className='w-[180px]'>
-                                    <SelectValue placeholder='Filter by Sales Rep.' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value='all'>
-                                        All Sales Reps.
-                                    </SelectItem>
-                                    {salesPersonOptions.map((salesPerson) => (
-                                        <SelectItem
-                                            key={salesPerson}
-                                            value={salesPerson}
-                                        >
-                                            {salesPerson}
+                                        {canvasserOptions.map((canvasser) => (
+                                            <SelectItem
+                                                key={canvasser}
+                                                value={canvasser}
+                                            >
+                                                {canvasser}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
+                            {salesPersonOptions && (
+                                <Select
+                                    onValueChange={setSalesRepFilter}
+                                    value={salesRepFilter || "all"}
+                                >
+                                    <SelectTrigger className='w-[180px]'>
+                                        <SelectValue placeholder='Filter by Sales Rep.' />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value='all'>
+                                            All Sales Reps.
                                         </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
-                        {isSuperAdmin && allBranches && (
-                            <Select
-                                onValueChange={setBranchFilter}
-                                value={branchFilter || "all"}
-                            >
-                                <SelectTrigger className='w-[180px]'>
-                                    <SelectValue placeholder='Filter by Branch' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value='all'>
-                                        All Branches
-                                    </SelectItem>
-                                    {allBranches.map((branch) => (
-                                        <SelectItem
-                                            key={branch.code}
-                                            value={branch.code}
-                                        >
-                                            {branch.name}
+                                        {salesPersonOptions.map(
+                                            (salesPerson) => (
+                                                <SelectItem
+                                                    key={salesPerson}
+                                                    value={salesPerson}
+                                                >
+                                                    {salesPerson}
+                                                </SelectItem>
+                                            )
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            )}
+                            {isSuperAdmin && allBranches && (
+                                <Select
+                                    onValueChange={setBranchFilter}
+                                    value={branchFilter || "all"}
+                                >
+                                    <SelectTrigger className='w-[180px]'>
+                                        <SelectValue placeholder='Filter by Branch' />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value='all'>
+                                            All Branches
                                         </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
-                    </>
-                )}
+                                        {allBranches.map((branch) => (
+                                            <SelectItem
+                                                key={branch.code}
+                                                value={branch.code}
+                                            >
+                                                {branch.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
+                        </>
+                    )}
 
-                <input
-                    type='date'
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    value={dateFilter}
-                    className='border rounded p-2'
-                />
+                    <Select
+                        onValueChange={setDateSortOrder}
+                        value={dateSortOrder}
+                    >
+                        <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Sort by Date' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value='none'>Sort by</SelectItem>
+                            <SelectItem value='oldToNew'>
+                                Oldest to Newest
+                            </SelectItem>
+                            <SelectItem value='newToOld'>
+                                Newest to Oldest
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <input
+                        type='date'
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        value={dateFilter}
+                        className='border rounded p-2'
+                    />
+                </div>
             </div>
             <div className='rounded-md border my-7'>
                 <Table className='bg-white rounded-lg'>

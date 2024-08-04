@@ -3,7 +3,6 @@
 import InfoCard from "@/app/dashboard/info-card";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
-import { displayTodaysDate } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -27,7 +26,6 @@ const SalesRepDashboard = ({
         return () => clearInterval(intervalId);
     }, [router]);
     const statusOptions = [
-        "APPOINTMENT",
         "ASSIGNED",
         "DEMO",
         "SALE",

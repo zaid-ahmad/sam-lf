@@ -12,6 +12,7 @@ export default function SuperAdminDashboardClient({
     branch,
 }) {
     const [dashboardData, setDashboardData] = useState(initialData);
+    const { slotTemplates } = dashboardData;
     const [selectedBranch, setSelectedBranch] = useState(initialData.branch);
     const [leadDate, setLeadDate] = useState(displayTodaysDate(branch));
     const [isToday, setIsToday] = useState(true);
@@ -97,6 +98,7 @@ export default function SuperAdminDashboardClient({
             isToday={isToday}
             isLoading={isLoading}
             selectedBranch={selectedBranch}
+            slotTemplates={slotTemplates}
         />
     );
 }

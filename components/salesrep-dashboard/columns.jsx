@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { colorMap } from "@/lib/utils";
+import Link from "next/link";
 
 export const columns = [
     {
@@ -31,8 +32,11 @@ export const columns = [
         },
     },
     {
-        accessorKey: "homeOwnerType",
-        header: "Home Owner Type",
+        accessorKey: "customerName",
+        header: "Customer Name",
+        cell: ({ row }) => {
+            return <p className='capitalize'>{row.getValue("customerName")}</p>;
+        },
     },
     {
         accessorKey: "quadrant",
@@ -66,6 +70,10 @@ export const columns = [
         },
     },
     {
+        accessorKey: "createdAt",
+        header: "Created At",
+    },
+    {
         id: "actions",
         cell: ({ row, onStatusChange }) => {
             const lead = row.original;
@@ -78,9 +86,9 @@ export const columns = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                        <a href={`/leads/${lead.id}`}>
+                        <Link href={`/leads/${lead.id}`} target='_blank'>
                             <DropdownMenuItem>View details</DropdownMenuItem>
-                        </a>
+                        </Link>
                         <DropdownMenuItem
                             onSelect={(e) => {
                                 e.preventDefault();

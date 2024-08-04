@@ -48,6 +48,8 @@ model Lead {
   images          String[]
   addressNotes    String?
   appointmentDateTime String
+  date            DateTime?    
+  timeslot        String?
   homeOwnerType   HomeOwnerType
   age             AgeRange
   concerns        String[]
@@ -55,6 +57,7 @@ model Lead {
   serviceNeeded   TypesOfServices[]
   status          LeadStatus?   @default(APPOINTMENT)
   amount          Float?
+  quote           Float?
   reason          String?
   jobNumber       String?
   DNSFile         String?
@@ -68,9 +71,15 @@ model Lead {
   updatedAt       DateTime      @updatedAt
 }
 
-model Timings {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  time            String
+model SlotTemplate {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  branchCode String
+  timeSlot   String
+  limit      Int      @default(5)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([branchCode, timeSlot])
 }
 
 enum Quadrant {

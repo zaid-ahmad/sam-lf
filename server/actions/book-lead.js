@@ -18,22 +18,43 @@ async function sendEmail(
     customerQuadrant,
     leadId
 ) {
-    const data = await resend.emails.send({
-        from: "SAM 2.0 <noreply@leadflowmanager.com>",
-        to: admin_emails,
-        subject: "New Lead | Awaiting Assignment",
-        react: NewLeadEmail({
-            customerName,
-            customerPhone,
-            customerAddress,
-            customerQuadrant,
-            leadId,
-        }),
-    });
+    const results = await Promise.all(
+        admin_emails.map(async (email) => {
+            try {
+                const data = await resend.emails.send({
+                    from: "SAM 2.0 <noreply@leadflowmanager.com>",
+                    to: email,
+                    subject: "New Lead | Awaiting Assignment",
+                    react: NewLeadEmail({
+                        customerName,
+                        customerPhone,
+                        customerAddress,
+                        customerQuadrant,
+                        leadId,
+                    }),
+                });
+
+                return {
+                    email,
+                    success: true,
+                    data: data,
+                };
+            } catch (error) {
+                console.error(`Failed to send email to ${email}:`, error);
+                return {
+                    email,
+                    success: false,
+                    error: error.message,
+                };
+            }
+        })
+    );
+
+    const allSuccessful = results.every((result) => result.success);
 
     return {
-        success: true,
-        data: data,
+        success: allSuccessful,
+        results: results,
     };
 }
 
@@ -65,7 +86,7 @@ STOP - To unsubscribe.
     return false;
 }
 
-export async function addLeadToDatabase(formData) {
+export async function addLeadToDatabase(formData, date, timeSlot) {
     try {
         const session = await auth();
 
@@ -106,6 +127,8 @@ export async function addLeadToDatabase(formData) {
                 images: validatedData.images || [],
                 addressNotes: validatedData.addressNotes,
                 appointmentDateTime: validatedData.appointmentDateTime,
+                date: date,
+                timeslot: timeSlot,
                 homeOwnerType: validatedData.homeownerType,
                 age: validatedData.age,
                 concerns: validatedData.concerns,
@@ -118,25 +141,40 @@ export async function addLeadToDatabase(formData) {
             },
         });
 
-        const admin_emails = await prisma.user.findMany({
-            where: {
-                branchCode: user.branchCode,
-                role: "ADMIN",
-            },
-            select: {
-                email: true,
-            },
-        });
+        const [admin_emails, superadmin_emails] = await Promise.all([
+            prisma.user.findMany({
+                where: {
+                    branchCode: user.branchCode,
+                    role: "ADMIN",
+                },
+                select: {
+                    email: true,
+                },
+            }),
+            prisma.user.findMany({
+                where: {
+                    role: "SUPERADMIN",
+                },
+                select: {
+                    email: true,
+                },
+            }),
+        ]);
 
-        const admin_email_list = admin_emails.map((admin) => admin.email);
+        const combined_email_list = [
+            ...admin_emails.map((admin) => admin.email),
+            ...superadmin_emails.map((superadmin) => superadmin.email),
+        ];
+
         if (user.branchCode === "3CGY") {
             sendMessage(
                 "+14039885931",
                 "There's a new appointment on SAM 2.0. Please assign it."
             );
         }
+
         const isEmailSent = await sendEmail(
-            admin_email_list,
+            combined_email_list,
             validatedData.firstName + " " + validatedData.lastName,
             validatedData.primaryPhone,
             validatedData.address,

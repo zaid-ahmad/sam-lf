@@ -46,6 +46,7 @@ const Dashboard = async () => {
             totalAssignedLeads,
             totalUnassignedLeads,
             leadsPerTimeSlot,
+            slotTemplates,
         } = await adminDashboardData(branch, todaysDate);
 
         const listOfCanvassers = await getAllCanvasserNames(branch);
@@ -62,12 +63,9 @@ const Dashboard = async () => {
             totalUnassignedLeads,
             listOfCanvassers,
             listOfSalesReps: listOfSalesPeople,
-            slots_11: leadsPerTimeSlot["11:00 AM"],
-            slots_01: leadsPerTimeSlot["01:00 PM"],
-            slots_03: leadsPerTimeSlot["03:00 PM"],
-            slots_05: leadsPerTimeSlot["05:00 PM"],
-            slots_07: leadsPerTimeSlot["07:00 PM"],
             branch,
+            slotTemplates,
+            leadsPerTimeSlot,
         };
 
         return <AdminDashboardClient initialData={initialData} />;
@@ -130,6 +128,7 @@ const Dashboard = async () => {
             superAdminTotalAssignedLeads,
             superAdminTotalUnassignedLeads,
             superAdminLeadsPerTimeSlot,
+            superAdminSlotTemplates,
         } = await superAdminDashboardData(defaultBranch, todaysDate);
 
         const listOfCanvassers = await getAllCanvasserNames(defaultBranch);
@@ -146,11 +145,8 @@ const Dashboard = async () => {
             totalUnassignedLeads: superAdminTotalUnassignedLeads,
             listOfCanvassers,
             listOfSalesReps: listOfSalesPeople,
-            slots_11: superAdminLeadsPerTimeSlot["11:00 AM"],
-            slots_01: superAdminLeadsPerTimeSlot["01:00 PM"],
-            slots_03: superAdminLeadsPerTimeSlot["03:00 PM"],
-            slots_05: superAdminLeadsPerTimeSlot["05:00 PM"],
-            slots_07: superAdminLeadsPerTimeSlot["07:00 PM"],
+            leadsPerTimeSlot: superAdminLeadsPerTimeSlot,
+            slotTemplates: superAdminSlotTemplates,
             branch: defaultBranch,
         };
 

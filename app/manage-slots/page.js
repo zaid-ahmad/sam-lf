@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import AppointmentRequestForm from "@/components/book-lead-form";
+import { SlotManagement } from "@/components/time-slots/SlotManagement";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -8,18 +8,15 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
-const BookLeadPage = async () => {
+async function ManageSlotsPage() {
     const session = await auth();
-    const user = await prisma.user.findUnique({
-        where: {
-            id: session.user.id,
-        },
-        select: {
-            branchCode: true,
-        },
-    });
+
+    if (session.user.role !== "ADMIN") {
+        return redirect("/dashboard");
+    }
+
     return (
         <div className='container'>
             <div className='py-6'>
@@ -32,17 +29,18 @@ const BookLeadPage = async () => {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                            <BreadcrumbPage>
-                                Appointment Request Form
-                            </BreadcrumbPage>
+                            <BreadcrumbPage>Manage Time Slots</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
             </div>
+            <h2 className='text-xl sm:text-2xl font-semibold'>
+                Manage Time Slots
+            </h2>
 
-            <AppointmentRequestForm branch={user.branchCode} />
+            <SlotManagement />
         </div>
     );
-};
+}
 
-export default BookLeadPage;
+export default ManageSlotsPage;

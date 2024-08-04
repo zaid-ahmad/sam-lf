@@ -4,7 +4,7 @@ const Spinner = ({ color, height = 140, padding = 6 }) => {
             className={`grid min-h-[${height}] w-full place-items-center overflow-x-scroll rounded-lg p-${padding} lg:overflow-visible`}
         >
             <svg
-                className={`${color} animate-spin duration-300`}
+                className={`${color} animate-spin duration-600`}
                 viewBox='0 0 64 64'
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'

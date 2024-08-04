@@ -33,11 +33,11 @@ const LogoutNavbar = () => {
     );
 };
 
-const AdminNavbar = () => {
+const AdminNavbar = ({ role }) => {
     return (
         <nav className='bg-white border-gray-200'>
             <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4'>
-                <a href='/' className='flex items-baseline justify-end'>
+                <Link href='/' className='flex items-baseline justify-end'>
                     <Image
                         src='/lf-logo.png'
                         width={180}
@@ -45,7 +45,7 @@ const AdminNavbar = () => {
                         alt='logo'
                     />
                     <p className='text-xs font-black'>SAM 2.0</p>
-                </a>
+                </Link>
 
                 <MobileMenuToggle>
                     <ul className='font-medium flex items-center justify-between p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white'>
@@ -66,6 +66,17 @@ const AdminNavbar = () => {
                                 Past leads
                             </Link>
                         </li>
+
+                        {role === "ADMIN" && (
+                            <li>
+                                <Link
+                                    href='/manage-slots'
+                                    className='block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0'
+                                >
+                                    Manage Time Slots
+                                </Link>
+                            </li>
+                        )}
 
                         <li>
                             <form
@@ -182,7 +193,7 @@ const Navbar = async () => {
     const role = session?.user?.role;
 
     return role === "ADMIN" || role === "SUPERADMIN" ? (
-        <AdminNavbar />
+        <AdminNavbar role={role} />
     ) : role === "CANVASSER" ? (
         <CanvasserNavbar />
     ) : role === "SALES_REP" ? (
