@@ -4,7 +4,6 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn, formatTimeto12Hour } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
     Popover,
@@ -143,7 +142,7 @@ export default function AppointmentScheduler({
                                                 : "hidden"
                                         }`}
                                     >
-                                        {convertTo12HourFormat(slot.timeSlot)}
+                                        {formatTimeto12Hour(slot.timeSlot)}
                                     </Label>
                                 </div>
                             ))}

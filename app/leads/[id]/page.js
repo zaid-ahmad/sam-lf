@@ -134,7 +134,7 @@ export default async function LeadDetailsPage({ params }) {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>
+                        <BreadcrumbPage className='capitalize'>
                             Appointment Details for {lead.firstName}
                         </BreadcrumbPage>
                     </BreadcrumbItem>
@@ -150,7 +150,7 @@ export default async function LeadDetailsPage({ params }) {
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                         <div>
                             <h3 className='font-semibold'>Name</h3>
-                            <p>
+                            <p className='capitalize'>
                                 {lead.firstName} {lead.lastName}
                             </p>
                         </div>

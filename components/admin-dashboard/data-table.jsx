@@ -293,7 +293,7 @@ export function DataTable({
                         <SelectValue placeholder='Sort by Date' />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value='none'>Sort</SelectItem>
+                        <SelectItem value='none'>Sort by</SelectItem>
                         <SelectItem value='oldToNew'>
                             Oldest to Newest
                         </SelectItem>

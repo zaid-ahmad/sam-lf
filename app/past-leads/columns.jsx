@@ -58,8 +58,8 @@ export const columns = [
         },
     },
     {
-        accessorKey: "homeOwnerType",
-        header: "Home Owner Type",
+        accessorKey: "customerName",
+        header: "Customer Name",
     },
     {
         accessorKey: "quadrant",
@@ -132,6 +132,10 @@ export const columns = [
     {
         accessorKey: "branch",
         header: "Branch",
+    },
+    {
+        accessorKey: "createdAt",
+        header: "Created At",
     },
     {
         id: "actions",
