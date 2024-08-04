@@ -13,7 +13,6 @@ import {
 } from "@/lib/data-fetching";
 import { getSalesRepresentatives } from "@/lib/data";
 import moment from "moment-timezone";
-import { getStartEndDateWithOffset } from "@/lib/utils";
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -50,6 +49,7 @@ export async function GET(request) {
                 totalAssignedLeads,
                 totalUnassignedLeads,
                 leadsPerTimeSlot,
+                slotTemplates,
             } = await adminDashboardData(branch, date);
             const listOfCanvassers = await getAllCanvasserNames(branch);
             const listOfSalesPeople = sale_reps.map((s) =>
@@ -65,12 +65,9 @@ export async function GET(request) {
                 totalUnassignedLeads,
                 listOfCanvassers,
                 listOfSalesReps: listOfSalesPeople,
-                slots_11: leadsPerTimeSlot["11:00 AM"],
-                slots_01: leadsPerTimeSlot["01:00 PM"],
-                slots_03: leadsPerTimeSlot["03:00 PM"],
-                slots_05: leadsPerTimeSlot["05:00 PM"],
-                slots_07: leadsPerTimeSlot["07:00 PM"],
                 branch,
+                slotTemplates,
+                leadsPerTimeSlot,
             };
 
             break;
@@ -125,6 +122,7 @@ export async function GET(request) {
                 superAdminTotalAssignedLeads,
                 superAdminTotalUnassignedLeads,
                 superAdminLeadsPerTimeSlot,
+                superAdminSlotTemplates,
             } = await superAdminDashboardData(branchFromAPI, date);
 
             const superAdmiListOfCanvassers = await getAllCanvasserNames(
@@ -143,11 +141,8 @@ export async function GET(request) {
                 totalUnassignedLeads: superAdminTotalUnassignedLeads,
                 listOfCanvassers: superAdmiListOfCanvassers,
                 listOfSalesReps: superAdmiListOfSalesPeople,
-                slots_11: superAdminLeadsPerTimeSlot["11:00 AM"],
-                slots_01: superAdminLeadsPerTimeSlot["01:00 PM"],
-                slots_03: superAdminLeadsPerTimeSlot["03:00 PM"],
-                slots_05: superAdminLeadsPerTimeSlot["05:00 PM"],
-                slots_07: superAdminLeadsPerTimeSlot["07:00 PM"],
+                slotTemplates: superAdminSlotTemplates,
+                leadsPerTimeSlot: superAdminLeadsPerTimeSlot,
             };
             break;
         default:

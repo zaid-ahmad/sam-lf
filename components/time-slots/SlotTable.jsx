@@ -10,17 +10,9 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { formatTimeto12Hour } from "@/lib/utils";
 
 export function SlotTable({ slots, onEdit, onDelete }) {
-    // Function to format time to 12-hour AM/PM format
-    const formatTime = (timeString) => {
-        const [hours, minutes] = timeString.split(":");
-        let hour = parseInt(hours);
-        const ampm = hour >= 12 ? "PM" : "AM";
-        hour = hour % 12;
-        hour = hour ? hour : 12; // the hour '0' should be '12'
-        return `${hour}:${minutes} ${ampm}`;
-    };
     return (
         <Table className='mt-8'>
             <TableHeader>
@@ -33,7 +25,9 @@ export function SlotTable({ slots, onEdit, onDelete }) {
             <TableBody>
                 {slots.map((slot) => (
                     <TableRow key={slot.id}>
-                        <TableCell>{formatTime(slot.timeSlot)}</TableCell>
+                        <TableCell>
+                            {formatTimeto12Hour(slot.timeSlot)}
+                        </TableCell>
                         <TableCell>{slot.limit}</TableCell>
                         <TableCell className='space-x-2'>
                             <Button onClick={() => onEdit(slot)}>Edit</Button>

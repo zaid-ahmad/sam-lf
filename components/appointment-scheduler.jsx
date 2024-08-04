@@ -3,7 +3,7 @@
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, formatTimeto12Hour } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -15,20 +15,6 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import { useEffect, useState } from "react";
 import { getAvailableSlots } from "@/server/actions/slotActions";
-
-function convertTo12HourFormat(time24) {
-    // Parse the time string
-    const [hours, minutes] = time24.split(":").map(Number);
-
-    // Determine AM or PM
-    const period = hours >= 12 ? "PM" : "AM";
-
-    // Convert hours to 12-hour format
-    const hours12 = hours % 12 || 12;
-
-    // Format the time string
-    return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
-}
 
 export default function AppointmentScheduler({
     onSchedule,
@@ -48,12 +34,11 @@ export default function AppointmentScheduler({
 
             // Format and schedule date
             const formattedDate = format(date, "MMMM do, yyyy");
-            console.log(selectedTime, formattedDate);
 
             let formattedDateTime = formattedDate;
 
             if (showTimeSlots && selectedTime) {
-                const twelveHourTime = convertTo12HourFormat(selectedTime);
+                const twelveHourTime = formatTimeto12Hour(selectedTime);
                 formattedDateTime = `${formattedDate} at ${twelveHourTime}`;
             }
 
@@ -104,10 +89,9 @@ export default function AppointmentScheduler({
                     <span className='truncate'>
                         {date ? (
                             showTimeSlots && selectedTime ? (
-                                `${format(
-                                    date,
-                                    "PPP"
-                                )} at ${convertTo12HourFormat(selectedTime)}`
+                                `${format(date, "PPP")} at ${formatTimeto12Hour(
+                                    selectedTime
+                                )}`
                             ) : (
                                 format(date, "PPP")
                             )
