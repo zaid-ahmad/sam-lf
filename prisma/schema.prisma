@@ -63,6 +63,7 @@ model Lead {
   DNSFile         String?
   installationDate String?
   funded          Boolean       @default(false)
+  commissionPaid          Boolean       @default(false)
   canvasser          User          @relation("CanvasserLeads", fields: [canvasserId], references: [id])
   canvasserId        String        @db.ObjectId
   salesRep           User?         @relation("SalesRepLeads", fields: [salesRepId], references: [id])
