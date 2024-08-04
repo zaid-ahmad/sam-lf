@@ -12,8 +12,22 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
-export function SlotForm({ onSubmit, initialData, onCancel, branchCode }) {
+export function SlotForm({
+    onSubmit,
+    initialData,
+    onCancel,
+    branchCode,
+    branches,
+    isSuperAdmin,
+}) {
     const form = useForm({
         defaultValues: initialData || {
             branchCode: branchCode,
@@ -24,12 +38,9 @@ export function SlotForm({ onSubmit, initialData, onCancel, branchCode }) {
 
     useEffect(() => {
         if (initialData && initialData.date) {
-            // Create a new Date object
             const date = new Date(initialData.date);
-            // Adjust for timezone offset
-            const timezoneOffset = date.getTimezoneOffset() * 60000; // offset in milliseconds
+            const timezoneOffset = date.getTimezoneOffset() * 60000;
             const adjustedDate = new Date(date.getTime() - timezoneOffset);
-            // Format the date as YYYY-MM-DD
             const formattedDate = adjustedDate.toISOString().split("T")[0];
             form.setValue("date", formattedDate);
         }
@@ -38,19 +49,50 @@ export function SlotForm({ onSubmit, initialData, onCancel, branchCode }) {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-                <FormField
-                    control={form.control}
-                    name='branchCode'
-                    render={({ field }) => (
-                        <FormItem className='hidden'>
-                            <FormLabel>Branch Code</FormLabel>
-                            <FormControl>
-                                <Input placeholder='3CGY' {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                {isSuperAdmin ? (
+                    <FormField
+                        control={form.control}
+                        name='branchCode'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Branch</FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Select a branch' />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {branches.map((branch) => (
+                                            <SelectItem
+                                                key={branch.id}
+                                                value={branch.code}
+                                            >
+                                                {branch.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                ) : (
+                    <FormField
+                        control={form.control}
+                        name='branchCode'
+                        render={({ field }) => (
+                            <FormItem className='hidden'>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                )}
                 <FormField
                     control={form.control}
                     name='timeSlot'

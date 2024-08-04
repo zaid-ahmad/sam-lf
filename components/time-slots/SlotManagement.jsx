@@ -10,36 +10,41 @@ import {
     updateSlot,
     deleteSlot,
 } from "@/server/actions/slotActions";
+import BranchSelector from "./branch-selector";
 
-export function SlotManagement() {
+export function SlotManagement({ session, branches, userBranch }) {
     const [slots, setSlots] = useState([]);
     const [editingSlot, setEditingSlot] = useState(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [branchCode, setBranchCode] = useState("");
+    const [selectedBranch, setSelectedBranch] = useState(userBranch || "");
+
+    const isSuperAdmin = session?.user?.role === "SUPERADMIN";
 
     useEffect(() => {
-        fetchSlots();
-    }, []);
+        if (selectedBranch) {
+            fetchSlots(selectedBranch);
+        }
+    }, [selectedBranch]);
 
-    const fetchSlots = async () => {
-        const result = await getSlots();
+    const fetchSlots = async (branchCode) => {
+        const result = await getSlots(branchCode);
         if (result.success) {
             setSlots(result.data);
-            setBranchCode(result.branchCode);
         } else {
             console.error(result.error);
-            // Handle error, maybe set an error state and display to user
         }
     };
 
     const handleCreate = async (newSlot) => {
-        const result = await createSlot(newSlot);
+        const result = await createSlot({
+            ...newSlot,
+            branchCode: selectedBranch,
+        });
         if (result.success) {
             setSlots([...slots, result.data]);
             setIsFormOpen(false);
         } else {
             console.error(result.error);
-            // Handle error, maybe set an error state and display to user
         }
     };
 
@@ -55,7 +60,6 @@ export function SlotManagement() {
             setIsFormOpen(false);
         } else {
             console.error(result.error);
-            // Handle error, maybe set an error state and display to user
         }
     };
 
@@ -65,12 +69,22 @@ export function SlotManagement() {
             setSlots(slots.filter((slot) => slot.id !== id));
         } else {
             console.error(result.error);
-            // Handle error, maybe set an error state and display to user
         }
+    };
+
+    const handleBranchChange = (branchCode) => {
+        setSelectedBranch(branchCode);
     };
 
     return (
         <div className='p-8'>
+            {isSuperAdmin && (
+                <BranchSelector
+                    branches={branches}
+                    selectedBranch={selectedBranch}
+                    onBranchChange={handleBranchChange}
+                />
+            )}
             <Button onClick={() => setIsFormOpen(true)}>Create New Slot</Button>
             {isFormOpen && (
                 <SlotForm
@@ -80,7 +94,9 @@ export function SlotManagement() {
                         setIsFormOpen(false);
                         setEditingSlot(null);
                     }}
-                    branchCode={branchCode}
+                    branchCode={selectedBranch}
+                    branches={branches}
+                    isSuperAdmin={isSuperAdmin}
                 />
             )}
             <SlotTable
