@@ -141,17 +141,31 @@ export async function addLeadToDatabase(formData, date, timeSlot) {
             },
         });
 
-        const admin_emails = await prisma.user.findMany({
-            where: {
-                branchCode: user.branchCode,
-                role: "ADMIN",
-            },
-            select: {
-                email: true,
-            },
-        });
+        const [admin_emails, superadmin_emails] = await Promise.all([
+            prisma.user.findMany({
+                where: {
+                    branchCode: user.branchCode,
+                    role: "ADMIN",
+                },
+                select: {
+                    email: true,
+                },
+            }),
+            prisma.user.findMany({
+                where: {
+                    role: "SUPERADMIN",
+                },
+                select: {
+                    email: true,
+                },
+            }),
+        ]);
 
-        const admin_email_list = admin_emails.map((admin) => admin.email);
+        const combined_email_list = [
+            ...admin_emails.map((admin) => admin.email),
+            ...superadmin_emails.map((superadmin) => superadmin.email),
+        ];
+
         if (user.branchCode === "3CGY") {
             sendMessage(
                 "+14039885931",
@@ -160,7 +174,7 @@ export async function addLeadToDatabase(formData, date, timeSlot) {
         }
 
         const isEmailSent = await sendEmail(
-            admin_email_list,
+            combined_email_list,
             validatedData.firstName + " " + validatedData.lastName,
             validatedData.primaryPhone,
             validatedData.address,
