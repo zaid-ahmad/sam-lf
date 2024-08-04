@@ -3,23 +3,37 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 
-export async function getSlots() {
+export async function getSlots(branchCode) {
     try {
         const session = await auth();
 
-        const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: {
-                branchCode: true,
-            },
-        });
+        if (!session || !session.user) {
+            return { success: false, error: "Not authenticated" };
+        }
 
-        const slots = await prisma.slotTemplate.findMany();
+        let slots;
+        if (session.user.role === "SUPERADMIN") {
+            if (branchCode) {
+                slots = await prisma.slotTemplate.findMany({
+                    where: { branchCode },
+                });
+            } else {
+                slots = await prisma.slotTemplate.findMany();
+            }
+        } else {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { branchCode: true },
+            });
+
+            slots = await prisma.slotTemplate.findMany({
+                where: { branchCode: user.branchCode },
+            });
+        }
 
         return {
             success: true,
             data: slots,
-            branchCode: user.branchCode,
         };
     } catch (error) {
         console.error("Failed to fetch slots:", error);
@@ -29,6 +43,21 @@ export async function getSlots() {
 
 export async function createSlot(data) {
     try {
+        const session = await auth();
+        if (!session || !session.user) {
+            return { success: false, error: "Not authenticated" };
+        }
+
+        if (
+            session.user.role !== "SUPERADMIN" &&
+            session.user.branchCode !== data.branchCode
+        ) {
+            return {
+                success: false,
+                error: "Not authorized to create slot for this branch",
+            };
+        }
+
         const newSlot = await prisma.slotTemplate.create({
             data: {
                 branchCode: data.branchCode,
@@ -45,10 +74,32 @@ export async function createSlot(data) {
 
 export async function updateSlot(id, data) {
     try {
+        const session = await auth();
+        if (!session || !session.user) {
+            return { success: false, error: "Not authenticated" };
+        }
+
+        const existingSlot = await prisma.slotTemplate.findUnique({
+            where: { id },
+        });
+
+        if (!existingSlot) {
+            return { success: false, error: "Slot not found" };
+        }
+
+        if (
+            session.user.role !== "SUPERADMIN" &&
+            session.user.branchCode !== existingSlot.branchCode
+        ) {
+            return {
+                success: false,
+                error: "Not authorized to update this slot",
+            };
+        }
+
         const updatedSlot = await prisma.slotTemplate.update({
             where: { id },
             data: {
-                branchCode: data.branchCode,
                 timeSlot: data.timeSlot,
                 limit: parseInt(data.limit),
                 booked: data.booked,
@@ -63,6 +114,29 @@ export async function updateSlot(id, data) {
 
 export async function deleteSlot(id) {
     try {
+        const session = await auth();
+        if (!session || !session.user) {
+            return { success: false, error: "Not authenticated" };
+        }
+
+        const existingSlot = await prisma.slotTemplate.findUnique({
+            where: { id },
+        });
+
+        if (!existingSlot) {
+            return { success: false, error: "Slot not found" };
+        }
+
+        if (
+            session.user.role !== "SUPERADMIN" &&
+            session.user.branchCode !== existingSlot.branchCode
+        ) {
+            return {
+                success: false,
+                error: "Not authorized to delete this slot",
+            };
+        }
+
         await prisma.slotTemplate.delete({
             where: { id },
         });

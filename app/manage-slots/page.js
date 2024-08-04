@@ -9,12 +9,31 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
 
 async function ManageSlotsPage() {
     const session = await auth();
 
-    if (session.user.role !== "ADMIN") {
+    if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
         return redirect("/dashboard");
+    }
+
+    // Fetch branches
+    const branches = await prisma.branch.findMany({
+        select: {
+            code: true,
+            name: true,
+        },
+    });
+
+    // Fetch user's branch if not a superadmin
+    let userBranch = null;
+    if (session.user.role !== "SUPERADMIN") {
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { branchCode: true },
+        });
+        userBranch = user.branchCode;
     }
 
     return (
@@ -38,7 +57,11 @@ async function ManageSlotsPage() {
                 Manage Time Slots
             </h2>
 
-            <SlotManagement />
+            <SlotManagement
+                session={session}
+                branches={branches}
+                userBranch={userBranch}
+            />
         </div>
     );
 }
