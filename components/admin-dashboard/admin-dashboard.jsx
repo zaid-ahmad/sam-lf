@@ -1,5 +1,4 @@
 import InfoCard from "@/app/dashboard/info-card";
-import { Separator } from "@/components/ui/separator";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import Spinner from "../spinner";

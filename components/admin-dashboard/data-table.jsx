@@ -8,8 +8,6 @@ import {
     useReactTable,
 } from "@tanstack/react-table";
 
-import { parse, isSameDay } from "date-fns";
-
 import {
     Table,
     TableBody,
@@ -49,11 +47,13 @@ export function DataTable({
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [data, setData] = useState(initialData);
+
     const [columnVisibility, setColumnVisibility] = useState({});
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 20,
     });
+
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
     const [isChangeLeadStatusDialogOpen, setIsChangeLeadStatusDialogOpen] =
         useState(false);

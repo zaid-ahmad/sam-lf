@@ -1,5 +1,4 @@
 import InfoCard from "@/app/dashboard/info-card";
-import { Separator } from "@/components/ui/separator";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import Spinner from "../spinner";
@@ -42,11 +41,13 @@ const SuperAdminDashboard = ({
         "DEAD",
         "REBOOK",
         "CANCELLED",
+        "INSTALL_CANCELLED",
     ];
 
     const timeOptions = slotTemplates.map((slot) =>
         formatTimeto12Hour(slot.timeSlot)
     );
+
     useEffect(() => {
         onBranchChange(branchFilter);
     }, [branchFilter, onBranchChange]);
