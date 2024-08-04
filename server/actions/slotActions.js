@@ -50,7 +50,7 @@ export async function createSlot(data) {
 
         if (
             session.user.role !== "SUPERADMIN" &&
-            session.user.branchCode !== data.branchCode
+            session.user.role !== "ADMIN"
         ) {
             return {
                 success: false,
@@ -89,11 +89,11 @@ export async function updateSlot(id, data) {
 
         if (
             session.user.role !== "SUPERADMIN" &&
-            session.user.branchCode !== existingSlot.branchCode
+            session.user.role !== "ADMIN"
         ) {
             return {
                 success: false,
-                error: "Not authorized to update this slot",
+                error: "Not authorized to create slot for this branch",
             };
         }
 
@@ -129,11 +129,11 @@ export async function deleteSlot(id) {
 
         if (
             session.user.role !== "SUPERADMIN" &&
-            session.user.branchCode !== existingSlot.branchCode
+            session.user.role !== "ADMIN"
         ) {
             return {
                 success: false,
-                error: "Not authorized to delete this slot",
+                error: "Not authorized to create slot for this branch",
             };
         }
 
