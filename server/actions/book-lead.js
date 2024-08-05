@@ -129,14 +129,8 @@ export async function addLeadToDatabase(formData, date, timeSlot) {
                 appointmentDateTime: validatedData.appointmentDateTime,
                 date: date,
                 timeslot: timeSlot,
-                homeOwnerType:
-                    validatedData.homeownerType === "PLEASE_SELECT"
-                        ? null
-                        : validatedData.homeownerType || null,
-                age:
-                    validatedData.age === "PLEASE_SELECT"
-                        ? null
-                        : validatedData.age || null,
+                homeOwnerType: validatedData.homeownerType || null,
+                age: validatedData.age || null,
                 concerns: validatedData.concerns,
                 surrounding: validatedData.surroundings,
                 serviceNeeded: validatedData.serviceNeeds,

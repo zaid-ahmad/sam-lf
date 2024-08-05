@@ -541,7 +541,9 @@ function AppointmentRequestForm() {
                                                             <SelectValue placeholder='Please Select' />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value='PLEASE_SELECT'>
+                                                            <SelectItem
+                                                                value={null}
+                                                            >
                                                                 Please Select
                                                             </SelectItem>
                                                             <SelectItem value='THIRTY_TO_FORTY'>
@@ -592,7 +594,9 @@ function AppointmentRequestForm() {
                                                             <SelectValue placeholder='Please Select' />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value='PLEASE_SELECT'>
+                                                            <SelectItem
+                                                                value={null}
+                                                            >
                                                                 Please Select
                                                             </SelectItem>
                                                             <SelectItem value='MR_SHO'>

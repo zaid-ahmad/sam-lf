@@ -15,7 +15,11 @@ export default async function LeadEdit({ params }) {
     const { id } = params;
     const session = await auth();
 
-    if (session.user.role === "ADMIN" || session.user.role === "SUPERADMIN") {
+    if (
+        session.user.role === "ADMIN" ||
+        session.user.role === "SUPERADMIN" ||
+        session.user.role === "CANVASSER"
+    ) {
         const result = await getLead(id);
         return (
             <div className='py-4 sm:py-10 px-4 sm:px-6 lg:px-8'>
@@ -32,7 +36,7 @@ export default async function LeadEdit({ params }) {
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <LeadEditPage id={id} data={result} />
+                <LeadEditPage id={id} data={result} role={session.user.role} />
             </div>
         );
     } else {

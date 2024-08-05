@@ -85,6 +85,9 @@ export const columns = [
                         <Link href={`/leads/${lead.id}`} target='_blank'>
                             <DropdownMenuItem>View details</DropdownMenuItem>
                         </Link>
+                        <Link href={`/leads/edit/${lead.id}`}>
+                            <DropdownMenuItem>Edit details</DropdownMenuItem>
+                        </Link>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

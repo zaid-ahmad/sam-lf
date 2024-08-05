@@ -37,7 +37,7 @@ const quadrants = [
     { id: "SE", label: "SE" },
 ];
 
-export default function LeadEditPage({ data, id }) {
+export default function LeadEditPage({ data, id, role }) {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [appointmentDateTime, setAppointmentDateTime] = useState("");
@@ -75,7 +75,14 @@ export default function LeadEditPage({ data, id }) {
     async function onSubmit(values) {
         try {
             setIsSubmitting(true);
-            const result = await updateLeadInDatabase(id, values);
+            const cleanedValues = Object.fromEntries(
+                Object.entries(values).map(([key, value]) => [
+                    key,
+                    value === "" || value === undefined ? null : value,
+                ])
+            );
+
+            const result = await updateLeadInDatabase(id, cleanedValues);
 
             if (result.success) {
                 toast({
@@ -284,43 +291,47 @@ export default function LeadEditPage({ data, id }) {
                                 )}
                             />
 
-                            <div className='flex flex-col gap-2'>
-                                <span className='text-sm font-medium bg-emerald-50 rounded-md px-2 py-3 text-zinc-900'>
-                                    {data.appointmentDateTime}
-                                </span>
+                            {role !== "CANVASSER" && (
+                                <div className='flex flex-col gap-2'>
+                                    <span className='text-sm font-medium bg-emerald-50 rounded-md px-2 py-3 text-zinc-900'>
+                                        {data.appointmentDateTime}
+                                    </span>
 
-                                <FormField
-                                    control={form.control}
-                                    name='appointmentDateTime'
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Appointment Date & Time
-                                                <span className='text-red-600'>
-                                                    *
-                                                </span>
-                                            </FormLabel>
-                                            <FormControl>
-                                                <AppointmentScheduler
-                                                    onSchedule={(
-                                                        formattedDateTime
-                                                    ) => {
-                                                        field.onChange(
+                                    <FormField
+                                        control={form.control}
+                                        name='appointmentDateTime'
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Appointment Date & Time
+                                                    <span className='text-red-600'>
+                                                        *
+                                                    </span>
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <AppointmentScheduler
+                                                        onSchedule={(
                                                             formattedDateTime
-                                                        );
-                                                        handleScheduleAppointment(
-                                                            formattedDateTime
-                                                        );
-                                                    }}
-                                                    setLeadDate={setDate}
-                                                    setTimeSlot={setTimeSlot}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
+                                                        ) => {
+                                                            field.onChange(
+                                                                formattedDateTime
+                                                            );
+                                                            handleScheduleAppointment(
+                                                                formattedDateTime
+                                                            );
+                                                        }}
+                                                        setLeadDate={setDate}
+                                                        setTimeSlot={
+                                                            setTimeSlot
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            )}
 
                             <FormField
                                 control={form.control}
@@ -329,13 +340,18 @@ export default function LeadEditPage({ data, id }) {
                                     <FormItem>
                                         <FormLabel>Home Owner Type</FormLabel>
                                         <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value}
+                                            onValueChange={(value) =>
+                                                field.onChange(value || null)
+                                            }
+                                            value={field.value || undefined}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder='Select home owner type' />
+                                                <SelectValue placeholder='Please Select' />
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem value={null}>
+                                                    Please Select
+                                                </SelectItem>
                                                 <SelectItem value='MR_SHO'>
                                                     Mr. SHO
                                                 </SelectItem>
@@ -362,13 +378,18 @@ export default function LeadEditPage({ data, id }) {
                                     <FormItem>
                                         <FormLabel>Age</FormLabel>
                                         <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value}
+                                            onValueChange={(value) =>
+                                                field.onChange(value || null)
+                                            }
+                                            value={field.value || undefined}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder='Select age range' />
+                                                <SelectValue placeholder='Please Select' />
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem value={null}>
+                                                    Please Select
+                                                </SelectItem>
                                                 <SelectItem value='THIRTY_TO_FORTY'>
                                                     30 - 40
                                                 </SelectItem>
