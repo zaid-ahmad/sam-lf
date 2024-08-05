@@ -187,19 +187,27 @@ export default async function LeadDetailsPage({ params }) {
                         </div>
                     </div>
 
-                    <Separator className='my-4' />
+                    {lead.homeOwnerType && (
+                        <>
+                            <Separator className='my-4' />
+                            <div>
+                                <h3 className='font-semibold'>
+                                    Home Owner Type
+                                </h3>
+                                <p>{lead.homeOwnerType}</p>
+                            </div>
+                        </>
+                    )}
 
-                    <div>
-                        <h3 className='font-semibold'>Home Owner Type</h3>
-                        <p>{lead.homeOwnerType}</p>
-                    </div>
-
-                    <Separator className='my-4' />
-
-                    <div>
-                        <h3 className='font-semibold'>Age Range</h3>
-                        <p>{formatAgeRange(lead.age)}</p>
-                    </div>
+                    {lead.age && (
+                        <>
+                            <Separator className='my-4' />
+                            <div>
+                                <h3 className='font-semibold'>Age Range</h3>
+                                <p>{formatAgeRange(lead.age)}</p>
+                            </div>
+                        </>
+                    )}
 
                     <Separator className='my-4' />
 

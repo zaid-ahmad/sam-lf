@@ -293,7 +293,7 @@ function AppointmentRequestForm() {
                                                     <FormControl>
                                                         <Input
                                                             {...field}
-                                                            className='h-12 text-base'
+                                                            className='h-12 text-base capitalize'
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -317,7 +317,7 @@ function AppointmentRequestForm() {
                                                 <FormControl>
                                                     <Input
                                                         {...field}
-                                                        className='h-12 text-base'
+                                                        className='h-12 text-base capitalize'
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -526,23 +526,26 @@ function AppointmentRequestForm() {
                                         name='age'
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>
-                                                    Age
-                                                    <span className='text-red-600'>
-                                                        *
-                                                    </span>
-                                                </FormLabel>
+                                                <FormLabel>Age</FormLabel>
                                                 <FormControl>
                                                     <Select
                                                         onValueChange={
                                                             field.onChange
                                                         }
-                                                        value={field.value}
+                                                        value={
+                                                            field.value ||
+                                                            undefined
+                                                        }
                                                     >
                                                         <SelectTrigger className='w-full h-12 text-base'>
                                                             <SelectValue placeholder='Please Select' />
                                                         </SelectTrigger>
                                                         <SelectContent>
+                                                            <SelectItem
+                                                                value={null}
+                                                            >
+                                                                Please Select
+                                                            </SelectItem>
                                                             <SelectItem value='THIRTY_TO_FORTY'>
                                                                 30 - 40
                                                             </SelectItem>
@@ -576,21 +579,26 @@ function AppointmentRequestForm() {
                                             <FormItem>
                                                 <FormLabel>
                                                     Home Owner
-                                                    <span className='text-red-600'>
-                                                        *
-                                                    </span>
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Select
                                                         onValueChange={
                                                             field.onChange
                                                         }
-                                                        value={field.value}
+                                                        value={
+                                                            field.value ||
+                                                            undefined
+                                                        }
                                                     >
                                                         <SelectTrigger className='w-full h-12 text-base'>
                                                             <SelectValue placeholder='Please Select' />
                                                         </SelectTrigger>
                                                         <SelectContent>
+                                                            <SelectItem
+                                                                value={null}
+                                                            >
+                                                                Please Select
+                                                            </SelectItem>
                                                             <SelectItem value='MR_SHO'>
                                                                 Mr. SHO
                                                             </SelectItem>
