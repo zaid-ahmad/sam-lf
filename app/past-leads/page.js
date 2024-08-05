@@ -39,7 +39,7 @@ async function getAdminPastLeads(session, branch = null) {
             branch: branchCode,
         },
         orderBy: {
-            createdAt: "desc",
+            createdAt: "asc",
         },
         select: {
             id: true,
@@ -62,6 +62,7 @@ async function getAdminPastLeads(session, branch = null) {
             quadrant: true,
             appointmentDateTime: true,
             branch: true,
+            createdAt: true,
         },
     });
 
@@ -102,6 +103,9 @@ async function getCanvasserPastLeads(user_id) {
         where: {
             canvasserId: user_id,
         },
+        orderBy: {
+            createdAt: "asc",
+        },
         select: {
             id: true,
             firstName: true,
@@ -123,6 +127,7 @@ async function getCanvasserPastLeads(user_id) {
             quadrant: true,
             appointmentDateTime: true,
             branch: true,
+            createdAt: true,
         },
     });
 
@@ -143,6 +148,7 @@ async function getCanvasserPastLeads(user_id) {
         salesRep: lead.salesRep
             ? `${lead.salesRep.firstName} ${lead.salesRep.lastName}`.trim()
             : null,
+        customerName: `${lead.firstName} ${lead.lastName}`.trim(),
     }));
 
     return { data: transformedData };
@@ -196,6 +202,7 @@ const PastLeads = async () => {
             "DEAD",
             "REBOOK",
             "CANCELLED",
+            "INSTALL_CANCELLED",
         ];
         return (
             <div className='container'>
@@ -239,6 +246,7 @@ const PastLeads = async () => {
             "DEAD",
             "REBOOK",
             "CANCELLED",
+            "INSTALL_CANCELLED",
         ];
 
         return (
