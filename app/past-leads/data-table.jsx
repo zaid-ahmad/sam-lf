@@ -47,6 +47,10 @@ export function DataTable({
     isCanvasser = false,
 }) {
     const [sorting, setSorting] = useState([]);
+
+    const [columnVisibility, setColumnVisibility] = useState({
+        createdAt: false,
+    });
     const [columnFilters, setColumnFilters] = useState([]);
     const [pagination, setPagination] = useState({
         pageIndex: 0,
@@ -65,7 +69,7 @@ export function DataTable({
     const [branchFilter, setBranchFilter] = useState("all");
     const [dateFilter, setDateFilter] = useState("");
     const [timeFilter, setTimeFilter] = useState("all");
-    const [dateSortOrder, setDateSortOrder] = useState("none");
+    const [dateSortOrder, setDateSortOrder] = useState("oldToNew");
 
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -222,10 +226,12 @@ export function DataTable({
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
+        onColumnVisibilityChange: setColumnVisibility,
         onPaginationChange: setPagination,
         state: {
             sorting,
             columnFilters,
+            columnVisibility,
             pagination,
         },
         pageCount: Math.ceil(
@@ -434,7 +440,6 @@ export function DataTable({
                                 <SelectValue placeholder='Sort by Date' />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value='none'>No sorting</SelectItem>
                                 <SelectItem value='oldToNew'>
                                     Oldest to Newest
                                 </SelectItem>
