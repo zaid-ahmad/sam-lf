@@ -75,6 +75,8 @@ export default function LeadEditPage({ data, id, role }) {
     async function onSubmit(values) {
         try {
             setIsSubmitting(true);
+            console.log(data);
+            console.log(values);
             const cleanedValues = Object.fromEntries(
                 Object.entries(values).map(([key, value]) => [
                     key,
@@ -119,6 +121,7 @@ export default function LeadEditPage({ data, id, role }) {
                 <CardTitle className='text-3xl font-bold'>Edit Lead</CardTitle>
             </CardHeader>
             <CardContent>
+                {console.log(data)}
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
@@ -291,47 +294,47 @@ export default function LeadEditPage({ data, id, role }) {
                                 )}
                             />
 
-                            {role !== "CANVASSER" && (
-                                <div className='flex flex-col gap-2'>
-                                    <span className='text-sm font-medium bg-emerald-50 rounded-md px-2 py-3 text-zinc-900'>
-                                        {data.appointmentDateTime}
-                                    </span>
+                            <div
+                                className={`flex flex-col gap-2 ${
+                                    role === "CANVASSER" ? "hidden" : ""
+                                }`}
+                            >
+                                <span className='text-sm font-medium bg-emerald-50 rounded-md px-2 py-3 text-zinc-900'>
+                                    {data.appointmentDateTime}
+                                </span>
 
-                                    <FormField
-                                        control={form.control}
-                                        name='appointmentDateTime'
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Appointment Date & Time
-                                                    <span className='text-red-600'>
-                                                        *
-                                                    </span>
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <AppointmentScheduler
-                                                        onSchedule={(
+                                <FormField
+                                    control={form.control}
+                                    name='appointmentDateTime'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Appointment Date & Time
+                                                <span className='text-red-600'>
+                                                    *
+                                                </span>
+                                            </FormLabel>
+                                            <FormControl>
+                                                <AppointmentScheduler
+                                                    onSchedule={(
+                                                        formattedDateTime
+                                                    ) => {
+                                                        field.onChange(
                                                             formattedDateTime
-                                                        ) => {
-                                                            field.onChange(
-                                                                formattedDateTime
-                                                            );
-                                                            handleScheduleAppointment(
-                                                                formattedDateTime
-                                                            );
-                                                        }}
-                                                        setLeadDate={setDate}
-                                                        setTimeSlot={
-                                                            setTimeSlot
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                            )}
+                                                        );
+                                                        handleScheduleAppointment(
+                                                            formattedDateTime
+                                                        );
+                                                    }}
+                                                    setLeadDate={setDate}
+                                                    setTimeSlot={setTimeSlot}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
                             <FormField
                                 control={form.control}
