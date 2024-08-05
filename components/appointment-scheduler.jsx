@@ -142,7 +142,8 @@ export default function AppointmentScheduler({
                                                 : "hidden"
                                         }`}
                                     >
-                                        {formatTimeto12Hour(slot.timeSlot)}
+                                        {formatTimeto12Hour(slot.timeSlot)} -{" "}
+                                        {slot.remainingSlots}
                                     </Label>
                                 </div>
                             ))}
