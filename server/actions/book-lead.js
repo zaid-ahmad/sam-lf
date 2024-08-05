@@ -129,8 +129,14 @@ export async function addLeadToDatabase(formData, date, timeSlot) {
                 appointmentDateTime: validatedData.appointmentDateTime,
                 date: date,
                 timeslot: timeSlot,
-                homeOwnerType: validatedData.homeownerType,
-                age: validatedData.age,
+                homeOwnerType:
+                    validatedData.homeownerType === "PLEASE_SELECT"
+                        ? null
+                        : validatedData.homeownerType || null,
+                age:
+                    validatedData.age === "PLEASE_SELECT"
+                        ? null
+                        : validatedData.age || null,
                 concerns: validatedData.concerns,
                 surrounding: validatedData.surroundings,
                 serviceNeeded: validatedData.serviceNeeds,
@@ -165,14 +171,14 @@ export async function addLeadToDatabase(formData, date, timeSlot) {
             ...admin_emails.map((admin) => admin.email),
             ...superadmin_emails.map((superadmin) => superadmin.email),
         ];
-
+        /*
         if (user.branchCode === "3CGY") {
             sendMessage(
                 "+14039885931",
                 "There's a new appointment on SAM 2.0. Please assign it."
             );
         }
-
+ */
         const isEmailSent = await sendEmail(
             combined_email_list,
             validatedData.firstName + " " + validatedData.lastName,

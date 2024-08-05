@@ -50,8 +50,8 @@ model Lead {
   appointmentDateTime String
   date            DateTime?    
   timeslot        String?
-  homeOwnerType   HomeOwnerType
-  age             AgeRange
+  homeOwnerType   HomeOwnerType?
+  age             AgeRange?
   concerns        String[]
   surrounding     String[]
   serviceNeeded   TypesOfServices[]
