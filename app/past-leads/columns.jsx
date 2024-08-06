@@ -78,7 +78,7 @@ export const columns = [
     },
     {
         id: "actions",
-        cell: ({ row, onAssignSalesRep, onDeleteLead }) => {
+        cell: ({ row, isCanvasser, onAssignSalesRep, onDeleteLead }) => {
             const lead = row.original;
             return (
                 <DropdownMenu>
@@ -92,51 +92,60 @@ export const columns = [
                         <Link href={`/leads/${lead.id}`} target='_blank'>
                             <DropdownMenuItem>View details</DropdownMenuItem>
                         </Link>
-                        <Link href={`/leads/edit/${lead.id}`} target='_blank'>
-                            <DropdownMenuItem>Edit details</DropdownMenuItem>
-                        </Link>
-                        <DropdownMenuItem
-                            onSelect={(e) => {
-                                e.preventDefault();
-                                onAssignSalesRep(lead);
-                            }}
-                        >
-                            Assign sales rep.
-                        </DropdownMenuItem>
-
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <form
-                                action={async (formData) => {
-                                    await deleteLead(formData);
-                                    onDeleteLead(lead.id);
-                                }}
-                                className='group-hover:text-red-900 flex items-center justify-between w-full'
-                            >
-                                <input
-                                    type='hidden'
-                                    name='id'
-                                    value={lead.id}
-                                    readOnly
-                                />
-                                <input
-                                    type='hidden'
-                                    name='inPastLeads'
-                                    value={false}
-                                    readOnly
-                                />
-                                <button
-                                    type='submit'
-                                    className='w-full text-left flex items-center justify-between'
+                        {!isCanvasser ? (
+                            <>
+                                <Link
+                                    href={`/leads/edit/${lead.id}`}
+                                    target='_blank'
                                 >
-                                    Delete
-                                    <Trash
-                                        size={14}
-                                        className='group-hover:text-red-900'
-                                    />
-                                </button>
-                            </form>
-                        </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        Edit details
+                                    </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuItem
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        onAssignSalesRep(lead);
+                                    }}
+                                >
+                                    Assign sales rep.
+                                </DropdownMenuItem>
+
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <form
+                                        action={async (formData) => {
+                                            await deleteLead(formData);
+                                            onDeleteLead(lead.id);
+                                        }}
+                                        className='group-hover:text-red-900 flex items-center justify-between w-full'
+                                    >
+                                        <input
+                                            type='hidden'
+                                            name='id'
+                                            value={lead.id}
+                                            readOnly
+                                        />
+                                        <input
+                                            type='hidden'
+                                            name='inPastLeads'
+                                            value={false}
+                                            readOnly
+                                        />
+                                        <button
+                                            type='submit'
+                                            className='w-full text-left flex items-center justify-between'
+                                        >
+                                            Delete
+                                            <Trash
+                                                size={14}
+                                                className='group-hover:text-red-900'
+                                            />
+                                        </button>
+                                    </form>
+                                </DropdownMenuItem>
+                            </>
+                        ) : null}
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

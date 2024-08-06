@@ -211,6 +211,7 @@ export function DataTable({
                 cell: ({ row }) =>
                     col.cell({
                         row,
+                        isCanvasser: isCanvasser,
                         onAssignSalesRep: handleAssignSalesRep,
                         onDeleteLead: handleDeleteLead,
                     }),
@@ -427,7 +428,7 @@ export function DataTable({
                     </div>
                     <div className='flex-1 min-w-[180px] ml-auto'>
                         <Label htmlFor='dateSortOrder' className='mb-2 block'>
-                            Sort chronologically
+                            Sort by
                         </Label>
                         <Select
                             onValueChange={setDateSortOrder}
