@@ -73,26 +73,84 @@ async function getPendingInstallsData(session, branch = null) {
     };
 }
 
-const PendingInstalls = async () => {
+async function getPendingCommissionsCanvasserData(session) {
+    const user = await prisma.user.findUnique({
+        where: {
+            email: session?.user?.email,
+        },
+    });
+
+    const whereClause = {
+        status: "SALE",
+        funded: true,
+        canvasserId: user.id,
+        branch: user.branchCode,
+    };
+
+    const pendingInstallsData = await prisma.lead.findMany({
+        where: whereClause,
+        select: {
+            id: true,
+            jobNumber: true,
+            appointmentDateTime: true,
+            installationDate: true,
+            amount: true,
+            funded: true,
+            commissionPaid: true,
+            branch: true,
+            canvasser: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+        },
+    });
+
+    const transformedData = pendingInstallsData.map((lead) => ({
+        ...lead,
+        canvasser: lead.canvasser
+            ? `${lead.canvasser.firstName} ${lead.canvasser.lastName}`.trim()
+            : "N/A",
+    }));
+
+    return {
+        transformedData,
+    };
+}
+
+const PendingCommissions = async () => {
     const session = await auth();
     const role = session?.user?.role;
 
-    if (role !== "ADMIN" && role !== "SUPERADMIN") {
-        return redirect("/");
+    if (role === "ADMIN" || role === "SUPERADMIN") {
+        const { transformedData, canvasserNames, allBranches } =
+            await getPendingInstallsData(session);
+
+        return (
+            <PendingCommissionsTable
+                columns={columns}
+                initialData={transformedData}
+                canvasserNames={canvasserNames}
+                allBranches={allBranches}
+                role={role}
+            />
+        );
+    } else if (role === "CANVASSER") {
+        const { transformedData } = await getPendingCommissionsCanvasserData(
+            session
+        );
+
+        return (
+            <PendingCommissionsTable
+                columns={columns}
+                initialData={transformedData}
+                role={role}
+            />
+        );
     }
 
-    const { transformedData, canvasserNames, allBranches } =
-        await getPendingInstallsData(session);
-
-    return (
-        <PendingCommissionsTable
-            columns={columns}
-            initialData={transformedData}
-            canvasserNames={canvasserNames}
-            allBranches={allBranches}
-            isSuperAdmin={role === "SUPERADMIN"}
-        />
-    );
+    return redirect("/");
 };
 
-export default PendingInstalls;
+export default PendingCommissions;

@@ -44,7 +44,7 @@ export function PendingCommissionsTable({
     initialData,
     canvasserNames,
     allBranches,
-    isSuperAdmin,
+    role,
 }) {
     const [sorting, setSorting] = useState([]);
     const [data, setData] = useState(initialData);
@@ -137,23 +137,28 @@ export function PendingCommissionsTable({
             <h1 className='my-5 text-2xl font-bold'>Pending Commissions</h1>
 
             <div className='flex space-x-4 mb-4'>
-                <Select
-                    onValueChange={setCanvasserFilter}
-                    value={canvasserFilter}
-                >
-                    <SelectTrigger className='w-[200px]'>
-                        <SelectValue placeholder='Filter by Canvasser' />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value='all'>All Canvassers</SelectItem>
-                        {canvasserNames.map((name) => (
-                            <SelectItem key={name} value={name}>
-                                {name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                {isSuperAdmin && (
+                {role === "SUPERADMIN" ||
+                    (role === "ADMIN" && (
+                        <Select
+                            onValueChange={setCanvasserFilter}
+                            value={canvasserFilter}
+                        >
+                            <SelectTrigger className='w-[200px]'>
+                                <SelectValue placeholder='Filter by Canvasser' />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value='all'>
+                                    All Canvassers
+                                </SelectItem>
+                                {canvasserNames.map((name) => (
+                                    <SelectItem key={name} value={name}>
+                                        {name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    ))}
+                {role === "SUPERADMIN" && (
                     <Select
                         onValueChange={setBranchFilter}
                         value={branchFilter}
@@ -224,17 +229,19 @@ export function PendingCommissionsTable({
                                         </TableCell>
                                     ))}
                                     <TableCell>
-                                        {!row.original.commissionPaid && (
-                                            <Button
-                                                onClick={() =>
-                                                    handleMarkAsFunded(
-                                                        row.original.id
-                                                    )
-                                                }
-                                            >
-                                                Mark as Paid
-                                            </Button>
-                                        )}
+                                        {(role === "ADMIN" ||
+                                            role === "SUPERADMIN") &&
+                                            !row.original.commissionPaid && (
+                                                <Button
+                                                    onClick={() =>
+                                                        handleMarkAsFunded(
+                                                            row.original.id
+                                                        )
+                                                    }
+                                                >
+                                                    Mark as Paid
+                                                </Button>
+                                            )}
                                     </TableCell>
                                 </TableRow>
                             ))
