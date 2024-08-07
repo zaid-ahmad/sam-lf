@@ -5,35 +5,51 @@ import { PendingInstallsTable } from "./pending-installs-table";
 import { columns } from "./columns";
 
 async function getPendingInstallsData(session, branch = null) {
-    const user = await prisma.user.findUnique({
-        where: {
-            email: session?.user?.email,
-        },
-    });
+    const [user, allBranches] = await Promise.all([
+        prisma.user.findUnique({
+            where: { email: session?.user?.email },
+            select: { branchCode: true },
+        }),
+        prisma.branch.findMany({
+            select: { code: true, name: true },
+        }),
+    ]);
 
-    const whereClause = {
-        status: "SALE",
-        branch: branch || user.branchCode,
-    };
+    const branchCode = branch || user.branchCode;
 
-    const pendingInstallsData = await prisma.lead.findMany({
-        where: whereClause,
-        select: {
-            id: true,
-            jobNumber: true,
-            appointmentDateTime: true,
-            installationDate: true,
-            amount: true,
-            funded: true,
-            branch: true,
-            canvasser: {
-                select: {
-                    firstName: true,
-                    lastName: true,
+    const [pendingInstallsData, canvassers] = await Promise.all([
+        prisma.lead.findMany({
+            where: {
+                status: "SALE",
+                branch: branchCode,
+            },
+            select: {
+                id: true,
+                jobNumber: true,
+                appointmentDateTime: true,
+                installationDate: true,
+                amount: true,
+                funded: true,
+                branch: true,
+                canvasser: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    },
                 },
             },
-        },
-    });
+        }),
+        prisma.user.findMany({
+            where: {
+                role: "CANVASSER",
+                branchCode: branchCode,
+            },
+            select: {
+                firstName: true,
+                lastName: true,
+            },
+        }),
+    ]);
 
     const transformedData = pendingInstallsData.map((lead) => ({
         ...lead,
@@ -42,27 +58,9 @@ async function getPendingInstallsData(session, branch = null) {
             : "N/A",
     }));
 
-    const canvassers = await prisma.user.findMany({
-        where: {
-            role: "CANVASSER",
-            branchCode: branch || user.branchCode,
-        },
-        select: {
-            firstName: true,
-            lastName: true,
-        },
-    });
-
     const canvasserNames = canvassers.map((c) =>
         `${c.firstName} ${c.lastName}`.trim()
     );
-
-    const allBranches = await prisma.branch.findMany({
-        select: {
-            code: true,
-            name: true,
-        },
-    });
 
     return {
         transformedData,
