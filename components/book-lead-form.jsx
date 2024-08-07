@@ -215,7 +215,7 @@ function AppointmentRequestForm() {
                         });
                         uploadedImageUrls.push(url.split("?")[0]);
                         setUploadProgress(
-                            ((i + 1) / imagesToUpload.length) * 100
+                            ((i + 1) / uploadedImageUrls.length) * 100
                         );
                     } catch (error) {
                         console.error("Error uploading image:", error);
@@ -257,10 +257,10 @@ function AppointmentRequestForm() {
     return (
         <Card className='w-full max-w-4xl mx-auto mt-4 sm:mt-7 p-4 sm:p-6 md:p-8'>
             <CardHeader>
-                <CardTitle className='text-3xl font-bold'>
+                <CardTitle className='text-2xl sm:text-3xl font-bold'>
                     Appointment Request Form
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className='text-sm sm:text-base'>
                     Fill out the form below to schedule an appointment.
                     Remember, the more details the better.
                 </CardDescription>
@@ -274,8 +274,8 @@ function AppointmentRequestForm() {
                         className='space-y-6 sm:space-y-8'
                     >
                         <div className='grid grid-cols-1 gap-6'>
-                            <div className='flex flex-col gap-20'>
-                                <div className='grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-6'>
+                            <div className='space-y-6'>
+                                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
                                     {/* First Name */}
 
                                     <div className='col-span-2'>
@@ -284,7 +284,7 @@ function AppointmentRequestForm() {
                                             name='firstName'
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>
+                                                    <FormLabel className='text-sm sm:text-base'>
                                                         First Name{""}
                                                         <span className='text-red-600'>
                                                             *
@@ -293,7 +293,7 @@ function AppointmentRequestForm() {
                                                     <FormControl>
                                                         <Input
                                                             {...field}
-                                                            className='h-12 text-base capitalize'
+                                                            className='h-10 sm:h-12 text-sm sm:text-base capitalize'
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -308,7 +308,7 @@ function AppointmentRequestForm() {
                                         name='lastName'
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>
+                                                <FormLabel className='text-sm sm:text-base'>
                                                     Last Name{""}
                                                     <span className='text-red-600'>
                                                         *
@@ -317,7 +317,7 @@ function AppointmentRequestForm() {
                                                 <FormControl>
                                                     <Input
                                                         {...field}
-                                                        className='h-12 text-base capitalize'
+                                                        className='h-10 sm:h-12 text-sm sm:text-base capitalize'
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -332,7 +332,7 @@ function AppointmentRequestForm() {
                                             name='primaryPhone'
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>
+                                                    <FormLabel className='text-sm sm:text-base'>
                                                         Primary Phone{""}
                                                         <span className='text-red-600'>
                                                             *
@@ -346,7 +346,7 @@ function AppointmentRequestForm() {
                                                             onChange={
                                                                 handlePhone1Change
                                                             }
-                                                            className='h-12 text-base'
+                                                            className='h-10 sm:h-12 text-sm sm:text-base'
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -361,7 +361,7 @@ function AppointmentRequestForm() {
                                         name='secondaryPhone'
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>
+                                                <FormLabel className='text-sm sm:text-base'>
                                                     Secondary Phone
                                                 </FormLabel>
                                                 <FormControl>
@@ -372,7 +372,7 @@ function AppointmentRequestForm() {
                                                         onChange={
                                                             handlePhone2Change
                                                         }
-                                                        className='h-12 text-base'
+                                                        className='h-10 sm:h-12 text-sm sm:text-base'
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -387,7 +387,7 @@ function AppointmentRequestForm() {
                                             name='email'
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>
+                                                    <FormLabel className='text-sm sm:text-base'>
                                                         Email Address
                                                     </FormLabel>
                                                     <FormControl>
@@ -395,7 +395,7 @@ function AppointmentRequestForm() {
                                                             type='email'
                                                             placeholder='example@example.com'
                                                             {...field}
-                                                            className='h-12 text-base'
+                                                            className='h-10 sm:h-12 text-sm sm:text-base'
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -413,7 +413,7 @@ function AppointmentRequestForm() {
                                     name='address'
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>
+                                            <FormLabel className='text-sm sm:text-base'>
                                                 Address{""}
                                                 <span className='text-red-600'>
                                                     *
@@ -447,13 +447,15 @@ function AppointmentRequestForm() {
                                     name='postalCode'
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Postal Code</FormLabel>
+                                            <FormLabel className='text-sm sm:text-base'>
+                                                Postal Code
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
                                                     readOnly
                                                     disabled
-                                                    className='h-12 text-base'
+                                                    className='h-10 sm:h-12 text-sm sm:text-base'
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -467,13 +469,13 @@ function AppointmentRequestForm() {
                                     name='addressNotes'
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>
+                                            <FormLabel className='text-sm sm:text-base'>
                                                 Extra Address Notes
                                             </FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     {...field}
-                                                    className='h-12 text-base'
+                                                    className='h-10 sm:h-12 text-sm sm:text-base'
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -491,7 +493,7 @@ function AppointmentRequestForm() {
                                         name='appointmentDateTime'
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>
+                                                <FormLabel className='text-sm sm:text-base'>
                                                     Appointment Date & Time
                                                     <span className='text-red-600'>
                                                         *
@@ -526,7 +528,9 @@ function AppointmentRequestForm() {
                                         name='age'
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Age</FormLabel>
+                                                <FormLabel className='text-sm sm:text-base'>
+                                                    Age
+                                                </FormLabel>
                                                 <FormControl>
                                                     <Select
                                                         onValueChange={
@@ -577,7 +581,7 @@ function AppointmentRequestForm() {
                                         name='homeownerType'
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>
+                                                <FormLabel className='text-sm sm:text-base'>
                                                     Home Owner
                                                 </FormLabel>
                                                 <FormControl>
@@ -626,7 +630,7 @@ function AppointmentRequestForm() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <div className='mb-4'>
-                                                    <FormLabel className='text-base'>
+                                                    <FormLabel className='text-sm sm:text-base'>
                                                         Quadrant{" "}
                                                         <span className='text-red-600'>
                                                             *
@@ -672,7 +676,7 @@ function AppointmentRequestForm() {
                                 render={() => (
                                     <FormItem>
                                         <div className='mb-4'>
-                                            <FormLabel className='text-base'>
+                                            <FormLabel className='text-sm sm:text-base'>
                                                 Concerns{" "}
                                                 <span className='text-red-600'>
                                                     *
@@ -766,7 +770,7 @@ function AppointmentRequestForm() {
                                 render={() => (
                                     <FormItem>
                                         <div className='mb-4'>
-                                            <FormLabel className='text-base'>
+                                            <FormLabel className='text-sm sm:text-base'>
                                                 Surrounding Awareness
                                                 {""}
                                                 <span className='text-red-600'>
@@ -832,7 +836,7 @@ function AppointmentRequestForm() {
                                 render={() => (
                                     <FormItem>
                                         <div className='mb-4'>
-                                            <FormLabel className='text-base'>
+                                            <FormLabel className='text-sm sm:text-base'>
                                                 Services Needed
                                                 {""}
                                                 <span className='text-red-600'>
@@ -900,7 +904,7 @@ function AppointmentRequestForm() {
                                 name='images'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>
+                                        <FormLabel className='text-sm sm:text-base'>
                                             Upload Images (max. 4)
                                         </FormLabel>
                                         <FormControl>
@@ -918,9 +922,13 @@ function AppointmentRequestForm() {
                                                     ].slice(0, 4);
                                                     field.onChange(newFiles);
                                                 }}
+                                                className='text-sm sm:text-base'
                                             />
                                         </FormControl>
-                                        <Progress value={uploadProgress} />
+                                        <Progress
+                                            value={uploadProgress}
+                                            className='h-2 sm:h-3'
+                                        />
                                         <FormMessage />
                                     </FormItem>
                                 )}

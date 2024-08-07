@@ -21,9 +21,9 @@ const BookLeadPage = async () => {
         },
     });
     return (
-        <div className='container'>
-            <div className='py-6'>
-                <Breadcrumb>
+        <div className='container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl'>
+            <div className='py-4 sm:py-6 lg:py-8'>
+                <Breadcrumb className='text-sm sm:text-base'>
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbLink href='/dashboard'>
@@ -32,9 +32,7 @@ const BookLeadPage = async () => {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                            <BreadcrumbPage>
-                                Appointment Request Form
-                            </BreadcrumbPage>
+                            <BreadcrumbPage>Appointment Request</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
