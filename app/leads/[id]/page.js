@@ -260,6 +260,7 @@ export default async function LeadDetailsPage({ params }) {
                                 {lead.status}
                             </Badge>
                         </div>
+
                         {lead.amount && (
                             <div>
                                 <h3 className='font-semibold'>Amount</h3>
@@ -378,8 +379,10 @@ export default async function LeadDetailsPage({ params }) {
                         <>
                             <Separator className='my-4' />
                             <div>
-                                <h3 className='font-semibold'>Address Notes</h3>
-                                <p>{lead.addressNotes}</p>
+                                <h3 className='font-semibold'>Extra Notes</h3>
+                                <p className='whitespace-pre-wrap pt-3'>
+                                    {lead.addressNotes}
+                                </p>
                             </div>
                         </>
                     )}
