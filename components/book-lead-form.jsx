@@ -470,7 +470,7 @@ function AppointmentRequestForm() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className='text-sm sm:text-base'>
-                                                Extra Address Notes
+                                                Extra Notes
                                             </FormLabel>
                                             <FormControl>
                                                 <Textarea
