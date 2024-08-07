@@ -33,6 +33,8 @@ import { Badge } from "@/components/ui/badge";
 import { colorMap } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ChangeLeadStatusDialog } from "@/components/change-lead-status-dialog";
+import { changeLeadStatus } from "@/server/actions/change-lead-status";
 
 export function DataTable({
     initialColumns,
@@ -59,7 +61,8 @@ export function DataTable({
 
     const [data, setData] = useState(initialData);
 
-    const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+    const [isChangeLeadStatusDialogOpen, setIsChangeLeadStatusDialogOpen] =
+        useState(false);
     const [selectedLeadId, setSelectedLeadId] = useState(null);
     const [leadDetails, setLeadDetails] = useState(null);
 
@@ -171,37 +174,36 @@ export function DataTable({
         startDate,
         endDate,
     ]);
-    const handleAssignSalesRep = (lead) => {
-        setSelectedLeadId(lead.id);
-        setLeadDetails(lead);
-        setIsAssignDialogOpen(true);
-    };
-
-    const handleAssignComplete = async (leadId, salesRepId) => {
-        try {
-            const updatedLead = await assignLeadToSalesRep(leadId, salesRepId);
-            setData(
-                data.map((lead) =>
-                    lead.id === leadId
-                        ? {
-                              ...lead,
-                              salesRep: `${updatedLead.salesRep.firstName} ${updatedLead.salesRep.lastName}`,
-                              status: updatedLead.status,
-                          }
-                        : lead
-                )
-            );
-            setIsAssignDialogOpen(false);
-            setSelectedLeadId(null);
-            setLeadDetails(null);
-        } catch (error) {
-            console.error("Error assigning lead:", error);
-            // Handle error (e.g., show an error message to the user)
-        }
-    };
 
     const handleDeleteLead = (id) => {
         setData(data.filter((lead) => lead.id !== id));
+    };
+
+    const handleLeadStatusChange = async (leadId, action, formData) => {
+        const updatedData = await changeLeadStatus(leadId, action, formData);
+        setData(
+            data.map((lead) =>
+                lead.id === leadId
+                    ? {
+                          ...lead,
+                          salesRep:
+                              updatedData.salesRep.firstName +
+                              " " +
+                              updatedData.salesRep.lastName,
+
+                          status: updatedData.status,
+                      }
+                    : lead
+            )
+        );
+        setSelectedLeadId(null);
+        setLeadDetails(null);
+    };
+
+    const handleColumnStatusChange = (lead) => {
+        setSelectedLeadId(lead.id);
+        setLeadDetails(lead);
+        setIsChangeLeadStatusDialogOpen(true);
     };
 
     const columns = initialColumns.map((col) => {
@@ -212,7 +214,7 @@ export function DataTable({
                     col.cell({
                         row,
                         isCanvasser: isCanvasser,
-                        onAssignSalesRep: handleAssignSalesRep,
+                        onStatusChange: handleColumnStatusChange,
                         onDeleteLead: handleDeleteLead,
                     }),
             };
@@ -503,12 +505,11 @@ export function DataTable({
                     </TableBody>
                 </Table>
                 {!isCanvasser && (
-                    <AssignSalesRepDialog
-                        isOpen={isAssignDialogOpen}
-                        onClose={() => setIsAssignDialogOpen(false)}
+                    <ChangeLeadStatusDialog
+                        isOpen={isChangeLeadStatusDialogOpen}
+                        onClose={() => setIsChangeLeadStatusDialogOpen(false)}
                         leadId={selectedLeadId}
-                        onAssign={handleAssignComplete}
-                        saleReps={saleReps}
+                        onStatusChange={handleLeadStatusChange}
                         leadDetails={leadDetails}
                     />
                 )}

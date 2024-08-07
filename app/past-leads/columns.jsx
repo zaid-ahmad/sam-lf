@@ -78,7 +78,7 @@ export const columns = [
     },
     {
         id: "actions",
-        cell: ({ row, isCanvasser, onAssignSalesRep, onDeleteLead }) => {
+        cell: ({ row, isCanvasser, onStatusChange, onDeleteLead }) => {
             const lead = row.original;
             return (
                 <DropdownMenu>
@@ -105,10 +105,10 @@ export const columns = [
                                 <DropdownMenuItem
                                     onSelect={(e) => {
                                         e.preventDefault();
-                                        onAssignSalesRep(lead);
+                                        onStatusChange(lead);
                                     }}
                                 >
-                                    Assign sales rep.
+                                    Change lead status
                                 </DropdownMenuItem>
 
                                 <DropdownMenuSeparator />
