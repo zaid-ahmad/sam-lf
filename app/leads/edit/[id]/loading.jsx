@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
     Breadcrumb,
