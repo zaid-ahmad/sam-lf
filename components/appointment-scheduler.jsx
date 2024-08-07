@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import { useEffect, useState } from "react";
 import { getAvailableSlots } from "@/server/actions/slotActions";
+import Spinner from "./spinner";
 
 export default function AppointmentScheduler({
     onSchedule,
@@ -24,6 +25,7 @@ export default function AppointmentScheduler({
 }) {
     const [date, setDate] = useState();
     const [selectedTime, setSelectedTime] = useState();
+    const [loading, setLoading] = useState(true);
     const [availableSlots, setAvailableSlots] = useState([]);
 
     useEffect(() => {
@@ -61,6 +63,7 @@ export default function AppointmentScheduler({
     const fetchAvailableSlots = async (branch, selectedDate) => {
         const slots = await getAvailableSlots(branch, selectedDate);
         setAvailableSlots(slots);
+        setLoading(false);
     };
 
     return (
@@ -124,31 +127,44 @@ export default function AppointmentScheduler({
                             onValueChange={setSelectedTime}
                             className='grid grid-cols-2 sm:grid-cols-1 gap-2 p-3 border-t sm:border-t-0 sm:border-l'
                         >
-                            {availableSlots.map((slot) => (
-                                <div key={slot.timeSlot}>
-                                    <RadioGroupItem
-                                        value={slot.timeSlot}
-                                        id={slot.timeSlot}
-                                        className='peer sr-only'
-                                        disabled={!slot.isAvailable}
-                                    />
-                                    <Label
-                                        htmlFor={slot.timeSlot}
-                                        className={`flex items-center justify-center px-4 py-3 text-base font-normal text-center border rounded-lg cursor-pointer ${
-                                            selectedTime === slot.timeSlot
-                                                ? "bg-primary text-white"
-                                                : slot.isAvailable
-                                                ? "bg-white text-gray-500 border-gray-200 hover:text-gray-900 hover:bg-gray-50"
-                                                : "hidden"
-                                        }`}
-                                    >
-                                        {formatTimeto12Hour(slot.timeSlot)} -{" "}
-                                        {slot.remainingSlots}
-                                    </Label>
-                                </div>
-                            ))}
+                            {availableSlots.map((slot) => {
+                                if (slot.remainingSlots > 0) {
+                                    return (
+                                        <div key={slot.timeSlot}>
+                                            <RadioGroupItem
+                                                value={slot.timeSlot}
+                                                id={slot.timeSlot}
+                                                className='peer sr-only'
+                                                disabled={!slot.isAvailable}
+                                            />
+                                            <Label
+                                                htmlFor={slot.timeSlot}
+                                                className={`flex flex-col items-center justify-center gap-2 px-4 py-3 text-base font-normal text-center border rounded-lg cursor-pointer ${
+                                                    selectedTime ===
+                                                    slot.timeSlot
+                                                        ? "bg-primary text-white"
+                                                        : slot.isAvailable
+                                                        ? "bg-white text-gray-500 border-gray-200 hover:text-gray-900 hover:bg-gray-50"
+                                                        : "hidden"
+                                                }`}
+                                            >
+                                                {formatTimeto12Hour(
+                                                    slot.timeSlot
+                                                )}
+                                                <span className='text-xs font-medium bg-zinc-200 border shadow-sm text-zinc-900 px-3 py-1 rounded-full ml-2'>
+                                                    <span className='font-semibold'>
+                                                        {slot.remainingSlots}
+                                                    </span>{" "}
+                                                    slots left
+                                                </span>
+                                            </Label>
+                                        </div>
+                                    );
+                                }
+                            })}
                         </RadioGroup>
                     )}
+                    {date && loading && <Spinner />}
                 </div>
             </PopoverContent>
         </Popover>
