@@ -39,8 +39,6 @@ import { changeLeadStatus } from "@/server/actions/change-lead-status";
 export function DataTable({
     initialColumns,
     initialData,
-    saleReps,
-    assignLeadToSalesRep,
     statusOptions,
     canvasserOptions,
     salesPersonOptions,

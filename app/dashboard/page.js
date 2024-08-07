@@ -68,7 +68,11 @@ const Dashboard = async () => {
             leadsPerTimeSlot,
         };
 
-        return <AdminDashboardClient initialData={initialData} />;
+        return (
+            <>
+                <AdminDashboardClient initialData={initialData} />
+            </>
+        );
     } else if (role === "CANVASSER") {
         const branch = await getUserBranch(session?.user?.id);
         const todaysDate = displayTodaysDate(branch);
