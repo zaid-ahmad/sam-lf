@@ -155,7 +155,10 @@ export default function AppointmentScheduler({
                                                     <span className='font-semibold'>
                                                         {slot.remainingSlots}
                                                     </span>{" "}
-                                                    slots left
+                                                    {slot.remainingSlots === 1
+                                                        ? "slot"
+                                                        : "slots"}{" "}
+                                                    left
                                                 </span>
                                             </Label>
                                         </div>
