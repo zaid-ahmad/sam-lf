@@ -31,6 +31,18 @@ export async function getSlots(branchCode) {
             });
         }
 
+        slots.sort((a, b) => {
+            const timeA = a.timeSlot.split(":").map(Number);
+            const timeB = b.timeSlot.split(":").map(Number);
+
+            // Compare hours first
+            if (timeA[0] !== timeB[0]) {
+                return timeA[0] - timeB[0];
+            }
+            // If hours are the same, compare minutes
+            return timeA[1] - timeB[1];
+        });
+
         return {
             success: true,
             data: slots,
@@ -186,8 +198,23 @@ export async function getAvailableSlots(branchCode, date) {
 
     const availabilities = await Promise.all(availabilityPromises);
 
-    return slotTemplates.map((template, index) => ({
+    const availableSlots = slotTemplates.map((template, index) => ({
         ...template,
         ...availabilities[index],
     }));
+
+    // Sort the available slots by timeSlot
+    availableSlots.sort((a, b) => {
+        const timeA = a.timeSlot.split(":").map(Number);
+        const timeB = b.timeSlot.split(":").map(Number);
+
+        // Compare hours first
+        if (timeA[0] !== timeB[0]) {
+            return timeA[0] - timeB[0];
+        }
+        // If hours are the same, compare minutes
+        return timeA[1] - timeB[1];
+    });
+
+    return availableSlots;
 }

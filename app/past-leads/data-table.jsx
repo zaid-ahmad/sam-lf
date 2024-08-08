@@ -67,7 +67,7 @@ export function DataTable({
     const [statusFilter, setStatusFilter] = useState("all");
     const [canvasserFilter, setCanvasserFilter] = useState("all");
     const [salesRepFilter, setSalesRepFilter] = useState("all");
-    const [branchFilter, setBranchFilter] = useState("all");
+    const [branchFilter, setBranchFilter] = useState(isSuperAdmin ? "all" : "");
     const [dateFilter, setDateFilter] = useState("");
     const [timeFilter, setTimeFilter] = useState("all");
     const [dateSortOrder, setDateSortOrder] = useState("oldToNew");

@@ -1,7 +1,6 @@
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { auth } from "@/auth";
-import { getBranches, getSalesRepresentatives } from "@/lib/data";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -10,12 +9,15 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getAllCanvasserNames, getPastLeads } from "@/lib/data-fetching";
+import {
+    getAllCanvasserNames,
+    getPastLeadsForAllBranches,
+    getPastLeads,
+} from "@/lib/data-fetching";
+import { getBranches, getSalesRepresentatives } from "@/lib/data";
 
 const PastLeads = async () => {
     const session = await auth();
-    const { data, branch } = await getPastLeads(session);
-
     const statusOptions = [
         "APPOINTMENT",
         "ASSIGNED",
@@ -27,16 +29,28 @@ const PastLeads = async () => {
         "INSTALL_CANCELLED",
     ];
 
-    let allBranches, listOfCanvassers, listOfSalesPeople;
+    let data, allBranches, listOfCanvassers, listOfSalesPeople;
 
-    if (session.user.role === "ADMIN" || session.user.role === "SUPERADMIN") {
-        [allBranches, listOfCanvassers, listOfSalesPeople] = await Promise.all([
-            session.user.role === "SUPERADMIN" ? getBranches() : null,
-            getAllCanvasserNames(branch),
-            getSalesRepresentatives(branch).then((reps) =>
+    if (session.user.role === "SUPERADMIN") {
+        allBranches = await getBranches();
+        data = await getPastLeadsForAllBranches();
+        [listOfCanvassers, listOfSalesPeople] = await Promise.all([
+            getAllCanvasserNames(),
+            getSalesRepresentatives().then((reps) =>
                 reps.map((s) => `${s.firstName} ${s.lastName}`.trim())
             ),
         ]);
+    } else {
+        const { data: branchData, branch } = await getPastLeads(session);
+        data = branchData;
+        if (session.user.role === "ADMIN") {
+            [listOfCanvassers, listOfSalesPeople] = await Promise.all([
+                getAllCanvasserNames(branch),
+                getSalesRepresentatives(branch).then((reps) =>
+                    reps.map((s) => `${s.firstName} ${s.lastName}`.trim())
+                ),
+            ]);
+        }
     }
 
     return (
@@ -64,7 +78,6 @@ const PastLeads = async () => {
                 allBranches={allBranches}
                 isSuperAdmin={session.user.role === "SUPERADMIN"}
                 isCanvasser={session.user.role === "CANVASSER"}
-                currentBranch={branch}
             />
         </div>
     );
